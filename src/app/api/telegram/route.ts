@@ -39,6 +39,7 @@ export async function POST(req: Request) {
             kategori: data.kategori,
             nominal: data.nominal,
             tipe: data.tipe,
+            dompet: data.dompet || 'Tunai',
             deskripsi: data.deskripsi,
           }
         ]);

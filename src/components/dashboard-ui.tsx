@@ -21,7 +21,14 @@ type Transaction = {
   deskripsi: string;
 };
 
-export default function DashboardUI({ data }: { data: Transaction[] }) {
+type Wallet = {
+  id: number;
+  nama: string;
+  tipe: string;
+  saldo_awal: number;
+};
+
+export default function DashboardUI({ data, budget, wallets }: { data: Transaction[], budget: number, wallets: Wallet[] }) {
   const { setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -32,9 +39,10 @@ export default function DashboardUI({ data }: { data: Transaction[] }) {
 
   const totalPemasukan = data.filter((t) => t.tipe === "Pemasukan").reduce((acc, curr) => acc + Number(curr.nominal), 0);
   const totalPengeluaran = data.filter((t) => t.tipe === "Pengeluaran").reduce((acc, curr) => acc + Number(curr.nominal), 0);
-  const saldo = totalPemasukan - totalPengeluaran;
+  const totalSaldoAwal = wallets.reduce((acc, curr) => acc + Number(curr.saldo_awal), 0);
+  const saldo = totalSaldoAwal + totalPemasukan - totalPengeluaran;
   
-  const budgetBulanan = 10500000;
+  const budgetBulanan = budget;
   const sisaAnggaran = budgetBulanan - totalPengeluaran;
   const persentaseAnggaran = Math.min(Math.round((totalPengeluaran / budgetBulanan) * 100), 100);
 
@@ -413,34 +421,33 @@ export default function DashboardUI({ data }: { data: Transaction[] }) {
                   <button className="text-slate-400 hover:text-white p-1"><Plus className="w-5 h-5" /></button>
                 </div>
                 <div className="space-y-5">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="font-bold text-white mb-0.5">BCA Payroll</p>
-                      <p className="text-xs text-slate-500">Rekening Utama</p>
-                    </div>
-                    <p className="font-bold text-white">Rp 16.420.000</p>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="font-bold text-white mb-0.5">GoPay & OVO</p>
-                      <p className="text-xs text-slate-500">Dompet Digital</p>
-                    </div>
-                    <p className="font-bold text-white">Rp 1.830.000</p>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="font-bold text-white mb-0.5">Bibit Investasi</p>
-                      <p className="text-xs text-slate-500">Reksa Dana Pasar Uang</p>
-                    </div>
-                    <p className="font-bold text-white">Rp 6.000.000</p>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="font-bold text-white mb-0.5">Tunai Dompet</p>
-                      <p className="text-xs text-slate-500">Uang Fisik</p>
-                    </div>
-                    <p className="font-bold text-white">Rp 600.000</p>
-                  </div>
+                  {wallets.slice(0, 4).map((wallet, idx) => {
+                    const iconColors = [
+                      "bg-blue-500/20 text-blue-400",
+                      "bg-cyan-500/20 text-cyan-400",
+                      "bg-purple-500/20 text-purple-400",
+                      "bg-slate-700/50 text-slate-400"
+                    ];
+                    const Icons = [Wallet, Wallet, TrendingUp, Wallet];
+                    const CurIcon = Icons[idx % Icons.length];
+                    
+                    // Kalkulasi saldo dinamis dari transaksi
+                    // Pemasukan ke dompet ini
+                    const inWallet = data.filter(t => t.tipe === "Pemasukan" && (t as any).dompet?.toLowerCase() === wallet.nama.toLowerCase()).reduce((a, b) => a + Number(b.nominal), 0);
+                    // Pengeluaran dari dompet ini
+                    const outWallet = data.filter(t => t.tipe === "Pengeluaran" && (t as any).dompet?.toLowerCase() === wallet.nama.toLowerCase()).reduce((a, b) => a + Number(b.nominal), 0);
+                    const saldoTerakhir = wallet.saldo_awal + inWallet - outWallet;
+
+                    return (
+                      <div key={wallet.id} className="flex justify-between items-center">
+                        <div>
+                          <p className="font-bold text-white mb-0.5">{wallet.nama}</p>
+                          <p className="text-xs text-slate-500">{wallet.tipe}</p>
+                        </div>
+                        <p className="font-bold text-white">{formatRupiah(saldoTerakhir)}</p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 

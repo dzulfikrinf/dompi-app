@@ -32,6 +32,7 @@ export async function processChat(text: string, recentTransactions: any[]) {
         "kategori": "string (Contoh: Makanan, Transportasi, Hiburan, dll)",
         "nominal": number (hanya angka bulat positif),
         "tipe": "Pengeluaran" | "Pemasukan",
+        "dompet": "string (Contoh: BCA, GoPay, Tunai, OVO. Default: Tunai)",
         "deskripsi": "string"
       },
       "reply": "string (Balasan chat natural dari kamu ke masjul. Pakai bahasa Indonesia santai, sapa masjul, jelaskan apa yang barusan dikerjakan, atau balas ngobrolnya)"
