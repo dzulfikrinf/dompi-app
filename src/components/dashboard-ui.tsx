@@ -22,12 +22,10 @@ export default function DashboardUI({ data }: { data: Transaction[] }) {
     setMounted(true);
   }, []);
 
-  // Hitung ringkasan
   const totalPemasukan = data.filter((t) => t.tipe === "Pemasukan").reduce((acc, curr) => acc + Number(curr.nominal), 0);
   const totalPengeluaran = data.filter((t) => t.tipe === "Pengeluaran").reduce((acc, curr) => acc + Number(curr.nominal), 0);
   const saldo = totalPemasukan - totalPengeluaran;
 
-  // Siapkan data untuk Donut Chart (hanya pengeluaran berdasarkan kategori)
   const expenseByCategory = data
     .filter((t) => t.tipe === "Pengeluaran")
     .reduce((acc, curr) => {
@@ -58,11 +56,10 @@ export default function DashboardUI({ data }: { data: Transaction[] }) {
     }).format(new Date(dateString));
   };
 
-  if (!mounted) return null; // Mencegah hydration mismatch untuk Next-Themes
+  if (!mounted) return null;
 
   return (
     <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
-      {/* Header */}
       <header className="flex justify-between items-center py-4 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <Wallet className="w-8 h-8 text-blue-600 dark:text-blue-400" />
@@ -77,7 +74,6 @@ export default function DashboardUI({ data }: { data: Transaction[] }) {
         </button>
       </header>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-2">
           <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
@@ -105,7 +101,6 @@ export default function DashboardUI({ data }: { data: Transaction[] }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Chart Section */}
         <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
           <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
             <PieChartIcon className="w-5 h-5 text-slate-400" />
@@ -125,11 +120,11 @@ export default function DashboardUI({ data }: { data: Transaction[] }) {
                     dataKey="value"
                   >
                     {chartData.map((entry, index) => (
-                      <Cell key={\`cell-\${index}\`} fill={COLORS[index % COLORS.length]} />
+                      <Cell key={"cell-" + index} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip 
-                    formatter={(value: number) => formatRupiah(value)}
+                    formatter={(value: any) => formatRupiah(Number(value))}
                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   />
                   <Legend />
@@ -143,7 +138,6 @@ export default function DashboardUI({ data }: { data: Transaction[] }) {
           )}
         </div>
 
-        {/* Recent Transactions List */}
         <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Receipt className="w-5 h-5 text-slate-400" />
@@ -154,7 +148,7 @@ export default function DashboardUI({ data }: { data: Transaction[] }) {
               data.map((trx) => (
                 <div key={trx.id} className="flex justify-between items-center p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
                   <div className="flex items-center gap-3">
-                    <div className={\`p-2 rounded-full \${trx.tipe === "Pemasukan" ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" : "bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400"}\`}>
+                    <div className={trx.tipe === "Pemasukan" ? "p-2 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" : "p-2 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400"}>
                       <ArrowDownUp className="w-4 h-4" />
                     </div>
                     <div>
@@ -166,7 +160,7 @@ export default function DashboardUI({ data }: { data: Transaction[] }) {
                       </div>
                     </div>
                   </div>
-                  <div className={\`font-semibold \${trx.tipe === "Pemasukan" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}\`}>
+                  <div className={trx.tipe === "Pemasukan" ? "font-semibold text-emerald-600 dark:text-emerald-400" : "font-semibold text-rose-600 dark:text-rose-400"}>
                     {trx.tipe === "Pemasukan" ? "+" : "-"}{formatRupiah(trx.nominal)}
                   </div>
                 </div>
