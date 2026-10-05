@@ -4,7 +4,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function parseTransaction(text: string) {
   // Menggunakan model Gemini 1.5 Flash yang sangat cepat
-  const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash-lite' });
   
   const prompt = `
     Kamu adalah asisten pencatat keuangan pribadi yang pintar. 
