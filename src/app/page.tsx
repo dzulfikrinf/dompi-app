@@ -1,13 +1,24 @@
-import { supabase } from "@/lib/supabase";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import DashboardUI from "@/components/dashboard-ui";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
   const { data: transactions, error } = await supabase
     .from("transactions")
     .select("*")
+    .is("deleted_at", null)
     .order("tanggal", { ascending: false })
     .order("id", { ascending: false });
 
@@ -33,5 +44,5 @@ export default async function Home() {
     { id: 4, nama: "Tunai", tipe: "Uang Fisik", saldo_awal: 600000 },
   ];
 
-  return <DashboardUI data={transactions || []} budget={budgetBulanan} wallets={wallets} />;
+  return <DashboardUI data={transactions || []} budget={budgetBulanan} wallets={wallets} userEmail={user.email} />;
 }
