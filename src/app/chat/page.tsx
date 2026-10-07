@@ -1,19 +1,10 @@
-import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
+import { requireAuthUser } from "@/lib/auth"
 import ChatClient from "./chat-client"
 
 export const dynamic = "force-dynamic"
-export const revalidate = 0
 
 export default async function ChatPage() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect("/login")
-  }
+  const user = await requireAuthUser()
 
   return <ChatClient userEmail={user.email} />
 }

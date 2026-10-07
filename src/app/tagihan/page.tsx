@@ -1,20 +1,11 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { requireAuthUser } from '@/lib/auth'
 import AppLayout from '@/components/layout/app-layout'
 import FeatureStatusCard from '@/components/common/feature-status-card'
 
 export const dynamic = 'force-dynamic'
-export const revalidate = 0
 
 export default async function TagihanPage() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
+  const user = await requireAuthUser()
 
   return (
     <AppLayout currentPath="/tagihan" userEmail={user.email}>

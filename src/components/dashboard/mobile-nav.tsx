@@ -62,6 +62,7 @@ export default function MobileNav({
       <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#0a0f1c]/95 backdrop-blur-md border-t border-slate-800/80 z-40 px-4 flex items-center justify-around">
         <Link
           href="/"
+          prefetch={true}
           className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-lg ${
             currentPath === '/' ? 'text-cyan-400' : 'text-slate-400 hover:text-white'
           }`}
@@ -72,6 +73,7 @@ export default function MobileNav({
 
         <Link
           href="/transaksi"
+          prefetch={true}
           className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-lg ${
             currentPath === '/transaksi' ? 'text-cyan-400' : 'text-slate-400 hover:text-white'
           }`}
@@ -83,6 +85,7 @@ export default function MobileNav({
         {/* Center Quick Action Floating-style */}
         <Link
           href="/transaksi?action=create"
+          prefetch={true}
           aria-label="Catat Transaksi Baru"
           className="w-11 h-11 -mt-5 rounded-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 flex items-center justify-center shadow-[0_0_15px_rgba(34,211,238,0.4)] transition"
         >
@@ -91,6 +94,7 @@ export default function MobileNav({
 
         <Link
           href="/chat"
+          prefetch={true}
           className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-lg ${
             currentPath === '/chat' ? 'text-cyan-400' : 'text-slate-400 hover:text-white'
           }`}
@@ -149,6 +153,7 @@ export default function MobileNav({
                     <Link
                       key={item.href}
                       href={item.href}
+                      prefetch={true}
                       onClick={() => setIsDrawerOpen(false)}
                       className={`flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium transition ${
                         isActive

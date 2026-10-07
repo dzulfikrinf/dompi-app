@@ -1,38 +1,34 @@
 import { Suspense } from "react"
-import { redirect } from "next/navigation"
+import { requireAuthUser } from "@/lib/auth"
 import { createClient } from "@/lib/supabase/server"
 import TransaksiClient, { Transaction, WalletItem } from "./transaksi-client"
 
 export const dynamic = "force-dynamic"
-export const revalidate = 0
 
 export default async function TransaksiPage() {
+  const user = await requireAuthUser()
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect("/login")
-  }
-
-  // Fetch transactions (RLS automatically restricts to user's rows, exclude soft-deleted)
-  const { data: transactions, error: trxError } = await supabase
-    .from("transactions")
-    .select("*")
-    .is("deleted_at", null)
-    .order("tanggal", { ascending: false })
-    .order("id", { ascending: false })
+  // Ambil transaksi dan dompet secara paralel
+  const [
+    { data: transactions, error: trxError },
+    { data: walletsData },
+  ] = await Promise.all([
+    supabase
+      .from("transactions")
+      .select("*")
+      .is("deleted_at", null)
+      .order("tanggal", { ascending: false })
+      .order("id", { ascending: false }),
+    supabase
+      .from("wallets")
+      .select("id, nama, tipe")
+      .order("id", { ascending: true }),
+  ])
 
   if (trxError) {
     console.error("Gagal mengambil daftar transaksi:", trxError)
   }
-
-  // Fetch wallets (RLS automatically restricts to user's rows)
-  const { data: walletsData } = await supabase
-    .from("wallets")
-    .select("id, nama, tipe")
-    .order("id", { ascending: true })
 
   const wallets: WalletItem[] = walletsData && walletsData.length > 0
     ? walletsData

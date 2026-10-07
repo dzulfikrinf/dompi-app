@@ -53,6 +53,26 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Forward authenticated user info in headers to eliminate duplicate auth roundtrips in Server Components
+  if (user) {
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-user-id', user.id)
+    requestHeaders.set('x-user-email', user.email || '')
+
+    const finalResponse = NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
+
+    // Forward any cookies that supabase setAll might have updated
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      finalResponse.cookies.set(cookie.name, cookie.value, cookie)
+    })
+
+    return finalResponse
+  }
+
   return supabaseResponse
 }
 
