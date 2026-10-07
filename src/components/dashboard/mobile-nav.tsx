@@ -60,12 +60,12 @@ export default function MobileNav({
   return (
     <>
       {/* 1. Mobile Fixed Bottom Bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#0a0f1c]/95 backdrop-blur-md border-t border-slate-800/80 z-40 px-4 flex items-center justify-around">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#070a12]/95 backdrop-blur-xl border-t border-white/[0.08] z-40 px-4 flex items-center justify-around shadow-[0_-10px_30px_rgba(0,0,0,0.4)]">
         <Link
           href="/"
           prefetch={true}
-          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-lg ${
-            currentPath === '/' ? 'text-cyan-400' : 'text-slate-400 hover:text-white'
+          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-xl ${
+            currentPath === '/' ? 'text-cyan-400 font-semibold' : 'text-slate-400 hover:text-white'
           }`}
         >
           <Home className="w-5 h-5" />
@@ -75,8 +75,8 @@ export default function MobileNav({
         <Link
           href="/transaksi"
           prefetch={true}
-          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-lg ${
-            currentPath === '/transaksi' ? 'text-cyan-400' : 'text-slate-400 hover:text-white'
+          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-xl ${
+            currentPath === '/transaksi' ? 'text-cyan-400 font-semibold' : 'text-slate-400 hover:text-white'
           }`}
         >
           <List className="w-5 h-5" />
@@ -88,7 +88,7 @@ export default function MobileNav({
           href="/transaksi?action=create"
           prefetch={true}
           aria-label="Catat Transaksi Baru"
-          className="w-11 h-11 -mt-5 rounded-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 flex items-center justify-center shadow-[0_0_15px_rgba(34,211,238,0.4)] transition"
+          className="w-12 h-12 -mt-6 rounded-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 flex items-center justify-center shadow-[0_4px_25px_rgba(34,211,238,0.45)] transition-all active:scale-95 border-2 border-[#070a12]"
         >
           <Plus className="w-6 h-6 stroke-[2.5]" />
         </Link>
@@ -96,8 +96,8 @@ export default function MobileNav({
         <Link
           href="/chat"
           prefetch={true}
-          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-lg ${
-            currentPath === '/chat' ? 'text-cyan-400' : 'text-slate-400 hover:text-white'
+          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-xl ${
+            currentPath === '/chat' ? 'text-cyan-400 font-semibold' : 'text-slate-400 hover:text-white'
           }`}
         >
           <MessageSquare className="w-5 h-5" />
@@ -107,7 +107,7 @@ export default function MobileNav({
         <button
           onClick={() => setIsDrawerOpen(true)}
           aria-label="Buka menu navigasi lainnya"
-          className="flex flex-col items-center gap-1 text-[11px] font-medium text-slate-400 hover:text-white transition py-1 px-2 rounded-lg cursor-pointer"
+          className="flex flex-col items-center gap-1 text-[11px] font-medium text-slate-400 hover:text-white transition py-1 px-2 rounded-xl cursor-pointer"
         >
           <Menu className="w-5 h-5" />
           <span>Menu</span>
@@ -119,16 +119,16 @@ export default function MobileNav({
         <div className="lg:hidden fixed inset-0 z-50 flex">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm animate-fade-in"
+            className="fixed inset-0 bg-black/80 backdrop-blur-md animate-fade-in"
             onClick={() => setIsDrawerOpen(false)}
             aria-hidden="true"
           />
 
           {/* Drawer content */}
-          <div className="relative ml-auto w-4/5 max-w-xs h-full bg-[#0a0f1c] border-l border-slate-800 p-5 flex flex-col justify-between shadow-2xl z-10 overflow-y-auto animate-slide-right">
+          <div className="relative ml-auto w-4/5 max-w-xs h-full bg-[#070a12] border-l border-white/[0.08] p-5 flex flex-col justify-between shadow-2xl z-10 overflow-y-auto animate-slide-right">
             <div>
               {/* Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+              <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0">
                     <Image

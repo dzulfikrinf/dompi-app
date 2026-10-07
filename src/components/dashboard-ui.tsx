@@ -113,7 +113,11 @@ export default function DashboardUI({
   if (!mounted) return null
 
   return (
-    <div className="flex h-screen bg-[#050811] text-slate-200 overflow-hidden font-sans selection:bg-cyan-500/30">
+    <div className="flex h-screen bg-[#06080e] text-slate-100 overflow-hidden font-sans selection:bg-cyan-500/30 relative">
+      {/* Ambient Lighting Orbs */}
+      <div className="absolute -top-32 right-1/4 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute -bottom-32 left-1/3 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-[160px] pointer-events-none" />
+
       {/* 1. Desktop Collapsible Sidebar */}
       <Sidebar
         collapsed={collapsed}
@@ -124,8 +128,8 @@ export default function DashboardUI({
       />
 
       {/* 2. Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 lg:space-y-8 pb-24 lg:pb-10 animate-fade-in">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 lg:space-y-8 pb-24 lg:pb-10 animate-fade-in max-w-[1600px] mx-auto w-full">
           {/* Top Header */}
           <Header userEmail={userEmail} />
 
