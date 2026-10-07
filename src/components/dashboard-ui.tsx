@@ -38,14 +38,12 @@ type DailyGroup = {
 
 type DashboardUIProps = {
   data: Transaction[]
-  budget: number
   wallets: Wallet[]
   userEmail?: string
 }
 
 export default function DashboardUI({
   data,
-  budget,
   wallets,
   userEmail,
 }: DashboardUIProps) {
@@ -65,7 +63,10 @@ export default function DashboardUI({
     router.refresh()
   }
 
-  // 1. Perhitungan Saldo & Ringkasan Arus Kas
+  // 1. Perhitungan Saldo & Ringkasan Arus Kas dari Database
+  const now = new Date()
+  const currentMonthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+
   const totalPemasukan = data
     .filter((t) => t.tipe === 'Pemasukan')
     .reduce((acc, curr) => acc + Number(curr.nominal), 0)
@@ -74,15 +75,18 @@ export default function DashboardUI({
     .filter((t) => t.tipe === 'Pengeluaran')
     .reduce((acc, curr) => acc + Number(curr.nominal), 0)
 
+  const thisMonthTransactions = data.filter((t) => t.tanggal.startsWith(currentMonthPrefix))
+
+  const pemasukanBulanIni = thisMonthTransactions
+    .filter((t) => t.tipe === 'Pemasukan')
+    .reduce((acc, curr) => acc + Number(curr.nominal), 0)
+
+  const pengeluaranBulanIni = thisMonthTransactions
+    .filter((t) => t.tipe === 'Pengeluaran')
+    .reduce((acc, curr) => acc + Number(curr.nominal), 0)
+
   const totalSaldoAwal = wallets.reduce((acc, curr) => acc + Number(curr.saldo_awal), 0)
   const saldo = totalSaldoAwal + totalPemasukan - totalPengeluaran
-
-  const budgetBulanan = budget
-  const sisaAnggaran = budgetBulanan - totalPengeluaran
-  const persentaseAnggaran = Math.min(
-    Math.round((totalPengeluaran / budgetBulanan) * 100),
-    100
-  )
 
   // 2. Pengelompokan Data Grafik Harian
   const groupedByDate = data.reduce((acc, curr) => {
@@ -125,20 +129,19 @@ export default function DashboardUI({
           {/* Top Header */}
           <Header userEmail={userEmail} />
 
-          {/* 1-4. Summary Metrics Cards */}
+          {/* 3 Summary Metrics Cards */}
           <SummaryCards
             saldo={saldo}
+            pemasukanBulanIni={pemasukanBulanIni}
             totalPemasukan={totalPemasukan}
+            pengeluaranBulanIni={pengeluaranBulanIni}
             totalPengeluaran={totalPengeluaran}
-            sisaAnggaran={sisaAnggaran}
-            budgetBulanan={budgetBulanan}
-            persentaseAnggaran={persentaseAnggaran}
           />
 
-          {/* 7-8. Akses Cepat Catat Transaksi & Chat Dompi */}
+          {/* Akses Cepat Catat Transaksi & Chat Dompi */}
           <QuickActions />
 
-          {/* 5 & 9. Grafik Arus Kas & Ringkasan Dompet */}
+          {/* Grafik Arus Kas & Ringkasan Dompet */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-8">
               <CashflowChart
@@ -152,7 +155,7 @@ export default function DashboardUI({
             </div>
           </div>
 
-          {/* 6. Transaksi Terbaru */}
+          {/* Transaksi Terbaru */}
           <RecentTransactions transactions={data} />
         </main>
       </div>

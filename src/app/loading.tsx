@@ -16,9 +16,9 @@ export default function Loading() {
           <div className="h-10 w-32 bg-[#0f172a] rounded-xl border border-slate-800/60 animate-shimmer" />
         </div>
 
-        {/* 4 Summary Cards Skeleton */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
+        {/* 3 Summary Cards Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+          {[1, 2, 3].map((i) => (
             <div
               key={i}
               className="h-28 bg-[#0f172a] border border-slate-800/80 rounded-2xl p-5 space-y-3 animate-shimmer"

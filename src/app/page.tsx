@@ -8,38 +8,45 @@ export default async function Home() {
   const user = await requireAuthUser();
   const supabase = await createClient();
 
-  // Ambil transaksi, pengaturan budget, dan daftar dompet secara paralel
+  // Ambil transaksi aktif dan daftar dompet milik user secara paralel dari database
   const [
-    { data: transactions, error },
-    { data: settingsData },
-    { data: walletsData },
+    { data: transactions, error: trxError },
+    { data: walletsData, error: walletError },
   ] = await Promise.all([
     supabase
       .from("transactions")
       .select("*")
+      .eq("user_id", user.id)
       .is("deleted_at", null)
       .order("tanggal", { ascending: false })
       .order("id", { ascending: false }),
-    supabase.from("settings").select("*").limit(1).maybeSingle(),
-    supabase.from("wallets").select("*"),
+    supabase
+      .from("wallets")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("id", { ascending: true }),
   ]);
 
-  if (error) {
-    console.error("Gagal mengambil data dari Supabase:", error);
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0f1c]">
-        <p className="text-rose-500 font-medium">Gagal memuat data keuangan dari database.</p>
-      </div>
-    );
+  if (trxError) {
+    console.error("Gagal mengambil data transaksi dari Supabase:", trxError);
+  }
+  if (walletError) {
+    console.error("Gagal mengambil data dompet dari Supabase:", walletError);
   }
 
-  const budgetBulanan = settingsData ? settingsData.budget_bulanan : 10500000;
-  const wallets = walletsData && walletsData.length > 0 ? walletsData : [
-    { id: 1, nama: "BCA Payroll", tipe: "Rekening Utama", saldo_awal: 16420000 },
-    { id: 2, nama: "GoPay & OVO", tipe: "Dompet Digital", saldo_awal: 1830000 },
-    { id: 3, nama: "Bibit Investasi", tipe: "Reksa Dana", saldo_awal: 6000000 },
-    { id: 4, nama: "Tunai", tipe: "Uang Fisik", saldo_awal: 600000 },
-  ];
+  // Gunakan data murni 100% dari database
+  const wallets = (walletsData || []).map((w) => ({
+    id: Number(w.id),
+    nama: w.nama,
+    tipe: w.tipe,
+    saldo_awal: Number(w.saldo_awal || 0),
+  }));
 
-  return <DashboardUI data={transactions || []} budget={budgetBulanan} wallets={wallets} userEmail={user.email} />;
+  return (
+    <DashboardUI
+      data={transactions || []}
+      wallets={wallets}
+      userEmail={user.email}
+    />
+  );
 }
