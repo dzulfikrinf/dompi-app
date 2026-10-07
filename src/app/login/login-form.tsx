@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
 import { Mail, Lock, Loader2, ArrowRight } from "lucide-react"
 
@@ -89,12 +90,19 @@ export default function LoginForm() {
       <div className="w-full max-w-md bg-[#0a0f1c] border border-slate-800/80 rounded-3xl p-8 shadow-2xl relative z-10 backdrop-blur-xl">
         {/* Brand header */}
         <div className="flex flex-col items-center mb-8">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-2xl font-bold text-black font-serif shadow-lg">
-              d
+          <div className="flex flex-col items-center gap-2 mb-3">
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 hover:scale-105">
+              <Image
+                src="/logo.png"
+                alt="Logo Dompi"
+                width={64}
+                height={64}
+                className="w-16 h-16 object-contain drop-shadow-xl"
+                priority
+              />
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-3xl font-bold text-white tracking-tight">dompi</span>
+              <span className="text-3xl font-extrabold text-white tracking-tight">dompi</span>
               <span className="text-[10px] font-bold border border-cyan-500/50 bg-[#0f172a] text-cyan-400 px-2 py-0.5 rounded-full uppercase">
                 Pro
               </span>

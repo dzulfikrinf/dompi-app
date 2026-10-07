@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   Home,
   List,
@@ -128,11 +129,17 @@ export default function MobileNav({
             <div>
               {/* Header */}
               <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center font-bold text-black font-serif text-lg">
-                    d
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Image
+                      src="/logo.png"
+                      alt="Logo Dompi"
+                      width={32}
+                      height={32}
+                      className="w-8 h-8 object-contain"
+                    />
                   </div>
-                  <span className="font-extrabold text-white text-lg">Menu Dompi</span>
+                  <span className="font-extrabold text-white text-lg tracking-tight">Menu Dompi</span>
                 </div>
                 <button
                   onClick={() => setIsDrawerOpen(false)}

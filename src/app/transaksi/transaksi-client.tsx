@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useRouter, useSearchParams } from "next/navigation"
 import {
   Search,
@@ -368,8 +369,14 @@ export default function TransaksiClient({
           </Link>
           <div className="h-6 w-px bg-slate-800" />
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center text-xl font-bold text-black font-serif shadow-sm">
-              d
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Image
+                src="/logo.png"
+                alt="Logo Dompi"
+                width={40}
+                height={40}
+                className="w-10 h-10 object-contain drop-shadow-sm"
+              />
             </div>
             <div>
               <h1 className="text-lg font-bold text-white tracking-tight leading-none">

@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   Home,
   List,
@@ -62,8 +63,15 @@ export default function Sidebar({
         {/* Logo & Toggle Header */}
         <div className="h-20 flex items-center justify-between px-5 border-b border-slate-800/80">
           <Link href="/" className="flex items-center gap-3 overflow-hidden group">
-            <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center text-xl font-bold text-black font-serif flex-shrink-0 shadow-sm transition-transform duration-200 group-hover:scale-105">
-              d
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-105">
+              <Image
+                src="/logo.png"
+                alt="Logo Dompi"
+                width={40}
+                height={40}
+                className="w-10 h-10 object-contain drop-shadow-md"
+                priority
+              />
             </div>
             {!collapsed && (
               <div className="flex items-center gap-2 animate-fade-in">

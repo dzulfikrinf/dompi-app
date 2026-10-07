@@ -14,8 +14,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Dompet Masjul",
-  description: "Aplikasi pencatat keuangan",
+  title: "Dompi - Pencatat Keuangan",
+  description: "Aplikasi pencatat keuangan pintar",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
