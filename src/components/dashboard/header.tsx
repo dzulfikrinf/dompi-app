@@ -24,7 +24,7 @@ export default function Header({ userEmail }: HeaderProps) {
       <div>
         <div className="inline-flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 mb-1">
           <Calendar className="w-3.5 h-3.5" />
-          <span>{todayFormatted}</span>
+          <span suppressHydrationWarning>{todayFormatted}</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
           Selamat Datang, {displayName}

@@ -50,7 +50,7 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
       id: 'welcome',
       sender: 'assistant',
       text: 'Halo! Saya Dompi, asisten keuangan pribadimu. Kamu bisa menyuruhku mencatat, mengubah, menghapus, atau merangkum pengeluaranmu dengan bahasa santai sehari-hari.',
-      timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+      timestamp: '',
     },
   ])
   const [inputValue, setInputValue] = useState('')
@@ -63,6 +63,20 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
+
+  useEffect(() => {
+    // Set timestamp on client to prevent SSR hydration mismatch (React error 418)
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.id === 'welcome' && !m.timestamp
+          ? {
+              ...m,
+              timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+            }
+          : m
+      )
+    )
+  }, [])
 
   useEffect(() => {
     scrollToBottom()
@@ -247,13 +261,16 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
                   </div>
                 )}
 
-                <div
-                  className={`text-[10px] mt-1.5 text-right ${
-                    msg.sender === 'user' ? 'text-zinc-400 dark:text-zinc-500' : 'text-zinc-400'
-                  }`}
-                >
-                  {msg.timestamp}
-                </div>
+                {msg.timestamp ? (
+                  <div
+                    suppressHydrationWarning
+                    className={`text-[10px] mt-1.5 text-right ${
+                      msg.sender === 'user' ? 'text-zinc-400 dark:text-zinc-500' : 'text-zinc-400'
+                    }`}
+                  >
+                    {msg.timestamp}
+                  </div>
+                ) : null}
               </div>
             </div>
           ))}
