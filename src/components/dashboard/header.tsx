@@ -2,7 +2,8 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Plus, Sparkles, Calendar } from 'lucide-react'
+import { Plus, MessageSquare, Calendar } from 'lucide-react'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 type HeaderProps = {
   userEmail?: string
@@ -16,44 +17,40 @@ export default function Header({ userEmail }: HeaderProps) {
     year: 'numeric',
   }).format(new Date())
 
-  const displayName = userEmail ? userEmail.split('@')[0] : 'Sobat Dompi'
+  const displayName = userEmail ? userEmail.split('@')[0] : 'Pengguna'
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]">
-      <div className="space-y-1">
-        <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/[0.03] border border-white/[0.06] text-[11px] text-slate-400 font-medium">
-          <Calendar className="w-3.5 h-3.5 text-cyan-400" />
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200 dark:border-zinc-800">
+      <div>
+        <div className="inline-flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 mb-1">
+          <Calendar className="w-3.5 h-3.5" />
           <span>{todayFormatted}</span>
         </div>
-        <h1 className="text-2xl lg:text-3xl font-extrabold text-white tracking-[-0.02em]">
-          Selamat Datang, <span>{displayName}</span>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          Selamat Datang, {displayName}
         </h1>
-        <p className="text-xs sm:text-sm text-slate-400">
-          Ikhtisar aktivitas finansial dan alokasi saldo dompet Anda hari ini.
+        <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+          Ringkasan posisi keuangan dan arus kas akun Anda.
         </p>
       </div>
 
       <div className="flex items-center gap-2.5 flex-wrap">
-        {/* Chat Dompi Button */}
+        <ThemeToggle />
+
         <Link
           href="/chat"
-          className="inline-flex items-center gap-2.5 bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 hover:text-white border border-white/[0.08] hover:border-cyan-500/40 font-medium py-2 px-4 rounded-full transition-all duration-200 text-xs sm:text-sm active:scale-95 group shadow-sm"
+          className="inline-flex items-center gap-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 px-3.5 py-2 rounded-lg text-sm font-medium transition active:scale-95 shadow-xs"
         >
-          <div className="w-6 h-6 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-105 transition-transform">
-            <Sparkles className="w-3.5 h-3.5" />
-          </div>
+          <MessageSquare className="w-4 h-4" />
           <span>Chat Dompi</span>
         </Link>
 
-        {/* Catat Transaksi Button (Nested Button Architecture) */}
         <Link
           href="/transaksi?action=create"
-          className="inline-flex items-center gap-2.5 bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold py-2 pl-4 pr-2 rounded-full transition-all duration-200 text-xs sm:text-sm shadow-[0_4px_20px_rgba(34,211,238,0.25)] active:scale-[0.98] group"
+          className="inline-flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:text-zinc-900 px-3.5 py-2 rounded-lg text-sm font-semibold transition active:scale-95 shadow-xs"
         >
-          <span>Catat Transaksi</span>
-          <div className="w-6 h-6 rounded-full bg-slate-950/15 flex items-center justify-center text-slate-950 group-hover:rotate-90 transition-transform duration-200">
-            <Plus className="w-4 h-4 stroke-[2.5]" />
-          </div>
+          <Plus className="w-4 h-4 stroke-[2.5]" />
+          <span>Tambah Transaksi</span>
         </Link>
       </div>
     </div>

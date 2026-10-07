@@ -55,37 +55,34 @@ export default function Sidebar({
 }: SidebarProps) {
   return (
     <aside
-      className={`hidden lg:flex flex-col justify-between bg-[#070a12] border-r border-white/[0.06] transition-[width] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-20 flex-shrink-0 ${
-        collapsed ? 'w-20' : 'w-64'
+      className={`hidden lg:flex flex-col justify-between bg-zinc-50 dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 transition-[width] duration-200 ease-in-out z-20 flex-shrink-0 ${
+        collapsed ? 'w-18' : 'w-60'
       }`}
     >
       <div>
         {/* Logo & Toggle Header */}
-        <div className="h-20 flex items-center justify-between px-5 border-b border-white/[0.06]">
-          <Link href="/" className="flex items-center gap-3 overflow-hidden group">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-105 bg-white/[0.03] border border-white/[0.08] p-1">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-zinc-200 dark:border-zinc-800">
+          <Link href="/" className="flex items-center gap-2.5 overflow-hidden group">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-zinc-200 dark:bg-zinc-800 p-1">
               <Image
                 src="/logo.png"
                 alt="Logo Dompi"
-                width={36}
-                height={36}
-                className="w-8 h-8 object-contain drop-shadow-md"
+                width={28}
+                height={28}
+                className="w-6 h-6 object-contain"
                 priority
               />
             </div>
             {!collapsed && (
-              <div className="flex items-center gap-2 animate-fade-in">
-                <span className="text-xl font-extrabold text-white tracking-[-0.03em]">dompi</span>
-                <span className="text-[9px] font-bold border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  Pro
-                </span>
-              </div>
+              <span className="text-base font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
+                dompi
+              </span>
             )}
           </Link>
           <button
             onClick={onToggleCollapse}
             aria-label={collapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors duration-150 cursor-pointer focus:outline-none active:scale-95 border border-transparent hover:border-white/[0.08]"
+            className="p-1 rounded-md text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition cursor-pointer"
           >
             {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
@@ -95,17 +92,17 @@ export default function Sidebar({
         <div className="p-3">
           <Link
             href="/transaksi?action=create"
-            className={`w-full flex items-center justify-center gap-2 bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold py-2.5 px-3 rounded-2xl transition-all duration-200 shadow-[0_4px_20px_rgba(34,211,238,0.25)] active:scale-[0.98] ${
-              collapsed ? 'p-2.5' : ''
+            className={`w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:text-zinc-900 font-semibold py-2 px-3 rounded-lg transition text-xs shadow-xs active:scale-[0.98] ${
+              collapsed ? 'p-2' : ''
             }`}
             title="Catat Transaksi Baru"
           >
             <Plus className="w-4 h-4 stroke-[2.5] flex-shrink-0" />
-            {!collapsed && <span className="text-xs font-bold uppercase tracking-wider animate-fade-in">Catat Transaksi</span>}
+            {!collapsed && <span>Catat Transaksi</span>}
           </Link>
 
           {/* Navigation Links */}
-          <nav className="mt-4 space-y-1" aria-label="Navigasi Utama">
+          <nav className="mt-3 space-y-1" aria-label="Navigasi Utama">
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon
               const isActive = currentPath === item.href
@@ -116,21 +113,18 @@ export default function Sidebar({
                   href={item.href}
                   prefetch={true}
                   title={collapsed ? item.label : undefined}
-                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all duration-150 relative group ${
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition ${
                     isActive
-                      ? 'bg-white/[0.08] text-white border border-white/[0.1] shadow-sm font-semibold'
-                      : 'text-slate-400 hover:text-white hover:bg-white/[0.03] hover:translate-x-0.5'
-                  } ${collapsed ? 'justify-center px-0 hover:translate-x-0' : ''}`}
+                      ? 'bg-zinc-200/70 dark:bg-zinc-800/80 text-zinc-950 dark:text-zinc-50 font-semibold'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900'
+                  } ${collapsed ? 'justify-center px-0' : ''}`}
                 >
-                  {isActive && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-cyan-400 rounded-r-full" />
-                  )}
-                  <Icon className={`w-4 h-4 flex-shrink-0 transition-transform duration-150 ${isActive ? 'text-cyan-400' : 'text-slate-400 group-hover:text-slate-200'}`} />
+                  <Icon className="w-4 h-4 flex-shrink-0" />
                   {!collapsed && (
-                    <div className="flex items-center justify-between flex-1 overflow-hidden animate-fade-in">
+                    <div className="flex items-center justify-between flex-1 overflow-hidden">
                       <span className="truncate">{item.label}</span>
                       {item.badge && (
-                        <span className="text-[9px] font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
                           {item.badge}
                         </span>
                       )}
@@ -144,25 +138,22 @@ export default function Sidebar({
       </div>
 
       {/* User Card & Logout */}
-      <div className="p-3 border-t border-white/[0.06]">
+      <div className="p-3 border-t border-zinc-200 dark:border-zinc-800">
         <div
-          className={`bg-white/[0.03] border border-white/[0.06] rounded-2xl p-2.5 flex items-center justify-between ${
-            collapsed ? 'flex-col gap-2 p-2' : 'gap-3'
+          className={`bg-zinc-100 dark:bg-zinc-900/60 rounded-lg p-2 flex items-center justify-between border border-zinc-200 dark:border-zinc-800 ${
+            collapsed ? 'flex-col gap-2 p-1.5' : 'gap-2'
           }`}
         >
-          <div className="flex items-center gap-2.5 overflow-hidden">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 border border-white/20">
-              {userEmail ? userEmail.charAt(0).toUpperCase() : 'M'}
+          <div className="flex items-center gap-2 overflow-hidden">
+            <div className="w-7 h-7 rounded-md bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 flex items-center justify-center text-xs font-bold flex-shrink-0">
+              {userEmail ? userEmail.charAt(0).toUpperCase() : 'U'}
             </div>
             {!collapsed && (
               <div className="overflow-hidden">
-                <p className="text-xs font-bold text-white truncate" title={userEmail || 'User'}>
-                  {userEmail ? userEmail.split('@')[0] : 'Sobat Dompi'}
+                <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 truncate" title={userEmail || 'Pengguna'}>
+                  {userEmail ? userEmail.split('@')[0] : 'Pengguna'}
                 </p>
-                <div className="flex items-center gap-1.5 text-[10px] text-emerald-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Online</span>
-                </div>
+                <p className="text-[10px] text-zinc-500 dark:text-zinc-400">Aktif</p>
               </div>
             )}
           </div>
@@ -170,9 +161,9 @@ export default function Sidebar({
             onClick={onLogout}
             aria-label="Keluar dari akun"
             title="Keluar dari akun"
-            className="text-slate-400 hover:text-rose-400 p-1.5 rounded-xl hover:bg-white/[0.05] transition cursor-pointer flex-shrink-0 active:scale-95"
+            className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 p-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-800 transition cursor-pointer flex-shrink-0"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>

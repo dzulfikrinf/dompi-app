@@ -26,6 +26,7 @@ import {
   TrendingUp,
   RefreshCw,
 } from "lucide-react"
+import { ThemeToggle } from "@/components/theme-toggle"
 import {
   createTransactionAction,
   updateTransactionAction,
@@ -355,49 +356,52 @@ export default function TransaksiClient({
     .reduce((acc, curr) => acc + Number(curr.nominal), 0)
 
   return (
-    <div className="min-h-screen bg-[#050811] text-slate-200 flex flex-col font-sans selection:bg-cyan-500/30">
+    <div className="min-h-screen bg-zinc-100/60 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-sans selection:bg-zinc-800 selection:text-white dark:selection:bg-zinc-200 dark:selection:text-zinc-900">
       {/* Top Navbar */}
-      <header className="h-20 border-b border-slate-800/80 bg-[#0a0f1c]/90 backdrop-blur-md px-6 lg:px-12 flex items-center justify-between sticky top-0 z-30">
-        <div className="flex items-center gap-4">
+      <header className="h-16 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30">
+        <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="flex items-center gap-2 text-slate-400 hover:text-white transition p-2 rounded-xl hover:bg-slate-800/60"
+            className="flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
             title="Kembali ke Dashboard"
           >
-            <ArrowLeft className="w-5 h-5" />
-            <span className="text-sm font-medium hidden sm:inline">Dashboard</span>
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-xs font-medium hidden sm:inline">Dashboard</span>
           </Link>
-          <div className="h-6 w-px bg-slate-800" />
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div className="h-4 w-px bg-zinc-200 dark:border-zinc-800" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0">
               <Image
                 src="/logo.png"
                 alt="Logo Dompi"
-                width={40}
-                height={40}
-                className="w-10 h-10 object-contain drop-shadow-sm"
+                width={32}
+                height={32}
+                className="w-8 h-8 object-contain"
               />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-white tracking-tight leading-none">
+              <h1 className="text-sm font-semibold tracking-tight leading-none text-zinc-900 dark:text-zinc-100">
                 Riwayat Transaksi
               </h1>
-              <p className="text-xs text-slate-400 mt-0.5">{userEmail || "Masjul"}</p>
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">{userEmail || "Masjul"}</p>
             </div>
           </div>
         </div>
 
-        <button
-          onClick={handleOpenCreateModal}
-          className="flex items-center gap-2 bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold py-2.5 px-4 rounded-xl transition shadow-[0_0_15px_rgba(34,211,238,0.25)] cursor-pointer text-sm"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Tambah Transaksi</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <button
+            onClick={handleOpenCreateModal}
+            className="flex items-center gap-1.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-medium py-1.5 px-3 rounded-lg transition cursor-pointer text-xs"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Tambah Transaksi</span>
+          </button>
+        </div>
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 lg:p-10 space-y-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-5">
         {/* Global Feedback Banner */}
         {feedback && (
           <div
@@ -425,22 +429,22 @@ export default function TransaksiClient({
         )}
 
         {/* Toolbar: Search & Filter Controls */}
-        <div className="bg-[#0f172a] border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 sm:p-5 space-y-3.5 shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
             {/* Search Input */}
-            <div className="md:col-span-5 flex items-center gap-3 bg-[#0a0f1c] border border-slate-800 rounded-xl px-4 py-2.5 focus-within:border-cyan-500/50 transition">
-              <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
+            <div className="md:col-span-5 flex items-center gap-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 focus-within:border-zinc-400 dark:focus-within:border-zinc-600 transition">
+              <Search className="w-4 h-4 text-zinc-400 flex-shrink-0" />
               <input
                 type="text"
                 placeholder="Cari deskripsi, kategori, atau dompet..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent border-none outline-none text-sm w-full text-white placeholder-slate-500"
+                className="bg-transparent border-none outline-none text-xs sm:text-sm w-full text-zinc-900 dark:text-zinc-100 placeholder-zinc-400"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="text-slate-500 hover:text-slate-300"
+                  className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -448,14 +452,14 @@ export default function TransaksiClient({
             </div>
 
             {/* Filter Tipe */}
-            <div className="md:col-span-3 flex bg-[#0a0f1c] border border-slate-800 rounded-xl p-1">
+            <div className="md:col-span-3 flex bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-1">
               <button
                 type="button"
                 onClick={() => setFilterTipe("SEMUA")}
-                className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition ${
+                className={`flex-1 py-1 text-xs font-medium rounded-md transition ${
                   filterTipe === "SEMUA"
-                    ? "bg-[#1e293b] text-white shadow-sm"
-                    : "text-slate-400 hover:text-white"
+                    ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm"
+                    : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
                 }`}
               >
                 Semua
@@ -463,10 +467,10 @@ export default function TransaksiClient({
               <button
                 type="button"
                 onClick={() => setFilterTipe("Pengeluaran")}
-                className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition ${
+                className={`flex-1 py-1 text-xs font-medium rounded-md transition ${
                   filterTipe === "Pengeluaran"
-                    ? "bg-rose-500/20 text-rose-400 shadow-sm"
-                    : "text-slate-400 hover:text-rose-400"
+                    ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm"
+                    : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
                 }`}
               >
                 Pengeluaran
@@ -474,10 +478,10 @@ export default function TransaksiClient({
               <button
                 type="button"
                 onClick={() => setFilterTipe("Pemasukan")}
-                className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition ${
+                className={`flex-1 py-1 text-xs font-medium rounded-md transition ${
                   filterTipe === "Pemasukan"
-                    ? "bg-emerald-500/20 text-emerald-400 shadow-sm"
-                    : "text-slate-400 hover:text-emerald-400"
+                    ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm"
+                    : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
                 }`}
               >
                 Pemasukan
@@ -489,7 +493,7 @@ export default function TransaksiClient({
               <select
                 value={filterKategori}
                 onChange={(e) => setFilterKategori(e.target.value)}
-                className="w-full bg-[#0a0f1c] border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-cyan-500/50"
+                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-2 text-xs text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 dark:focus:border-zinc-600"
               >
                 <option value="SEMUA">Semua Kategori</option>
                 {availableCategories.map((c) => (
@@ -505,7 +509,7 @@ export default function TransaksiClient({
               <select
                 value={filterDompet}
                 onChange={(e) => setFilterDompet(e.target.value)}
-                className="w-full bg-[#0a0f1c] border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-cyan-500/50"
+                className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-2 text-xs text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 dark:focus:border-zinc-600"
               >
                 <option value="SEMUA">Semua Dompet</option>
                 {wallets.map((w) => (
@@ -518,34 +522,34 @@ export default function TransaksiClient({
           </div>
 
           {/* Row 2: Date Filters & Summary */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-slate-800/60">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 bg-[#0a0f1c] border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-300">
-                <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                <span className="text-slate-500">Dari:</span>
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1 text-xs text-zinc-600 dark:text-zinc-300">
+                <Calendar className="w-3.5 h-3.5 text-zinc-400" />
+                <span className="text-zinc-400">Dari:</span>
                 <input
                   type="date"
                   value={filterStartDate}
                   onChange={(e) => setFilterStartDate(e.target.value)}
-                  className="bg-transparent text-white outline-none text-xs"
+                  className="bg-transparent text-zinc-900 dark:text-zinc-100 outline-none text-xs"
                 />
               </div>
 
-              <div className="flex items-center gap-2 bg-[#0a0f1c] border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-300">
-                <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                <span className="text-slate-500">Sampai:</span>
+              <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1 text-xs text-zinc-600 dark:text-zinc-300">
+                <Calendar className="w-3.5 h-3.5 text-zinc-400" />
+                <span className="text-zinc-400">Sampai:</span>
                 <input
                   type="date"
                   value={filterEndDate}
                   onChange={(e) => setFilterEndDate(e.target.value)}
-                  className="bg-transparent text-white outline-none text-xs"
+                  className="bg-transparent text-zinc-900 dark:text-zinc-100 outline-none text-xs"
                 />
               </div>
 
               {hasActiveFilter && (
                 <button
                   onClick={handleResetFilters}
-                  className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white px-3 py-1.5 rounded-xl hover:bg-slate-800/50 transition cursor-pointer"
+                  className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 px-2.5 py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
                 >
                   <RefreshCw className="w-3 h-3" />
                   <span>Reset Filter</span>
@@ -554,18 +558,18 @@ export default function TransaksiClient({
             </div>
 
             {/* Quick summary numbers */}
-            <div className="flex items-center gap-4 text-xs">
-              <span className="text-slate-400">
+            <div className="flex items-center gap-3 text-xs">
+              <span className="text-zinc-500">
                 Ditemukan:{" "}
-                <span className="font-bold text-white">
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                   {filteredTransactions.length}
                 </span>{" "}
                 transaksi
               </span>
-              <span className="text-emerald-400">
+              <span className="font-medium tabular-nums text-zinc-900 dark:text-zinc-100">
                 +{formatRupiah(totalFilteredPemasukan)}
               </span>
-              <span className="text-rose-400">
+              <span className="font-medium tabular-nums text-zinc-500 dark:text-zinc-400">
                 -{formatRupiah(totalFilteredPengeluaran)}
               </span>
             </div>
@@ -573,17 +577,17 @@ export default function TransaksiClient({
         </div>
 
         {/* Transaction Table / List */}
-        <div className="bg-[#0f172a] border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm">
           {filteredTransactions.length === 0 ? (
             /* Empty State */
-            <div className="py-20 text-center px-4 animate-fade-in">
-              <div className="w-16 h-16 bg-slate-800/50 border border-slate-700/50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-500">
-                <Filter className="w-7 h-7" />
+            <div className="py-16 text-center px-4">
+              <div className="w-12 h-12 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl flex items-center justify-center mx-auto mb-3 text-zinc-400">
+                <Filter className="w-5 h-5" />
               </div>
-              <h3 className="text-base font-bold text-white mb-1">
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-1">
                 Tidak ada transaksi ditemukan
               </h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto mb-6">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto mb-5">
                 {hasActiveFilter
                   ? "Coba sesuaikan kata kunci pencarian atau ubah filter untuk menemukan transaksi."
                   : "Belum ada transaksi yang tercatat di akun Anda. Mulai catat transaksi pertama sekarang."}
@@ -591,71 +595,61 @@ export default function TransaksiClient({
               {hasActiveFilter ? (
                 <button
                   onClick={handleResetFilters}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white rounded-xl text-xs font-semibold transition"
+                  className="px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 rounded-lg text-xs font-medium transition cursor-pointer"
                 >
                   Reset Semua Filter
                 </button>
               ) : (
                 <button
                   onClick={handleOpenCreateModal}
-                  className="px-4 py-2 bg-cyan-400 hover:bg-cyan-300 active:scale-95 text-slate-950 rounded-xl text-xs font-bold transition shadow-md"
+                  className="px-3.5 py-1.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 rounded-lg text-xs font-medium transition cursor-pointer"
                 >
                   Tambah Transaksi Pertama
                 </button>
               )}
             </div>
           ) : (
-            <div className="divide-y divide-slate-800/80">
+            <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
               {filteredTransactions.map((trx) => (
                 <div
                   key={trx.id}
-                  className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[#0a0f1c]/80 transition-all duration-150 group"
+                  className="p-4 sm:p-4.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-850/60 transition group"
                 >
                   {/* Left: Icon, Description, Category & Wallet badges */}
-                  <div className="flex items-center gap-4 min-w-0">
-                    <div
-                      className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm border ${
-                        trx.tipe === "Pemasukan"
-                          ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                          : "bg-slate-800/80 border-slate-700/60 text-slate-300"
-                      }`}
-                    >
-                      {getIconForCategory(trx.kategori)}
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300">
+                      {trx.tipe === "Pemasukan" ? (
+                        <TrendingUp className="w-4 h-4 text-zinc-800 dark:text-zinc-200" />
+                      ) : (
+                        <TrendingDown className="w-4 h-4 text-zinc-500" />
+                      )}
                     </div>
 
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-bold text-white truncate">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <p className="text-xs sm:text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
                           {trx.deskripsi}
                         </p>
-                        <span className="text-[10px] font-semibold bg-[#0a0f1c] border border-slate-800 text-slate-400 px-2 py-0.5 rounded-md">
+                        <span className="text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 px-1.5 py-0.5 rounded">
                           {trx.dompet || "Tunai"}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-slate-400">
+                      <div className="flex items-center gap-2 text-xs text-zinc-400 dark:text-zinc-500 text-[11px]">
                         <span>{trx.tanggal}</span>
                         <span>•</span>
-                        <span className="text-slate-400 font-medium">
-                          {trx.kategori}
-                        </span>
+                        <span>{trx.kategori}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Right: Nominal & Actions */}
-                  <div className="flex items-center justify-between sm:justify-end gap-6">
+                  <div className="flex items-center justify-between sm:justify-end gap-5">
                     <div className="text-left sm:text-right">
-                      <p
-                        className={`text-base font-extrabold tracking-tight ${
-                          trx.tipe === "Pemasukan"
-                            ? "text-emerald-400"
-                            : "text-rose-400"
-                        }`}
-                      >
+                      <p className="text-sm sm:text-base font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">
                         {trx.tipe === "Pemasukan" ? "+" : "-"}
                         {formatRupiah(Number(trx.nominal))}
                       </p>
-                      <p className="text-[11px] text-slate-500 font-medium capitalize">
+                      <p className="text-[10px] text-zinc-400 capitalize">
                         {trx.tipe}
                       </p>
                     </div>
@@ -664,16 +658,16 @@ export default function TransaksiClient({
                       <button
                         onClick={() => handleOpenEditModal(trx)}
                         title="Edit Transaksi"
-                        className="p-2 text-slate-400 hover:text-cyan-400 hover:bg-slate-800 rounded-xl transition cursor-pointer"
+                        className="p-1.5 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition cursor-pointer"
                       >
-                        <Edit2 className="w-4 h-4" />
+                        <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => setDeletingTransaction(trx)}
                         title="Hapus Transaksi"
-                        className="p-2 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-xl transition cursor-pointer"
+                        className="p-1.5 text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition cursor-pointer"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
@@ -686,56 +680,56 @@ export default function TransaksiClient({
 
       {/* MODAL: Form Tambah / Edit */}
       {isFormModalOpen && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="w-full max-w-lg bg-[#0a0f1c] border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative animate-scale-in">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-white">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="w-full max-w-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 sm:p-6 shadow-xl relative text-zinc-900 dark:text-zinc-100">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-semibold tracking-tight">
                 {editingTransaction ? "Edit Transaksi" : "Tambah Transaksi Baru"}
               </h3>
               <button
                 onClick={() => setIsFormModalOpen(false)}
-                className="text-slate-500 hover:text-white p-1 rounded-lg"
+                className="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 p-1 rounded-md cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             {formError && (
-              <div className="mb-5 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-2">
+              <div className="mb-4 p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 <span>{formError}</span>
               </div>
             )}
 
-            <form onSubmit={handleSubmitForm} className="space-y-4">
+            <form onSubmit={handleSubmitForm} className="space-y-3.5">
               {/* Tipe Transaksi */}
               <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-2">
+                <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">
                   Tipe Transaksi
                 </label>
-                <div className="grid grid-cols-2 gap-3 bg-[#0f172a] p-1.5 rounded-xl border border-slate-800">
+                <div className="grid grid-cols-2 gap-2 bg-zinc-100 dark:bg-zinc-950 p-1 rounded-lg border border-zinc-200 dark:border-zinc-800">
                   <button
                     type="button"
                     onClick={() => setFormTipe("Pengeluaran")}
-                    className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                    className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition cursor-pointer ${
                       formTipe === "Pengeluaran"
-                        ? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
-                        : "text-slate-400 hover:text-white"
+                        ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm"
+                        : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
                     }`}
                   >
-                    <TrendingDown className="w-4 h-4" />
+                    <TrendingDown className="w-3.5 h-3.5" />
                     <span>Pengeluaran</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setFormTipe("Pemasukan")}
-                    className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                    className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition cursor-pointer ${
                       formTipe === "Pemasukan"
-                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                        : "text-slate-400 hover:text-white"
+                        ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm"
+                        : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
                     }`}
                   >
-                    <TrendingUp className="w-4 h-4" />
+                    <TrendingUp className="w-3.5 h-3.5" />
                     <span>Pemasukan</span>
                   </button>
                 </div>
@@ -745,11 +739,11 @@ export default function TransaksiClient({
               <div>
                 <label
                   htmlFor="nominal"
-                  className="block text-xs font-semibold text-slate-400 mb-1"
+                  className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1"
                 >
                   Nominal (Rp)
                 </label>
-                <div className="bg-[#0f172a] border border-slate-800 rounded-xl px-4 py-3 focus-within:border-cyan-500/50 transition">
+                <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 focus-within:border-zinc-400 dark:focus-within:border-zinc-600 transition">
                   <input
                     id="nominal"
                     type="number"
@@ -759,11 +753,11 @@ export default function TransaksiClient({
                     placeholder="Contoh: 35000"
                     value={formNominal}
                     onChange={(e) => setFormNominal(e.target.value)}
-                    className="bg-transparent border-none outline-none text-base font-bold text-white w-full placeholder-slate-600"
+                    className="bg-transparent border-none outline-none text-base font-semibold tabular-nums text-zinc-900 dark:text-zinc-100 w-full placeholder-zinc-400"
                   />
                 </div>
                 {formNominal && Number(formNominal) > 0 && (
-                  <p className="text-[11px] text-cyan-400 mt-1">
+                  <p className="text-[11px] text-zinc-500 mt-1 tabular-nums">
                     {formatRupiah(Number(formNominal))}
                   </p>
                 )}
@@ -773,7 +767,7 @@ export default function TransaksiClient({
               <div>
                 <label
                   htmlFor="deskripsi"
-                  className="block text-xs font-semibold text-slate-400 mb-1"
+                  className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1"
                 >
                   Deskripsi
                 </label>
@@ -784,16 +778,16 @@ export default function TransaksiClient({
                   placeholder="Contoh: Makan siang nasi padang"
                   value={formDeskripsi}
                   onChange={(e) => setFormDeskripsi(e.target.value)}
-                  className="w-full bg-[#0f172a] border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none focus:border-cyan-500/50 transition"
+                  className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition"
                 />
               </div>
 
               {/* Tanggal & Dompet */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label
                     htmlFor="tanggal"
-                    className="block text-xs font-semibold text-slate-400 mb-1"
+                    className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1"
                   >
                     Tanggal
                   </label>
@@ -803,14 +797,14 @@ export default function TransaksiClient({
                     required
                     value={formTanggal}
                     onChange={(e) => setFormTanggal(e.target.value)}
-                    className="w-full bg-[#0f172a] border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-cyan-500/50 transition"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="dompet"
-                    className="block text-xs font-semibold text-slate-400 mb-1"
+                    className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1"
                   >
                     Dompet / Rekening
                   </label>
@@ -818,7 +812,7 @@ export default function TransaksiClient({
                     id="dompet"
                     value={formDompet}
                     onChange={(e) => setFormDompet(e.target.value)}
-                    className="w-full bg-[#0f172a] border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-cyan-500/50 transition"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition"
                   >
                     {wallets.map((w) => (
                       <option key={w.id} value={w.nama}>
@@ -833,7 +827,7 @@ export default function TransaksiClient({
               <div>
                 <label
                   htmlFor="kategori"
-                  className="block text-xs font-semibold text-slate-400 mb-1"
+                  className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1"
                 >
                   Kategori
                 </label>
@@ -841,7 +835,7 @@ export default function TransaksiClient({
                   id="kategori"
                   value={formKategori}
                   onChange={(e) => setFormKategori(e.target.value)}
-                  className="w-full bg-[#0f172a] border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-cyan-500/50 transition"
+                  className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition"
                 >
                   {availableCategories.map((c) => (
                     <option key={c} value={c}>
@@ -852,22 +846,22 @@ export default function TransaksiClient({
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-4 flex items-center justify-end gap-3">
+              <div className="pt-3 flex items-center justify-end gap-2.5 border-t border-zinc-200 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setIsFormModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-lg text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex items-center gap-2 bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-xs transition shadow-[0_0_15px_rgba(34,211,238,0.25)] cursor-pointer"
+                  className="flex items-center gap-1.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 disabled:opacity-50 text-white dark:text-zinc-900 font-medium px-4 py-1.5 rounded-lg text-xs transition cursor-pointer"
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
                       <span>Menyimpan...</span>
                     </>
                   ) : (
@@ -884,41 +878,31 @@ export default function TransaksiClient({
 
       {/* MODAL: Konfirmasi Hapus */}
       {deletingTransaction && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="w-full max-w-md bg-[#0a0f1c] border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative animate-scale-in">
-            <div className="w-12 h-12 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center justify-center text-rose-400 mb-4">
-              <AlertCircle className="w-6 h-6" />
-            </div>
-
-            <h3 className="text-lg font-bold text-white mb-2">Hapus Transaksi?</h3>
-            <p className="text-xs text-slate-400 leading-relaxed mb-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xl relative text-zinc-900 dark:text-zinc-100">
+            <h3 className="text-base font-semibold mb-1">Hapus Transaksi?</h3>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed mb-4">
               Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat
               dibatalkan.
             </p>
 
-            <div className="bg-[#0f172a] border border-slate-800 rounded-2xl p-4 mb-6 text-xs space-y-1.5">
-              <p className="font-bold text-white">{deletingTransaction.deskripsi}</p>
-              <p className="text-slate-400">
+            <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 mb-4 text-xs space-y-1">
+              <p className="font-medium text-zinc-900 dark:text-zinc-100">{deletingTransaction.deskripsi}</p>
+              <p className="text-zinc-500 text-[11px]">
                 {deletingTransaction.tanggal} • {deletingTransaction.kategori} (
                 {deletingTransaction.dompet || "Tunai"})
               </p>
-              <p
-                className={`font-extrabold ${
-                  deletingTransaction.tipe === "Pemasukan"
-                    ? "text-emerald-400"
-                    : "text-rose-400"
-                }`}
-              >
+              <p className="font-semibold tabular-nums text-zinc-900 dark:text-zinc-100 pt-1">
                 {deletingTransaction.tipe === "Pemasukan" ? "+" : "-"}
                 {formatRupiah(Number(deletingTransaction.nominal))}
               </p>
             </div>
 
-            <div className="flex items-center justify-end gap-3">
+            <div className="flex items-center justify-end gap-2 border-t border-zinc-200 dark:border-zinc-800 pt-3">
               <button
                 type="button"
                 onClick={() => setDeletingTransaction(null)}
-                className="px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition cursor-pointer"
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
               >
                 Batal
               </button>
@@ -926,11 +910,11 @@ export default function TransaksiClient({
                 type="button"
                 onClick={handleConfirmDelete}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 bg-rose-500 hover:bg-rose-400 disabled:opacity-50 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition shadow-[0_0_15px_rgba(244,63,94,0.3)] cursor-pointer"
+                className="flex items-center gap-1.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 disabled:opacity-50 text-white dark:text-zinc-900 font-medium px-3.5 py-1.5 rounded-lg text-xs transition cursor-pointer"
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     <span>Menghapus...</span>
                   </>
                 ) : (

@@ -55,21 +55,21 @@ const formatRupiah = (angka: number) => {
 function getWalletIcon(tipe: string) {
   const lower = tipe.toLowerCase()
   if (lower.includes('bank') || lower.includes('rekening')) {
-    return <Building2 className="w-5 h-5 text-cyan-400" />
+    return <Building2 className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
   }
   if (lower.includes('digital') || lower.includes('e-wallet') || lower.includes('gopay') || lower.includes('ovo')) {
-    return <Smartphone className="w-5 h-5 text-emerald-400" />
+    return <Smartphone className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
   }
   if (lower.includes('investasi') || lower.includes('reksa') || lower.includes('saham')) {
-    return <TrendingUp className="w-5 h-5 text-purple-400" />
+    return <TrendingUp className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
   }
   if (lower.includes('fisik') || lower.includes('tunai') || lower.includes('cash')) {
-    return <Banknote className="w-5 h-5 text-amber-400" />
+    return <Banknote className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
   }
   if (lower.includes('kredit')) {
-    return <CreditCard className="w-5 h-5 text-rose-400" />
+    return <CreditCard className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
   }
-  return <Wallet className="w-5 h-5 text-cyan-400" />
+  return <Wallet className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
 }
 
 export default function DompetClient({
@@ -254,19 +254,19 @@ export default function DompetClient({
         )}
 
         {/* Header & Quick Action */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800/60">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-zinc-200 dark:border-zinc-800">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
               Manajemen Dompet & Rekening
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
               Atur seluruh rekening bank, e-wallet, dan pos tabungan Anda beserta saldo awal dan mutasinya.
             </p>
           </div>
 
           <button
             onClick={handleOpenCreateModal}
-            className="flex items-center justify-center gap-2 bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold py-3 px-5 rounded-xl transition-all duration-200 shadow-[0_0_20px_rgba(34,211,238,0.25)] hover:shadow-[0_0_25px_rgba(34,211,238,0.4)] active:scale-95 cursor-pointer text-sm"
+            className="flex items-center justify-center gap-1.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-medium py-2 px-3.5 rounded-lg transition active:scale-95 cursor-pointer text-xs sm:text-sm"
           >
             <Plus className="w-4 h-4" />
             <span>Tambah Dompet Baru</span>
@@ -274,55 +274,55 @@ export default function DompetClient({
         </div>
 
         {/* Ringkasan Akumulasi Saldo Seluruh Dompet */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-[#0f172a] border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
-            <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4">
+            <div className="flex items-center justify-between text-zinc-500 text-xs mb-1.5">
               <span>Total Saldo Terkini</span>
-              <PiggyBank className="w-4 h-4 text-cyan-400" />
+              <PiggyBank className="w-4 h-4 text-zinc-400" />
             </div>
-            <div className="text-xl sm:text-2xl font-extrabold text-cyan-400 truncate">
+            <div className="text-lg sm:text-xl font-semibold tabular-nums text-zinc-900 dark:text-zinc-100 truncate">
               {formatRupiah(totalSaldoTerkini)}
             </div>
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">
               Saldo awal + seluruh mutasi aktif
             </p>
           </div>
 
-          <div className="bg-[#0f172a] border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
-            <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4">
+            <div className="flex items-center justify-between text-zinc-500 text-xs mb-1.5">
               <span>Total Saldo Awal</span>
-              <Wallet className="w-4 h-4 text-slate-400" />
+              <Wallet className="w-4 h-4 text-zinc-400" />
             </div>
-            <div className="text-xl sm:text-2xl font-extrabold text-white truncate">
+            <div className="text-lg sm:text-xl font-semibold tabular-nums text-zinc-900 dark:text-zinc-100 truncate">
               {formatRupiah(totalSaldoAwal)}
             </div>
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">
               Akumulasi modal pembukuan awal
             </p>
           </div>
 
-          <div className="bg-[#0f172a] border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
-            <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4">
+            <div className="flex items-center justify-between text-zinc-500 text-xs mb-1.5">
               <span>Total Pemasukan Masuk</span>
-              <ArrowDownRight className="w-4 h-4 text-emerald-400" />
+              <ArrowDownRight className="w-4 h-4 text-zinc-400" />
             </div>
-            <div className="text-xl sm:text-2xl font-extrabold text-emerald-400 truncate">
+            <div className="text-lg sm:text-xl font-semibold tabular-nums text-zinc-900 dark:text-zinc-100 truncate">
               {formatRupiah(totalPemasukan)}
             </div>
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">
               Total dana masuk ke dompet
             </p>
           </div>
 
-          <div className="bg-[#0f172a] border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
-            <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4">
+            <div className="flex items-center justify-between text-zinc-500 text-xs mb-1.5">
               <span>Total Pengeluaran Keluar</span>
-              <ArrowUpRight className="w-4 h-4 text-rose-400" />
+              <ArrowUpRight className="w-4 h-4 text-zinc-400" />
             </div>
-            <div className="text-xl sm:text-2xl font-extrabold text-rose-400 truncate">
+            <div className="text-lg sm:text-xl font-semibold tabular-nums text-zinc-500 dark:text-zinc-400 truncate">
               {formatRupiah(totalPengeluaran)}
             </div>
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">
               Total dana keluar dari dompet
             </p>
           </div>
@@ -330,53 +330,53 @@ export default function DompetClient({
 
         {/* Daftar Kartu Dompet */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+          <div className="flex items-center justify-between mb-3.5">
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
               <span>Daftar Dompet & Akun</span>
-              <span className="text-xs font-semibold bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 px-1.5 py-0.5 rounded">
                 {walletsWithBalance.length} Dompet
               </span>
             </h2>
           </div>
 
           {walletsWithBalance.length === 0 ? (
-            <div className="bg-[#0f172a] border border-slate-800 border-dashed rounded-3xl p-12 text-center space-y-4">
-              <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center mx-auto">
-                <Wallet className="w-8 h-8" />
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 border-dashed rounded-xl p-10 text-center space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-400 flex items-center justify-center mx-auto">
+                <Wallet className="w-6 h-6" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-bold text-white">Belum Ada Dompet Tercatat</h3>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Belum Ada Dompet Tercatat</h3>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
                   Tambahkan dompet pertama Anda seperti BCA, Mandiri, GoPay, atau Tunai untuk mulai mengelola saldo secara rapi.
                 </p>
               </div>
               <button
                 onClick={handleOpenCreateModal}
-                className="inline-flex items-center gap-2 bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold py-2.5 px-5 rounded-xl transition text-sm cursor-pointer shadow-[0_0_15px_rgba(34,211,238,0.2)]"
+                className="inline-flex items-center gap-1.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-medium py-1.5 px-3.5 rounded-lg transition text-xs cursor-pointer"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-3.5 h-3.5" />
                 <span>Tambah Dompet Sekarang</span>
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
               {walletsWithBalance.map((wallet) => (
                 <div
                   key={wallet.id}
-                  className="bg-[#0f172a] border border-slate-800/90 rounded-2xl p-5 hover:border-slate-700/80 hover:-translate-y-1 hover:shadow-xl transition-all duration-200 flex flex-col justify-between group"
+                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 transition flex flex-col justify-between group shadow-sm hover:border-zinc-300 dark:hover:border-zinc-700"
                 >
                   <div>
                     {/* Header Card: Icon, Tipe, & Menu Actions */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60 group-hover:scale-105 transition-transform">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
                           {getWalletIcon(wallet.tipe)}
                         </div>
                         <div>
-                          <h3 className="text-base font-bold text-white leading-tight">
+                          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-tight">
                             {wallet.nama}
                           </h3>
-                          <span className="inline-block text-[10px] font-medium text-slate-400 bg-slate-800/60 border border-slate-700/50 px-2 py-0.5 rounded-md mt-1">
+                          <span className="inline-block text-[10px] font-medium text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-1.5 py-0.5 rounded mt-0.5">
                             {wallet.tipe}
                           </span>
                         </div>
@@ -387,42 +387,42 @@ export default function DompetClient({
                         <button
                           onClick={() => handleOpenEditModal(wallet)}
                           title="Edit Dompet"
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-slate-800 transition cursor-pointer"
+                          className="p-1 rounded-md text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => setDeletingWallet(wallet)}
                           title="Hapus Dompet"
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition cursor-pointer"
+                          className="p-1 rounded-md text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
 
                     {/* Saldo Terkini */}
-                    <div className="space-y-1 mb-4">
-                      <span className="text-[11px] text-slate-400 font-medium">Saldo Terkini</span>
-                      <p className="text-2xl font-extrabold text-cyan-400 tracking-tight">
+                    <div className="space-y-0.5 mb-3">
+                      <span className="text-[11px] text-zinc-500 dark:text-zinc-400">Saldo Terkini</span>
+                      <p className="text-lg font-semibold tabular-nums text-zinc-900 dark:text-zinc-100 tracking-tight">
                         {formatRupiah(wallet.saldo_terkini ?? wallet.saldo_awal)}
                       </p>
                     </div>
                   </div>
 
                   {/* Card Footer: Saldo Awal & Mutasi */}
-                  <div className="pt-3 border-t border-slate-800/80 space-y-2 text-xs">
-                    <div className="flex justify-between text-slate-400">
+                  <div className="pt-2.5 border-t border-zinc-200 dark:border-zinc-800 space-y-1 text-xs">
+                    <div className="flex justify-between text-zinc-500 text-[11px]">
                       <span>Saldo Awal:</span>
-                      <span className="text-white font-medium">{formatRupiah(wallet.saldo_awal)}</span>
+                      <span className="text-zinc-800 dark:text-zinc-200 font-medium tabular-nums">{formatRupiah(wallet.saldo_awal)}</span>
                     </div>
-                    <div className="flex justify-between text-[11px]">
-                      <span className="text-emerald-400 flex items-center gap-1">
-                        <ArrowDownRight className="w-3 h-3" />
+                    <div className="flex justify-between text-[11px] tabular-nums">
+                      <span className="text-zinc-900 dark:text-zinc-100 flex items-center gap-0.5 font-medium">
+                        <ArrowDownRight className="w-3 h-3 text-zinc-400" />
                         +{formatRupiah(wallet.total_masuk || 0)}
                       </span>
-                      <span className="text-rose-400 flex items-center gap-1">
-                        <ArrowUpRight className="w-3 h-3" />
+                      <span className="text-zinc-500 flex items-center gap-0.5">
+                        <ArrowUpRight className="w-3 h-3 text-zinc-400" />
                         -{formatRupiah(wallet.total_keluar || 0)}
                       </span>
                     </div>
@@ -438,38 +438,38 @@ export default function DompetClient({
           MODAL TAMBAH / EDIT DOMPET
           ======================================================== */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[#0f172a] border border-slate-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-scale-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl w-full max-w-md overflow-hidden shadow-xl text-zinc-900 dark:text-zinc-100">
             {/* Header Modal */}
-            <div className="px-6 py-5 border-b border-slate-800 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400">
-                  <Wallet className="w-4 h-4" />
+            <div className="px-5 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+                  <Wallet className="w-3.5 h-3.5" />
                 </div>
-                <h3 className="text-lg font-bold text-white">
+                <h3 className="text-sm font-semibold tracking-tight">
                   {editingWallet ? 'Edit Dompet' : 'Tambah Dompet Baru'}
                 </h3>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                className="p-1 rounded-md text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Form Modal */}
-            <form onSubmit={handleSubmitForm} className="p-6 space-y-4">
+            <form onSubmit={handleSubmitForm} className="p-5 space-y-3.5">
               {formError && (
-                <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-2">
+                <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   <span>{formError}</span>
                 </div>
               )}
 
               {/* Nama Dompet */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
                   Nama Dompet / Rekening
                 </label>
                 <input
@@ -478,22 +478,22 @@ export default function DompetClient({
                   placeholder="Contoh: BCA Payroll, GoPay, Tunai Dompet"
                   value={formNama}
                   onChange={(e) => setFormNama(e.target.value)}
-                  className="w-full bg-[#050811] border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
+                  className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition"
                 />
               </div>
 
               {/* Tipe Dompet */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
                   Tipe Dompet
                 </label>
                 <select
                   value={formTipe}
                   onChange={(e) => setFormTipe(e.target.value)}
-                  className="w-full bg-[#050811] border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition cursor-pointer"
+                  className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition cursor-pointer"
                 >
                   {WALLET_TYPES.map((tipe) => (
-                    <option key={tipe} value={tipe} className="bg-slate-900 text-white">
+                    <option key={tipe} value={tipe} className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
                       {tipe}
                     </option>
                   ))}
@@ -501,12 +501,12 @@ export default function DompetClient({
               </div>
 
               {/* Saldo Awal */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
                   Saldo Awal (Rp)
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-semibold">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs font-medium">
                     Rp
                   </span>
                   <input
@@ -515,30 +515,30 @@ export default function DompetClient({
                     placeholder="0"
                     value={formSaldoAwal}
                     onChange={(e) => setFormSaldoAwal(e.target.value)}
-                    className="w-full bg-[#050811] border border-slate-700/80 rounded-xl pl-11 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition font-mono"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-9 pr-3 py-2 text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition tabular-nums"
                   />
                 </div>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
                   Saldo pembukuan awal sebelum ada catatan transaksi mutasi baru.
                 </p>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-200 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
                   disabled={isSubmitting}
-                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-lg text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-cyan-400 hover:bg-cyan-300 text-slate-950 transition shadow-[0_0_15px_rgba(34,211,238,0.2)] disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 transition disabled:opacity-50 cursor-pointer"
                 >
-                  {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>{editingWallet ? 'Simpan Perubahan' : 'Buat Dompet'}</span>
                 </button>
               </div>
@@ -551,26 +551,26 @@ export default function DompetClient({
           MODAL KONFIRMASI HAPUS DOMPET
           ======================================================== */}
       {deletingWallet && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[#0f172a] border border-slate-800 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl p-6 text-center space-y-4 animate-scale-in">
-            <div className="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center mx-auto">
-              <Trash2 className="w-6 h-6" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl w-full max-w-sm overflow-hidden shadow-xl p-5 text-center space-y-3.5 text-zinc-900 dark:text-zinc-100">
+            <div className="w-10 h-10 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
+              <Trash2 className="w-5 h-5" />
             </div>
 
             <div className="space-y-1">
-              <h3 className="text-base font-bold text-white">Hapus Dompet Ini?</h3>
-              <p className="text-xs text-slate-400">
+              <h3 className="text-sm font-semibold">Hapus Dompet Ini?</h3>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 Apakah Anda yakin ingin menghapus dompet{' '}
-                <strong className="text-white font-semibold">"{deletingWallet.nama}"</strong>?
+                <strong className="text-zinc-900 dark:text-zinc-100 font-medium">"{deletingWallet.nama}"</strong>?
               </p>
             </div>
 
-            <div className="flex items-center justify-center gap-3 pt-2">
+            <div className="flex items-center justify-center gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
               <button
                 type="button"
                 onClick={() => setDeletingWallet(null)}
                 disabled={isSubmitting}
-                className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
               >
                 Batal
               </button>
@@ -578,7 +578,7 @@ export default function DompetClient({
                 type="button"
                 onClick={handleConfirmDelete}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-rose-500 hover:bg-rose-400 text-white transition shadow-[0_0_15px_rgba(244,63,94,0.3)] disabled:opacity-50 cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 transition disabled:opacity-50 cursor-pointer"
               >
                 {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 <span>Ya, Hapus Dompet</span>

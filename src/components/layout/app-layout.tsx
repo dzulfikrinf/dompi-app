@@ -28,11 +28,7 @@ export default function AppLayout({
   }
 
   return (
-    <div className="flex h-screen bg-[#06080e] text-slate-100 overflow-hidden font-sans selection:bg-cyan-500/30 relative">
-      {/* Ambient Lighting Orbs */}
-      <div className="absolute -top-32 right-1/4 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute -bottom-32 left-1/3 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-[160px] pointer-events-none" />
-
+    <div className="flex h-screen bg-zinc-100/60 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 overflow-hidden font-sans selection:bg-zinc-800 selection:text-white dark:selection:bg-zinc-200 dark:selection:text-zinc-900 relative">
       {/* 1. Desktop Collapsible Sidebar */}
       <Sidebar
         collapsed={collapsed}

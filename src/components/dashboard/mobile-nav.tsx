@@ -18,6 +18,7 @@ import {
   LogOut,
   Plus,
 } from 'lucide-react'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 type MobileNavProps = {
   currentPath: string
@@ -60,26 +61,30 @@ export default function MobileNav({
   return (
     <>
       {/* 1. Mobile Fixed Bottom Bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#070a12]/95 backdrop-blur-xl border-t border-white/[0.08] z-40 px-4 flex items-center justify-around shadow-[0_-10px_30px_rgba(0,0,0,0.4)]">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-800 z-40 px-4 flex items-center justify-around shadow-sm">
         <Link
           href="/"
           prefetch={true}
-          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-xl ${
-            currentPath === '/' ? 'text-cyan-400 font-semibold' : 'text-slate-400 hover:text-white'
+          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-lg ${
+            currentPath === '/'
+              ? 'text-zinc-950 dark:text-zinc-50 font-bold'
+              : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
           }`}
         >
-          <Home className="w-5 h-5" />
+          <Home className="w-4 h-4" />
           <span>Beranda</span>
         </Link>
 
         <Link
           href="/transaksi"
           prefetch={true}
-          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-xl ${
-            currentPath === '/transaksi' ? 'text-cyan-400 font-semibold' : 'text-slate-400 hover:text-white'
+          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-lg ${
+            currentPath === '/transaksi'
+              ? 'text-zinc-950 dark:text-zinc-50 font-bold'
+              : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
           }`}
         >
-          <List className="w-5 h-5" />
+          <List className="w-4 h-4" />
           <span>Transaksi</span>
         </Link>
 
@@ -88,28 +93,30 @@ export default function MobileNav({
           href="/transaksi?action=create"
           prefetch={true}
           aria-label="Catat Transaksi Baru"
-          className="w-12 h-12 -mt-6 rounded-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 flex items-center justify-center shadow-[0_4px_25px_rgba(34,211,238,0.45)] transition-all active:scale-95 border-2 border-[#070a12]"
+          className="w-11 h-11 -mt-5 rounded-full bg-zinc-900 dark:bg-zinc-50 text-white dark:text-zinc-900 flex items-center justify-center shadow-md transition active:scale-95 border-2 border-white dark:border-zinc-950"
         >
-          <Plus className="w-6 h-6 stroke-[2.5]" />
+          <Plus className="w-5 h-5 stroke-[2.5]" />
         </Link>
 
         <Link
           href="/chat"
           prefetch={true}
-          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-xl ${
-            currentPath === '/chat' ? 'text-cyan-400 font-semibold' : 'text-slate-400 hover:text-white'
+          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-lg ${
+            currentPath === '/chat'
+              ? 'text-zinc-950 dark:text-zinc-50 font-bold'
+              : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
           }`}
         >
-          <MessageSquare className="w-5 h-5" />
+          <MessageSquare className="w-4 h-4" />
           <span>Chat</span>
         </Link>
 
         <button
           onClick={() => setIsDrawerOpen(true)}
           aria-label="Buka menu navigasi lainnya"
-          className="flex flex-col items-center gap-1 text-[11px] font-medium text-slate-400 hover:text-white transition py-1 px-2 rounded-xl cursor-pointer"
+          className="flex flex-col items-center gap-1 text-[11px] font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition py-1 px-2 rounded-lg cursor-pointer"
         >
-          <Menu className="w-5 h-5" />
+          <Menu className="w-4 h-4" />
           <span>Menu</span>
         </button>
       </div>
@@ -119,39 +126,44 @@ export default function MobileNav({
         <div className="lg:hidden fixed inset-0 z-50 flex">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/80 backdrop-blur-md animate-fade-in"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-fade-in"
             onClick={() => setIsDrawerOpen(false)}
             aria-hidden="true"
           />
 
           {/* Drawer content */}
-          <div className="relative ml-auto w-4/5 max-w-xs h-full bg-[#070a12] border-l border-white/[0.08] p-5 flex flex-col justify-between shadow-2xl z-10 overflow-y-auto animate-slide-right">
+          <div className="relative ml-auto w-4/5 max-w-xs h-full bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 p-5 flex flex-col justify-between shadow-xl z-10 overflow-y-auto">
             <div>
               {/* Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center p-1">
                     <Image
                       src="/logo.png"
                       alt="Logo Dompi"
-                      width={32}
-                      height={32}
-                      className="w-8 h-8 object-contain"
+                      width={24}
+                      height={24}
+                      className="w-5 h-5 object-contain"
                     />
                   </div>
-                  <span className="font-extrabold text-white text-lg tracking-tight">Menu Dompi</span>
+                  <span className="text-base font-bold text-zinc-900 dark:text-zinc-50">
+                    dompi
+                  </span>
                 </div>
-                <button
-                  onClick={() => setIsDrawerOpen(false)}
-                  aria-label="Tutup menu"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <ThemeToggle />
+                  <button
+                    onClick={() => setIsDrawerOpen(false)}
+                    aria-label="Tutup menu"
+                    className="p-1 rounded-md text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
-              {/* Navigation items */}
-              <nav className="mt-4 space-y-1" aria-label="Navigasi Menu Mobile">
+              {/* Navigation list */}
+              <nav className="mt-4 space-y-1">
                 {DRAWER_ITEMS.map((item) => {
                   const Icon = item.icon
                   const isActive = currentPath === item.href
@@ -162,18 +174,18 @@ export default function MobileNav({
                       href={item.href}
                       prefetch={true}
                       onClick={() => setIsDrawerOpen(false)}
-                      className={`flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium transition ${
+                      className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition ${
                         isActive
-                          ? 'bg-[#111c3a] text-cyan-400'
-                          : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                          ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-950 dark:text-zinc-50 font-bold'
+                          : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-50 hover:bg-zinc-50 dark:hover:bg-zinc-900'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <Icon className="w-5 h-5 flex-shrink-0" />
+                        <Icon className="w-4 h-4" />
                         <span>{item.label}</span>
                       </div>
                       {item.badge && (
-                        <span className="text-[10px] font-bold bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 px-1.5 py-0.5 rounded-md">
+                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
                           {item.badge}
                         </span>
                       )}
@@ -183,26 +195,18 @@ export default function MobileNav({
               </nav>
             </div>
 
-            {/* User profile & Logout */}
-            <div className="pt-4 border-t border-slate-800 space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                  {userEmail ? userEmail.charAt(0).toUpperCase() : 'M'}
-                </div>
-                <div className="overflow-hidden">
-                  <p className="text-xs font-bold text-white truncate">{userEmail || 'Masjul'}</p>
-                  <p className="text-[10px] text-slate-400">Pengguna Aktif</p>
-                </div>
-              </div>
+            {/* User info & Logout */}
+            <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-xs">
+              <span className="text-zinc-500 truncate max-w-[150px]">{userEmail || 'Pengguna'}</span>
               <button
                 onClick={() => {
                   setIsDrawerOpen(false)
                   onLogout()
                 }}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-rose-950/30 border border-rose-800/50 text-rose-400 hover:bg-rose-900/40 font-semibold text-xs transition cursor-pointer"
+                className="flex items-center gap-1 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium"
               >
-                <LogOut className="w-4 h-4" />
-                <span>Keluar dari Akun</span>
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Keluar</span>
               </button>
             </div>
           </div>

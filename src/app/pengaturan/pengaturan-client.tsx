@@ -34,39 +34,39 @@ export default function PengaturanClient({
 
   return (
     <AppLayout currentPath="/pengaturan" userEmail={userEmail}>
-      <div className="max-w-3xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6 animate-fade-in-up">
+      <div className="max-w-3xl mx-auto space-y-5 text-zinc-900 dark:text-zinc-100">
         {/* Page Title */}
-        <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
-          <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center border border-cyan-500/20">
-            <Settings className="w-6 h-6" />
+        <div className="flex items-center gap-3 pb-3 border-b border-zinc-200 dark:border-zinc-800">
+          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center border border-zinc-200 dark:border-zinc-700">
+            <Settings className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-white">Pengaturan Akun & Sistem</h1>
-            <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Pengaturan Akun & Sistem</h1>
+            <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
               Informasi profil pengguna, status integrasi bot, dan konfigurasi aplikasi.
             </p>
           </div>
         </div>
 
         {/* 1. Profil Pengguna */}
-        <div className="bg-[#0f172a] border border-slate-800 rounded-2xl p-6 space-y-4">
-          <div className="flex items-center gap-2.5 text-sm font-bold text-white border-b border-slate-800/80 pb-3">
-            <User className="w-4 h-4 text-cyan-400" />
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 space-y-3.5 shadow-sm">
+          <div className="flex items-center gap-2 text-sm font-semibold border-b border-zinc-200 dark:border-zinc-800 pb-2.5">
+            <User className="w-4 h-4 text-zinc-500" />
             <span>Profil Pengguna & Sesi</span>
           </div>
 
-          <div className="space-y-3 text-xs sm:text-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-b border-slate-800/60 gap-1">
-              <span className="text-slate-400 font-medium">Email Pemilik</span>
-              <span className="text-white font-semibold font-mono">{userEmail || 'dzulfikrinfalah@gmail.com'}</span>
+          <div className="space-y-2.5 text-xs sm:text-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 border-b border-zinc-100 dark:border-zinc-800 gap-1">
+              <span className="text-zinc-500">Email Pemilik</span>
+              <span className="font-medium font-mono">{userEmail || 'dzulfikrinfalah@gmail.com'}</span>
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-b border-slate-800/60 gap-1">
-              <span className="text-slate-400 font-medium">User ID (Supabase Auth)</span>
-              <span className="text-slate-400 font-mono text-xs truncate max-w-xs">{userId || '-'}</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 border-b border-zinc-100 dark:border-zinc-800 gap-1">
+              <span className="text-zinc-500">User ID (Supabase Auth)</span>
+              <span className="text-zinc-400 font-mono text-xs truncate max-w-xs">{userId || '-'}</span>
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between py-2 gap-1">
-              <span className="text-slate-400 font-medium">Status Keamanan Database</span>
-              <span className="inline-flex items-center gap-1.5 text-xs text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 gap-1">
+              <span className="text-zinc-500">Status Keamanan Database</span>
+              <span className="inline-flex items-center gap-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-medium bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-0.5 rounded">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 Row Level Security (RLS) Aktif
               </span>
@@ -75,70 +75,70 @@ export default function PengaturanClient({
         </div>
 
         {/* 2. Integrasi Bot Telegram */}
-        <div className="bg-[#0f172a] border border-slate-800 rounded-2xl p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-            <div className="flex items-center gap-2.5 text-sm font-bold text-white">
-              <Send className="w-4 h-4 text-cyan-400" />
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 space-y-3.5 shadow-sm">
+          <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-2.5">
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <Send className="w-4 h-4 text-zinc-500" />
               <span>Integrasi Bot Telegram</span>
             </div>
-            <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-0.5 rounded">
               Tersambung
             </span>
           </div>
 
-          <div className="space-y-3 text-xs sm:text-sm text-slate-300">
+          <div className="space-y-3 text-xs sm:text-sm text-zinc-600 dark:text-zinc-300">
             <p className="leading-relaxed">
               Bot Telegram Dompi telah terpasang untuk akun Anda. Anda dapat mencatat dan mengoreksi transaksi langsung lewat chat Telegram pribadi tanpa perlu membuka aplikasi web.
             </p>
-            <div className="p-3.5 rounded-xl bg-[#0a0f1c] border border-slate-800 space-y-1.5 text-xs">
+            <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 space-y-1 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-400">Mode Akses:</span>
-                <span className="text-white font-medium">Pribadi (Single-User Whitelist)</span>
+                <span className="text-zinc-500">Mode Akses:</span>
+                <span className="font-medium text-zinc-900 dark:text-zinc-100">Pribadi (Single-User Whitelist)</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Proteksi Webhook:</span>
-                <span className="text-white font-medium">Secret Token & Chat ID Whitelist</span>
+                <span className="text-zinc-500">Proteksi Webhook:</span>
+                <span className="font-medium text-zinc-900 dark:text-zinc-100">Secret Token & Chat ID Whitelist</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* 3. Asisten AI Dompi */}
-        <div className="bg-[#0f172a] border border-slate-800 rounded-2xl p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-            <div className="flex items-center gap-2.5 text-sm font-bold text-white">
-              <Sparkles className="w-4 h-4 text-cyan-400" />
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 space-y-3 shadow-sm">
+          <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-2.5">
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <Sparkles className="w-4 h-4 text-zinc-500" />
               <span>Asisten Natural Language</span>
             </div>
-            <span className="text-[11px] font-semibold text-cyan-400 bg-cyan-950 border border-cyan-800 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-0.5 rounded">
               Gemini 3.5 Flash Lite
             </span>
           </div>
 
-          <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+          <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
             Mendukung pemahaman bahasa Indonesia sehari-hari untuk mencatat pengeluaran, mengubah data, soft-delete, undo, serta ringkasan keuangan bulanan.
           </p>
         </div>
 
         {/* 4. Keluar dari Akun */}
-        <div className="bg-[#0f172a] border border-rose-900/30 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
           <div>
-            <h2 className="text-sm font-bold text-white">Keluar dari Akun</h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <h2 className="text-sm font-semibold">Keluar dari Akun</h2>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
               Mengakhiri sesi aktif di peramban ini dan kembali ke halaman login.
             </p>
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 text-xs sm:text-sm font-bold transition cursor-pointer flex-shrink-0"
+            className="flex items-center justify-center gap-2 py-2 px-3.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 text-xs font-medium transition cursor-pointer flex-shrink-0"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-3.5 h-3.5" />
             <span>Keluar Sekarang</span>
           </button>
         </div>
 
         {/* 5. Info Versi */}
-        <div className="flex items-center justify-center gap-2 text-xs text-slate-500 pt-4">
+        <div className="flex items-center justify-center gap-1.5 text-xs text-zinc-400 pt-3">
           <Info className="w-3.5 h-3.5" />
           <span>Dompi MVP v1.0 • Pencatat Keuangan Pribadi</span>
         </div>

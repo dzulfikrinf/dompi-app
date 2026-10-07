@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
 import { Mail, Lock, Loader2, ArrowRight } from "lucide-react"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function LoginForm() {
   const router = useRouter()
@@ -81,37 +82,38 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050811] text-slate-200 flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden font-sans">
-      {/* Decorative ambient background glows */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-zinc-100/60 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col justify-center items-center px-4 py-12 relative font-sans">
+      {/* Theme toggle in top right corner */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+        <ThemeToggle />
+      </div>
 
       {/* Main card */}
-      <div className="w-full max-w-md bg-[#0a0f1c] border border-slate-800/80 rounded-3xl p-8 shadow-2xl relative z-10 backdrop-blur-xl">
+      <div className="w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 sm:p-7 shadow-sm">
         {/* Brand header */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="flex flex-col items-center gap-2 mb-3">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 hover:scale-105">
+        <div className="flex flex-col items-center mb-6">
+          <div className="flex flex-col items-center gap-2 mb-2">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0">
               <Image
                 src="/logo.png"
                 alt="Logo Dompi"
-                width={64}
-                height={64}
-                className="w-16 h-16 object-contain drop-shadow-xl"
+                width={48}
+                height={48}
+                className="w-12 h-12 object-contain"
                 priority
               />
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-3xl font-extrabold text-white tracking-tight">dompi</span>
-              <span className="text-[10px] font-bold border border-cyan-500/50 bg-[#0f172a] text-cyan-400 px-2 py-0.5 rounded-full uppercase">
+            <div className="flex items-center gap-1.5">
+              <span className="text-2xl font-bold tracking-tight">dompi</span>
+              <span className="text-[10px] font-medium border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 px-1.5 py-0.5 rounded uppercase">
                 Pro
               </span>
             </div>
           </div>
-          <h1 className="text-xl font-bold text-white">
+          <h1 className="text-lg font-semibold">
             {mode === "login" ? "Masuk ke Akun Anda" : "Buat Akun Baru"}
           </h1>
-          <p className="text-xs text-slate-400 mt-1 text-center">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 text-center">
             {mode === "login"
               ? "Kelola dan pantau catatan keuangan Anda dengan aman."
               : "Mulai catat keuangan pribadi dengan asisten cerdas Dompi."}
@@ -120,25 +122,25 @@ export default function LoginForm() {
 
         {/* Feedback notifications */}
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs leading-relaxed">
+          <div className="mb-4 p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs leading-relaxed">
             {error}
           </div>
         )}
 
         {message && (
-          <div className="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs leading-relaxed">
+          <div className="mb-4 p-3 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs leading-relaxed">
             {message}
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3.5">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5" htmlFor="email">
+            <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1" htmlFor="email">
               Email
             </label>
-            <div className="flex items-center gap-3 bg-[#0f172a] border border-slate-800 rounded-xl px-4 py-3 focus-within:border-cyan-500/60 focus-within:ring-1 focus-within:ring-cyan-500/40 transition">
-              <Mail className="w-4 h-4 text-slate-500" />
+            <div className="flex items-center gap-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 focus-within:border-zinc-400 dark:focus-within:border-zinc-600 transition">
+              <Mail className="w-4 h-4 text-zinc-400" />
               <input
                 id="email"
                 type="email"
@@ -146,17 +148,17 @@ export default function LoginForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="nama@email.com"
-                className="bg-transparent border-none outline-none text-sm w-full text-white placeholder-slate-500"
+                className="bg-transparent border-none outline-none text-xs sm:text-sm w-full text-zinc-900 dark:text-zinc-100 placeholder-zinc-400"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5" htmlFor="password">
+            <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1" htmlFor="password">
               Kata Sandi
             </label>
-            <div className="flex items-center gap-3 bg-[#0f172a] border border-slate-800 rounded-xl px-4 py-3 focus-within:border-cyan-500/60 focus-within:ring-1 focus-within:ring-cyan-500/40 transition">
-              <Lock className="w-4 h-4 text-slate-500" />
+            <div className="flex items-center gap-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 focus-within:border-zinc-400 dark:focus-within:border-zinc-600 transition">
+              <Lock className="w-4 h-4 text-zinc-400" />
               <input
                 id="password"
                 type="password"
@@ -165,18 +167,18 @@ export default function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="bg-transparent border-none outline-none text-sm w-full text-white placeholder-slate-500"
+                className="bg-transparent border-none outline-none text-xs sm:text-sm w-full text-zinc-900 dark:text-zinc-100 placeholder-zinc-400"
               />
             </div>
             {mode === "register" && (
-              <p className="text-[11px] text-slate-500 mt-1">Minimal 6 karakter.</p>
+              <p className="text-[11px] text-zinc-400 mt-1">Minimal 6 karakter.</p>
             )}
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-bold py-3.5 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(34,211,238,0.25)] mt-6 cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed text-white dark:text-zinc-900 font-medium py-2.5 px-4 rounded-lg transition text-xs sm:text-sm mt-5 cursor-pointer"
           >
             {loading ? (
               <>
@@ -186,21 +188,21 @@ export default function LoginForm() {
             ) : mode === "login" ? (
               <>
                 <span>Masuk Sekarang</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-3.5 h-3.5" />
               </>
             ) : (
               <>
                 <span>Daftar Akun</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-3.5 h-3.5" />
               </>
             )}
           </button>
         </form>
 
         {/* Toggle Mode */}
-        <div className="mt-6 pt-6 border-t border-slate-800/80 text-center">
+        <div className="mt-5 pt-4 border-t border-zinc-200 dark:border-zinc-800 text-center">
           {mode === "login" ? (
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
               Belum punya akun?{" "}
               <button
                 type="button"
@@ -209,13 +211,13 @@ export default function LoginForm() {
                   setError(null)
                   setMessage(null)
                 }}
-                className="text-cyan-400 hover:text-cyan-300 font-semibold transition ml-1 cursor-pointer"
+                className="text-zinc-900 dark:text-zinc-100 font-medium hover:underline underline-offset-4 transition ml-1 cursor-pointer"
               >
                 Daftar sekarang
               </button>
             </p>
           ) : (
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
               Sudah memiliki akun?{" "}
               <button
                 type="button"
@@ -224,7 +226,7 @@ export default function LoginForm() {
                   setError(null)
                   setMessage(null)
                 }}
-                className="text-cyan-400 hover:text-cyan-300 font-semibold transition ml-1 cursor-pointer"
+                className="text-zinc-900 dark:text-zinc-100 font-medium hover:underline underline-offset-4 transition ml-1 cursor-pointer"
               >
                 Masuk di sini
               </button>
