@@ -358,18 +358,17 @@ export default function TransaksiClient({
   return (
     <div className="min-h-screen bg-zinc-100/60 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-sans selection:bg-zinc-800 selection:text-white dark:selection:bg-zinc-200 dark:selection:text-zinc-900">
       {/* Top Navbar */}
-      <header className="h-16 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30">
-        <div className="flex items-center gap-3">
+      <header className="h-16 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md px-3 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex-shrink-0"
             title="Kembali ke Dashboard"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-xs font-medium hidden sm:inline">Dashboard</span>
           </Link>
-          <div className="h-4 w-px bg-zinc-200 dark:border-zinc-800" />
-          <div className="flex items-center gap-2.5">
+
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0">
               <Image
                 src="/logo.png"
@@ -379,23 +378,26 @@ export default function TransaksiClient({
                 className="w-8 h-8 object-contain"
               />
             </div>
-            <div>
-              <h1 className="text-sm font-semibold tracking-tight leading-none text-zinc-900 dark:text-zinc-100">
+            <div className="min-w-0">
+              <h1 className="text-sm font-semibold tracking-tight leading-none text-zinc-900 dark:text-zinc-100 truncate">
                 Riwayat Transaksi
               </h1>
-              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">{userEmail || "Masjul"}</p>
+              <p className="hidden sm:block text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 truncate max-w-[200px]">{userEmail || "Masjul"}</p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
           <ThemeToggle />
           <button
             onClick={handleOpenCreateModal}
-            className="flex items-center gap-1.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-medium py-1.5 px-3 rounded-lg transition cursor-pointer text-xs"
+            className="inline-flex items-center justify-center h-9 px-3 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-medium transition cursor-pointer text-xs"
+            title="Tambah Transaksi Baru"
+            aria-label="Tambah Transaksi Baru"
           >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Tambah Transaksi</span>
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline ml-1.5">Tambah Transaksi</span>
+            <span className="sm:hidden ml-1">Tambah</span>
           </button>
         </div>
       </header>

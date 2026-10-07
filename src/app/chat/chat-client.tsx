@@ -138,50 +138,52 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
   return (
     <div className="min-h-screen bg-zinc-100/60 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-sans selection:bg-zinc-800 selection:text-white dark:selection:bg-zinc-200 dark:selection:text-zinc-900">
       {/* Top Header */}
-      <header className="h-16 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30">
-        <div className="flex items-center gap-3">
+      <header className="h-16 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md px-3 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex-shrink-0"
             title="Kembali ke Dashboard"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-xs font-medium hidden sm:inline">Dashboard</span>
           </Link>
-          <div className="h-4 w-px bg-zinc-200 dark:bg-zinc-800" />
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-950">
+
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-950 flex-shrink-0">
               <Sparkles className="w-4 h-4" />
             </div>
-            <div>
-              <h1 className="text-sm font-semibold tracking-tight leading-none flex items-center gap-2">
-                Chat Dompi
-                <span className="text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 px-1.5 py-0.5 rounded">
+            <div className="min-w-0">
+              <h1 className="text-sm font-semibold tracking-tight leading-none flex items-center gap-1.5 truncate">
+                <span>Chat Dompi</span>
+                <span className="text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 px-1.5 py-0.2 rounded">
                   AI
                 </span>
               </h1>
-              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">{userEmail || 'Masjul'}</p>
+              <p className="hidden sm:block text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 truncate max-w-[200px]">{userEmail || 'Masjul'}</p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
           <ThemeToggle />
           <button
             onClick={handleUndo}
             disabled={isLoading}
-            className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 transition cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center justify-center w-9 h-9 sm:w-auto sm:px-3 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 text-xs font-medium transition cursor-pointer disabled:opacity-40"
             title="Pulihkan transaksi terakhir yang baru dihapus"
+            aria-label="Batalkan penghapusan terakhir"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Batalkan Penghapusan</span>
+            <RotateCcw className="w-4 h-4" />
+            <span className="hidden sm:inline ml-1.5">Batalkan</span>
           </button>
           <Link
             href="/transaksi"
-            className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 transition"
+            className="inline-flex items-center justify-center w-9 h-9 sm:w-auto sm:px-3 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 text-xs font-medium transition"
+            title="Buka Riwayat Transaksi"
+            aria-label="Buka Riwayat Transaksi"
           >
-            <List className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Daftar Transaksi</span>
+            <List className="w-4 h-4" />
+            <span className="hidden sm:inline ml-1.5">Riwayat</span>
           </Link>
         </div>
       </header>

@@ -34,12 +34,12 @@ export default function Header({ userEmail }: HeaderProps) {
         </p>
       </div>
 
-      <div className="flex items-center gap-2.5 flex-wrap">
+      <div className="flex items-center gap-2 flex-wrap">
         <ThemeToggle />
 
         <Link
           href="/chat"
-          className="inline-flex items-center gap-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 px-3.5 py-2 rounded-lg text-sm font-medium transition active:scale-95 shadow-xs"
+          className="inline-flex items-center justify-center h-9 gap-1.5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 px-3 rounded-lg text-xs font-medium transition active:scale-95 shadow-xs"
         >
           <MessageSquare className="w-4 h-4" />
           <span>Chat Dompi</span>
@@ -47,9 +47,9 @@ export default function Header({ userEmail }: HeaderProps) {
 
         <Link
           href="/transaksi?action=create"
-          className="inline-flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:text-zinc-900 px-3.5 py-2 rounded-lg text-sm font-semibold transition active:scale-95 shadow-xs"
+          className="inline-flex items-center justify-center h-9 gap-1.5 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:text-zinc-900 px-3 rounded-lg text-xs font-medium transition active:scale-95 shadow-xs"
         >
-          <Plus className="w-4 h-4 stroke-[2.5]" />
+          <Plus className="w-4 h-4" />
           <span>Tambah Transaksi</span>
         </Link>
       </div>
