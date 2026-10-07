@@ -10,7 +10,6 @@ import SummaryCards from '@/components/dashboard/summary-cards'
 import CashflowChart from '@/components/dashboard/cashflow-chart'
 import RecentTransactions from '@/components/dashboard/recent-transactions'
 import WalletSummary from '@/components/dashboard/wallet-summary'
-import QuickActions from '@/components/dashboard/quick-actions'
 
 type Transaction = {
   id: number
@@ -137,9 +136,6 @@ export default function DashboardUI({
             pengeluaranBulanIni={pengeluaranBulanIni}
             totalPengeluaran={totalPengeluaran}
           />
-
-          {/* Akses Cepat Catat Transaksi & Chat Dompi */}
-          <QuickActions />
 
           {/* Grafik Arus Kas & Ringkasan Dompet */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
