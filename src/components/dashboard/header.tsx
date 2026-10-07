@@ -26,7 +26,7 @@ export default function Header({ userEmail }: HeaderProps) {
           <span>{todayFormatted}</span>
         </div>
         <h1 className="text-2xl lg:text-3xl font-extrabold text-white tracking-[-0.02em]">
-          Selamat Datang, <span className="bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">{displayName}</span>
+          Selamat Datang, <span>{displayName}</span>
         </h1>
         <p className="text-xs sm:text-sm text-slate-400">
           Ikhtisar aktivitas finansial dan alokasi saldo dompet Anda hari ini.
