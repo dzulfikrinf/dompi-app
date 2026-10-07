@@ -11,6 +11,13 @@ import {
   TransactionRecord,
 } from '@/lib/services/transaction-service'
 import {
+  getWallets,
+  createWallet,
+  updateWallet,
+  deleteWallet,
+  calculateWalletBalances,
+} from '@/lib/services/wallet-service'
+import {
   processNaturalLanguageChat,
   GeminiResponse,
   GeminiContext,
@@ -63,15 +70,11 @@ export async function sendChatMessageAction(
       .limit(1)
       .maybeSingle()
 
-    // 3. Ambil daftar dompet milik user
-    const { data: walletsData } = await supabase
-      .from('wallets')
-      .select('nama')
-      .eq('user_id', user.id)
-
-    const walletNames = walletsData && walletsData.length > 0
-      ? walletsData.map((w) => w.nama)
-      : ['BCA', 'GoPay', 'Tunai', 'OVO']
+    // 3. Ambil daftar dompet detail milik user dan hitung saldonya
+    const walletsResult = await getWallets()
+    const rawWallets = walletsResult.success && walletsResult.data ? walletsResult.data : []
+    const { walletsWithBalance, totalSaldoTerkini } = calculateWalletBalances(rawWallets, activeTransactions)
+    const walletNames = rawWallets.map((w) => w.nama)
 
     // 4. Hitung ringkasan bulan ini milik user
     const now = new Date()
@@ -109,6 +112,13 @@ export async function sendChatMessageAction(
           }
         : null,
       wallets: walletNames,
+      walletDetails: walletsWithBalance.map((w) => ({
+        id: w.id,
+        nama: w.nama,
+        tipe: w.tipe,
+        saldo_awal: w.saldo_awal,
+        saldo_terkini: w.saldo_terkini,
+      })),
       summary: {
         bulanIni: currentMonthPrefix,
         totalPengeluaran,
@@ -224,6 +234,109 @@ export async function sendChatMessageAction(
             `Transaksi "${undoRes.data?.deskripsi}" sebesar Rp${Number(undoRes.data?.nominal).toLocaleString('id-ID')} berhasil dipulihkan.`,
           geminiOutput: geminiRes.data,
           affectedTransaction: undoRes.data,
+        }
+      }
+
+      case 'TAMBAH_DOMPET': {
+        const { data_dompet } = geminiRes.data
+        if (!data_dompet || !data_dompet.nama) {
+          return {
+            success: false,
+            error: 'Nama dompet harus disebutkan untuk membuat dompet baru.',
+          }
+        }
+        const createRes = await createWallet({
+          nama: data_dompet.nama,
+          tipe: data_dompet.tipe || 'Rekening Bank',
+          saldo_awal: data_dompet.saldo_awal ?? 0,
+        })
+        if (!createRes.success) {
+          return {
+            success: false,
+            error: createRes.error || 'Gagal membuat dompet baru.',
+          }
+        }
+        revalidatePath('/dompet')
+        revalidatePath('/')
+        revalidatePath('/transaksi')
+        return {
+          success: true,
+          reply:
+            reply ||
+            `Dompet "${createRes.data?.nama}" (${createRes.data?.tipe}) berhasil dibuat dengan saldo awal Rp${Number(createRes.data?.saldo_awal || 0).toLocaleString('id-ID')}.`,
+          geminiOutput: geminiRes.data,
+        }
+      }
+
+      case 'UBAH_DOMPET': {
+        const { wallet_id, data_dompet } = geminiRes.data
+        if (!wallet_id || !data_dompet) {
+          return {
+            success: false,
+            error: 'Target dompet atau data perubahan tidak jelas.',
+          }
+        }
+        const updateRes = await updateWallet(wallet_id, data_dompet)
+        if (!updateRes.success) {
+          return {
+            success: false,
+            error: updateRes.error || 'Gagal mengubah dompet.',
+          }
+        }
+        revalidatePath('/dompet')
+        revalidatePath('/')
+        revalidatePath('/transaksi')
+        return {
+          success: true,
+          reply:
+            reply ||
+            `Dompet "${updateRes.data?.nama}" berhasil diperbarui! Saldo awal: Rp${Number(updateRes.data?.saldo_awal || 0).toLocaleString('id-ID')}.`,
+          geminiOutput: geminiRes.data,
+        }
+      }
+
+      case 'HAPUS_DOMPET': {
+        const { wallet_id } = geminiRes.data
+        if (!wallet_id) {
+          return {
+            success: false,
+            error: 'Target dompet yang ingin dihapus tidak ditemukan.',
+          }
+        }
+        const deleteRes = await deleteWallet(wallet_id)
+        if (!deleteRes.success) {
+          return {
+            success: false,
+            error: deleteRes.error || 'Gagal menghapus dompet.',
+          }
+        }
+        revalidatePath('/dompet')
+        revalidatePath('/')
+        revalidatePath('/transaksi')
+        return {
+          success: true,
+          reply: reply || `Dompet "${deleteRes.data?.nama}" berhasil dihapus.`,
+          geminiOutput: geminiRes.data,
+        }
+      }
+
+      case 'LIHAT_DOMPET': {
+        let customReply = reply
+        if (walletsWithBalance.length === 0) {
+          customReply = 'Anda belum memiliki dompet yang tercatat.'
+        } else {
+          const list = walletsWithBalance
+            .map(
+              (w) =>
+                `• ${w.nama} (${w.tipe}): Saldo Terkini Rp${Number(w.saldo_terkini ?? w.saldo_awal).toLocaleString('id-ID')} (Awal: Rp${Number(w.saldo_awal).toLocaleString('id-ID')})`
+            )
+            .join('\n')
+          customReply = `Berikut daftar dompet & rekening Anda:\n\n${list}\n\nTotal Seluruh Saldo: Rp${Number(totalSaldoTerkini).toLocaleString('id-ID')}`
+        }
+        return {
+          success: true,
+          reply: customReply,
+          geminiOutput: geminiRes.data,
         }
       }
 

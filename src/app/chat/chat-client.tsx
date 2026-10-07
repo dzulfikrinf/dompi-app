@@ -38,8 +38,8 @@ type Message = {
 const SAMPLE_PROMPTS = [
   'Tadi makan siang 35 ribu pakai BCA',
   'Catat gaji 8 juta masuk ke BCA',
-  'Ubah transaksi kopi terakhir jadi 25 ribu',
-  'Hapus transaksi makan tadi',
+  'Cek saldo semua dompet',
+  'Tambah dompet Seabank saldo 500rb',
   'Berapa pengeluaranku bulan ini?',
 ]
 
