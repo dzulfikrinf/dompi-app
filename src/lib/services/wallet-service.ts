@@ -205,7 +205,10 @@ export async function updateWallet(
       updates.tipe = input.tipe.trim()
     }
 
-    if (input.saldo_awal !== undefined) {
+    if (input.tambah_saldo !== undefined) {
+      const delta = Math.round(Number(input.tambah_saldo))
+      updates.saldo_awal = Number(currentWallet.saldo_awal || 0) + delta
+    } else if (input.saldo_awal !== undefined) {
       updates.saldo_awal = Math.round(Number(input.saldo_awal))
     }
 

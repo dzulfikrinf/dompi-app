@@ -135,6 +135,13 @@ export async function POST(req: Request) {
       .filter((t) => t.tipe === 'Pemasukan')
       .reduce((sum, t) => sum + Number(t.nominal), 0)
 
+    const selisihBulanIni = totalPemasukan - totalPengeluaran
+    const rincianDompet = walletsWithBalance.map((w) => ({
+      nama: w.nama,
+      tipe: w.tipe,
+      saldo: w.saldo_terkini ?? w.saldo_awal,
+    }))
+
     const context: GeminiContext = {
       activeTransactions: activeTransactions.map((t) => ({
         id: t.id,
@@ -169,7 +176,10 @@ export async function POST(req: Request) {
         bulanIni: currentMonthPrefix,
         totalPengeluaran,
         totalPemasukan,
+        selisihBulanIni,
+        totalSaldoTerkini,
         jumlahTransaksi: thisMonthTransactions.length,
+        rincianDompet,
       },
     }
 
@@ -296,9 +306,20 @@ export async function POST(req: Request) {
         if (!updateRes.success || !updateRes.data) {
           botReply = updateRes.error || 'Gagal mengubah dompet. Dompet mungkin tidak ditemukan.'
         } else {
-          botReply =
-            reply ||
-            `Dompet "${updateRes.data.nama}" berhasil diperbarui! Saldo awal: Rp${Number(updateRes.data.saldo_awal).toLocaleString('id-ID')}.`
+          if (data_dompet.tambah_saldo !== undefined) {
+            const targetWallet = walletsWithBalance.find((w) => w.id === wallet_id)
+            const oldSaldo = targetWallet ? (targetWallet.saldo_terkini ?? targetWallet.saldo_awal) : (updateRes.data.saldo_awal - data_dompet.tambah_saldo)
+            const newSaldo = oldSaldo + data_dompet.tambah_saldo
+            const deltaSign = data_dompet.tambah_saldo >= 0 ? 'ditambah' : 'dikurangi'
+            const absDelta = Math.abs(data_dompet.tambah_saldo)
+            botReply =
+              reply ||
+              `Saldo dompet "${updateRes.data.nama}" berhasil ${deltaSign} sebesar Rp${Number(absDelta).toLocaleString('id-ID')}!\n*Saldo sekarang: Rp${Number(newSaldo).toLocaleString('id-ID')}*`
+          } else {
+            botReply =
+              reply ||
+              `Dompet "${updateRes.data.nama}" berhasil diperbarui! Saldo: Rp${Number(updateRes.data.saldo_awal).toLocaleString('id-ID')}.`
+          }
         }
         break
       }
@@ -341,7 +362,18 @@ export async function POST(req: Request) {
         break
       }
 
-      case 'RINGKASAN':
+      case 'RINGKASAN': {
+        let textReply = reply
+        if (context.summary?.totalSaldoTerkini !== undefined && !textReply.toLowerCase().includes('saldo')) {
+          const dompetLines = (context.summary.rincianDompet || [])
+            .map((w) => `• *${w.nama}*: Rp${Number(w.saldo).toLocaleString('id-ID')}`)
+            .join('\n')
+          textReply += `\n\n💳 *Total Saldo Saat Ini:* Rp${Number(context.summary.totalSaldoTerkini).toLocaleString('id-ID')}\n*Rincian Dompet:*\n${dompetLines}`
+        }
+        botReply = textReply
+        break
+      }
+
       case 'NGOBROL':
       default: {
         botReply = reply

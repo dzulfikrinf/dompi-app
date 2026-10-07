@@ -13,6 +13,7 @@ export type WalletInput = {
   nama: string
   tipe: string
   saldo_awal?: number
+  tambah_saldo?: number
 }
 
 export const WALLET_TYPES = [
@@ -43,6 +44,12 @@ export function validateWalletInput(input: Partial<WalletInput>, isUpdate = fals
   if (input.saldo_awal !== undefined) {
     if (typeof input.saldo_awal !== 'number' || isNaN(input.saldo_awal)) {
       return 'Saldo awal harus berupa angka valid.'
+    }
+  }
+
+  if (input.tambah_saldo !== undefined) {
+    if (typeof input.tambah_saldo !== 'number' || isNaN(input.tambah_saldo)) {
+      return 'Nominal penambahan saldo harus berupa angka valid.'
     }
   }
 

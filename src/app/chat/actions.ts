@@ -89,6 +89,13 @@ export async function sendChatMessageAction(
       .filter((t) => t.tipe === 'Pemasukan')
       .reduce((sum, t) => sum + Number(t.nominal), 0)
 
+    const selisihBulanIni = totalPemasukan - totalPengeluaran
+    const rincianDompet = walletsWithBalance.map((w) => ({
+      nama: w.nama,
+      tipe: w.tipe,
+      saldo: w.saldo_terkini ?? w.saldo_awal,
+    }))
+
     const context: GeminiContext = {
       activeTransactions: activeTransactions.map((t) => ({
         id: t.id,
@@ -123,7 +130,10 @@ export async function sendChatMessageAction(
         bulanIni: currentMonthPrefix,
         totalPengeluaran,
         totalPemasukan,
+        selisihBulanIni,
+        totalSaldoTerkini,
         jumlahTransaksi: thisMonthTransactions.length,
+        rincianDompet,
       },
     }
 
@@ -286,11 +296,26 @@ export async function sendChatMessageAction(
         revalidatePath('/dompet')
         revalidatePath('/')
         revalidatePath('/transaksi')
+
+        let confirmReply = reply
+        if (data_dompet.tambah_saldo !== undefined) {
+          const targetWallet = walletsWithBalance.find((w) => w.id === wallet_id)
+          const oldSaldo = targetWallet ? (targetWallet.saldo_terkini ?? targetWallet.saldo_awal) : ((updateRes.data?.saldo_awal ?? 0) - data_dompet.tambah_saldo)
+          const newSaldo = oldSaldo + data_dompet.tambah_saldo
+          const deltaSign = data_dompet.tambah_saldo >= 0 ? 'ditambah' : 'dikurangi'
+          const absDelta = Math.abs(data_dompet.tambah_saldo)
+          confirmReply =
+            reply ||
+            `Saldo dompet "${updateRes.data?.nama}" berhasil ${deltaSign} sebesar Rp${Number(absDelta).toLocaleString('id-ID')}!\nSaldo sekarang: Rp${Number(newSaldo).toLocaleString('id-ID')}`
+        } else {
+          confirmReply =
+            reply ||
+            `Dompet "${updateRes.data?.nama}" berhasil diperbarui! Saldo: Rp${Number(updateRes.data?.saldo_awal || 0).toLocaleString('id-ID')}.`
+        }
+
         return {
           success: true,
-          reply:
-            reply ||
-            `Dompet "${updateRes.data?.nama}" berhasil diperbarui! Saldo awal: Rp${Number(updateRes.data?.saldo_awal || 0).toLocaleString('id-ID')}.`,
+          reply: confirmReply,
           geminiOutput: geminiRes.data,
         }
       }
@@ -340,7 +365,21 @@ export async function sendChatMessageAction(
         }
       }
 
-      case 'RINGKASAN':
+      case 'RINGKASAN': {
+        let textReply = reply
+        if (context.summary?.totalSaldoTerkini !== undefined && !textReply.toLowerCase().includes('saldo')) {
+          const dompetLines = (context.summary.rincianDompet || [])
+            .map((w) => `• ${w.nama}: Rp${Number(w.saldo).toLocaleString('id-ID')}`)
+            .join('\n')
+          textReply += `\n\n💳 Total Saldo Saat Ini: Rp${Number(context.summary.totalSaldoTerkini).toLocaleString('id-ID')}\nRincian Dompet:\n${dompetLines}`
+        }
+        return {
+          success: true,
+          reply: textReply || 'Berikut ringkasan keuangan Anda.',
+          geminiOutput: geminiRes.data,
+        }
+      }
+
       case 'NGOBROL': {
         return {
           success: true,

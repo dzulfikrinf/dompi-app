@@ -26,6 +26,7 @@ export type GeminiWalletData = {
   nama?: string;
   tipe?: string;
   saldo_awal?: number;
+  tambah_saldo?: number;
 };
 
 export type GeminiResponse = {
@@ -70,7 +71,14 @@ export type GeminiContext = {
     bulanIni: string;
     totalPengeluaran: number;
     totalPemasukan: number;
+    selisihBulanIni?: number;
+    totalSaldoTerkini?: number;
     jumlahTransaksi: number;
+    rincianDompet?: Array<{
+      nama: string;
+      tipe?: string;
+      saldo: number;
+    }>;
   };
 };
 
@@ -210,6 +218,10 @@ export function validateGeminiOutput(raw: unknown): { valid: boolean; error?: st
         validDataDompet.saldo_awal !== undefined && !isNaN(Number(validDataDompet.saldo_awal))
           ? Math.round(Number(validDataDompet.saldo_awal))
           : (action === 'TAMBAH_DOMPET' ? 0 : undefined),
+      tambah_saldo:
+        validDataDompet.tambah_saldo !== undefined && !isNaN(Number(validDataDompet.tambah_saldo))
+          ? Math.round(Number(validDataDompet.tambah_saldo))
+          : undefined,
     };
   }
 
@@ -279,7 +291,7 @@ ${JSON.stringify(context.activeTransactions, null, 2)}
 Konteks Transaksi Terakhir yang Dihapus (untuk UNDO):
 ${context.latestDeletedTransaction ? JSON.stringify(context.latestDeletedTransaction, null, 2) : 'Tidak ada transaksi yang baru dihapus.'}
 
-Ringkasan Keuangan Pengguna Bulan Ini:
+Ringkasan Keuangan Pengguna Bulan Ini (Arus Kas & Total Saldo):
 ${context.summary ? JSON.stringify(context.summary, null, 2) : 'Belum ada ringkasan.'}
 
 Pesan Pengguna:
@@ -307,24 +319,53 @@ ATURAN UTAMA:
      * Isi "data_dompet": { "nama": "string", "tipe": "string (misal: Rekening Bank, Dompet Digital, Reksa Dana / Investasi, Uang Fisik / Tunai, Lainnya)", "saldo_awal": number (default 0 jika tidak disebut) }.
      * "transaction_id": null, "wallet_id": null.
      * Buat "reply" konfirmasi: "Dompet [Nama] berhasil dibuat dengan saldo awal Rp[Nominal]."
-   - "UBAH_DOMPET": User ingin mengubah data dompet (nama, tipe, atau saldo awal dompet).
-     * Contoh: "update saldo awal BCA jadi 20jt", "ubah saldo dompet Tunai jadi 500.000", "ganti nama dompet Gopay jadi GoPay Tabungan".
-     * Cari ID dompet yang cocok di Daftar Dompet Pengguna.
-     * Isi "wallet_id" dengan ID dompet tersebut.
-     * Isi "data_dompet" dengan field yang diubah (misal { "saldo_awal": 20000000 } atau { "nama": "GoPay Tabungan" }).
-     * Buat "reply" konfirmasi perubahan yang jelas.
+
+   - "UBAH_DOMPET": User ingin mengubah data dompet (menambah saldo, mengganti saldo, ganti nama, atau ganti tipe).
+     * PERHATIAN UTAMA (MENAMBAH SALDO DOMPET):
+       Jika user memberi perintah untuk MENAMBAH saldo dompet (misal: "tambah saldo dompet BCA 50rb", "tambah saldo Tunai 100.000", "tambahkan saldo dompet OVO 25rb", "isi saldo dompet BCA 50rb"):
+       - User bermaksud MENAMBAHKAN nominal tersebut ke saldo yang sudah ada, BUKAN mengganti saldonya!
+       - JANGAN isi field "saldo_awal" dengan angka penambahan itu! (Karena mengisi saldo_awal akan mengganti/menimpa saldo dompet).
+       - WAJIB gunakan field "tambah_saldo": [nominal penambahan] di dalam "data_dompet".
+       - Cari ID dompet yang cocok di Daftar Dompet Pengguna, isi "wallet_id" dengan ID tersebut.
+       - Hitung estimasi saldo baru (saldo sekarang + nominal penambahan).
+       - Buat "reply": "Saldo dompet [Nama] berhasil ditambah sebesar Rp[Nominal Ditambah]! Saldo sekarang menjadi Rp[Saldo Baru]."
+     * MENGATUR ULANG / MENIMPA / MENGGANTI SALDO:
+       Jika user secara eksplisit ingin MENGGANTI / MENIMPA / SET saldo menjadi nominal tertentu (misal: "ubah saldo BCA jadi 20jt", "ganti saldo dompet Tunai jadi 500.000", "set saldo Gopay 100rb"):
+       - Gunakan field "saldo_awal": [nominal baru yang dituju].
+       - Isi "wallet_id" dengan ID dompet yang cocok.
+       - Buat "reply": "Saldo dompet [Nama] berhasil diubah menjadi Rp[Nominal Baru]."
+     * MENGURANGI SALDO DOMPET:
+       Jika user ingin mengurangi saldo dompet (misal: "kurangi saldo dompet BCA 20rb"):
+       - Gunakan field "tambah_saldo": -[nominal pengurangan] (angka negatif).
+       - Buat "reply": "Saldo dompet [Nama] berhasil dikurangi sebesar Rp[Nominal Pengurangan]."
+     * MENGUBAH NAMA / TIPE DOMPET:
+       Jika user ingin ganti nama atau tipe (misal: "ganti nama dompet Gopay jadi GoPay Tabungan"):
+       - Isi "wallet_id" dengan ID dompet yang cocok.
+       - Gunakan field "nama" atau "tipe".
+
    - "HAPUS_DOMPET": User ingin menghapus dompet / rekening.
      * Contoh: "hapus dompet Bibit", "delete rekening Mandiri", "hapus dompet OVO".
      * Cari ID dompet yang cocok di Daftar Dompet Pengguna.
      * Isi "wallet_id" dengan ID dompet tersebut. "data_dompet": null.
      * Buat "reply" konfirmasi: "Dompet [Nama] telah dihapus."
+
    - "LIHAT_DOMPET": User menanyakan daftar dompet atau saldo rekening mereka.
-     * Contoh: "cek dompet", "ada dompet apa aja?", "berapa saldo semua dompetku?", "lihat saldo rekening".
+     * Contoh: "cek dompet", "ada dompet apa aja?", "berapa saldo semua dompetku?", "lihat saldo rekening", "cek saldo".
      * "wallet_id": null, "data_dompet": null.
-     * Buat "reply" yang merinci daftar semua dompet pengguna beserta saldo terkini / saldo awalnya secara rapi dan enak dibaca.
+     * Buat "reply" yang merinci daftar semua dompet pengguna beserta saldo terkini / saldo awalnya secara rapi dan sebutkan Total Saldo keseluruhan.
 
    --- UMUM ---
-   - "RINGKASAN": User bertanya mengenai ringkasan keuangan bulanan / mingguan.
+   - "RINGKASAN": User bertanya mengenai ringkasan atau rekap keuangan (misal: "rekap keuangan", "ringkasan keuangan", "laporan keuangan", "rekap bulan ini", "rekap", "bagaimana keuanganku?").
+     * PENTING SEKALI: Balasan rekap keuangan JANGAN CUMA menyebutkan pemasukan dan pengeluaran! Kamu WAJIB menyertakan Total Saldo dan Rincian Saldo Dompet!
+     * Struktur balasan WAJIB memuat:
+       1. Periode (Bulan ini).
+       2. Total Pemasukan bulan ini (Rp...).
+       3. Total Pengeluaran bulan ini (Rp...).
+       4. Selisih / Arus Kas Bersih bulan ini (Surplus / Defisit Rp...).
+       5. TOTAL SALDO SAAT INI (Rp... gabungan seluruh dompet/rekening pengguna).
+       6. Rincian Saldo masing-masing dompet/rekening (sebutkan nama dompet dan saldo terkininya, misal BCA: Rp..., GoPay: Rp..., Tunai: Rp...).
+     * Susun balasan dengan format yang rapi, ramah, dan terstruktur menggunakan bullet points serta emoji agar nyaman dibaca.
+
    - "NGOBROL": Sapaan, basa-basi, atau pertanyaan umum.
    - "KLARIFIKASI": Jika input kurang jelas / ambigu tentang transaksi/dompet mana yang dimaksud. Ajukan pertanyaan singkat spesifik.
 
@@ -345,7 +386,8 @@ Kamu WAJIB mengembalikan HANYA JSON murni tanpa markdown, tanpa backtick, dan ta
   "data_dompet": {
     "nama": "string",
     "tipe": "string",
-    "saldo_awal": number
+    "saldo_awal": number,
+    "tambah_saldo": number
   } | null,
   "reply": "string",
   "clarification_question": "string" | null
