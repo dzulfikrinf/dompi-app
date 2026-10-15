@@ -561,7 +561,7 @@ export default function DompetClient({
               <h3 className="text-sm font-semibold">Hapus Dompet Ini?</h3>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 Apakah Anda yakin ingin menghapus dompet{' '}
-                <strong className="text-zinc-900 dark:text-zinc-100 font-medium">"{deletingWallet.nama}"</strong>?
+                <strong className="text-zinc-900 dark:text-zinc-100 font-medium">&ldquo;{deletingWallet.nama}&rdquo;</strong>?
               </p>
             </div>
 

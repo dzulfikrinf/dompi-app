@@ -12,12 +12,6 @@ import {
   Trash2,
   Edit2,
   Calendar,
-  Wallet,
-  Coffee,
-  Briefcase,
-  ShoppingBag,
-  Droplet,
-  Play,
   Loader2,
   CheckCircle2,
   AlertCircle,
@@ -176,27 +170,6 @@ export default function TransaksiClient({
       currency: "IDR",
       minimumFractionDigits: 0,
     }).format(angka)
-  }
-
-  // Category Icon helper
-  const getIconForCategory = (kategori: string) => {
-    const k = kategori.toLowerCase()
-    if (k.includes("makan") || k.includes("kopi") || k.includes("minum"))
-      return <Coffee className="w-4 h-4" />
-    if (k.includes("gaji") || k.includes("freelance") || k.includes("kerja"))
-      return <Briefcase className="w-4 h-4" />
-    if (
-      k.includes("belanja") ||
-      k.includes("supermarket") ||
-      k.includes("pasar") ||
-      k.includes("sayur")
-    )
-      return <ShoppingBag className="w-4 h-4" />
-    if (k.includes("bensin") || k.includes("transport") || k.includes("ojek"))
-      return <Droplet className="w-4 h-4" />
-    if (k.includes("tagihan") || k.includes("langganan") || k.includes("listrik"))
-      return <Play className="w-4 h-4" />
-    return <Wallet className="w-4 h-4" />
   }
 
   // Open modal for Create

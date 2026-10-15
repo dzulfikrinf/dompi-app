@@ -8,11 +8,8 @@ import {
   Sparkles,
   RotateCcw,
   AlertCircle,
-  Clock,
   TrendingDown,
   TrendingUp,
-  CreditCard,
-  Tag,
   List,
 } from 'lucide-react'
 import { sendChatMessageAction, ChatActionResult } from './actions'
@@ -24,6 +21,7 @@ type Message = {
   text: string
   timestamp: string
   action?: string
+  actionType?: string
   affectedTransaction?: {
     id: number
     tanggal: string
@@ -33,15 +31,24 @@ type Message = {
     dompet?: string
     deskripsi: string
   }
+  affectedTransactions?: Array<{
+    id: number
+    tanggal: string
+    kategori: string
+    nominal: number
+    tipe: 'Pengeluaran' | 'Pemasukan'
+    dompet?: string
+    deskripsi: string
+  }>
   isError?: boolean
 }
 
 const SAMPLE_PROMPTS = [
-  'Tadi makan siang 35 ribu pakai BCA',
-  'Catat gaji 8 juta masuk ke BCA',
-  'Cek saldo semua dompet',
-  'Tambah dompet Seabank saldo 500rb',
-  'Berapa pengeluaranku bulan ini?',
+  'Tadi makan siang 25rb Cash dan beli bensin 50rb BRI',
+  'Pindahin 100rb dari blu bca ke Cash',
+  'Analisis keuanganku bulan ini, aku boncos di apa aja?',
+  'Koreksi saldo Cash asliku sekarang jadi 50.000',
+  'Gimana tips mengatur budget keuangan pribadi?',
 ]
 
 export default function ChatClient({ userEmail }: { userEmail?: string }) {
@@ -49,8 +56,8 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
     {
       id: 'welcome',
       sender: 'assistant',
-      text: 'Halo! Saya Dompi, asisten keuangan pribadimu. Kamu bisa menyuruhku mencatat, mengubah, menghapus, atau merangkum pengeluaranmu dengan bahasa santai sehari-hari.',
-      timestamp: '',
+      text: 'Halo! Saya Dompi, asisten keuangan pribadimu. Kamu bisa menyuruhku mencatat banyak transaksi sekaligus, pindah saldo antar dompet, atau menganalisis keuanganmu dengan bahasa santai sehari-hari.',
+      timestamp: 'Baru saja',
     },
   ])
   const [inputValue, setInputValue] = useState('')
@@ -63,20 +70,6 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
-
-  useEffect(() => {
-    // Set timestamp on client to prevent SSR hydration mismatch (React error 418)
-    setMessages((prev) =>
-      prev.map((m) =>
-        m.id === 'welcome' && !m.timestamp
-          ? {
-              ...m,
-              timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-            }
-          : m
-      )
-    )
-  }, [])
 
   useEffect(() => {
     scrollToBottom()
@@ -99,8 +92,17 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
     setMessages((prev) => [...prev, userMessage])
     setIsLoading(true)
 
+    // Siapkan riwayat percakapan untuk konteks multi-turn agent
+    const historyPayload = messages
+      .filter((m) => !m.isError && m.text && m.id !== 'welcome')
+      .slice(-8)
+      .map((m) => ({
+        role: (m.sender === 'assistant' ? 'assistant' : 'user') as 'assistant' | 'user',
+        text: m.text,
+      }))
+
     try {
-      const res: ChatActionResult = await sendChatMessageAction(text)
+      const res: ChatActionResult = await sendChatMessageAction(text, historyPayload)
 
       if (res.success && res.reply) {
         const assistantMessage: Message = {
@@ -108,8 +110,10 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
           sender: 'assistant',
           text: res.reply,
           timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-          action: res.geminiOutput?.action,
+          action: res.actionType,
+          actionType: res.actionType,
           affectedTransaction: res.affectedTransaction,
+          affectedTransactions: res.affectedTransactions,
         }
         setMessages((prev) => [...prev, assistantMessage])
       } else {
@@ -235,19 +239,49 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
                 {/* Message text */}
                 <div className="whitespace-pre-wrap">{msg.text}</div>
 
-                {/* Operation result details if transaction affected */}
-                {msg.affectedTransaction && (
+                {/* Operation result details if transactions affected */}
+                {msg.affectedTransactions && msg.affectedTransactions.length > 0 ? (
+                  <div className="mt-2.5 space-y-1.5">
+                    {msg.affectedTransactions.map((trx, idx) => (
+                      <div
+                        key={trx.id || idx}
+                        className="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 space-y-1 text-xs text-zinc-700 dark:text-zinc-350"
+                      >
+                        <div className="flex items-center justify-between font-medium">
+                          <span className="flex items-center gap-1.5 truncate max-w-[200px] sm:max-w-xs">
+                            {trx.tipe === 'Pengeluaran' ? (
+                              <TrendingDown className="w-3.5 h-3.5 text-zinc-500 flex-shrink-0" />
+                            ) : (
+                              <TrendingUp className="w-3.5 h-3.5 text-zinc-500 flex-shrink-0" />
+                            )}
+                            <span className="truncate">{trx.deskripsi}</span>
+                          </span>
+                          <span className="font-semibold tabular-nums flex-shrink-0 ml-2">
+                            Rp{Number(trx.nominal).toLocaleString('id-ID')}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3 text-zinc-500 dark:text-zinc-400 pt-1 border-t border-zinc-200 dark:border-zinc-800 text-[11px]">
+                          <span>{trx.kategori}</span>
+                          <span>•</span>
+                          <span>{trx.dompet || 'Tunai'}</span>
+                          <span>•</span>
+                          <span>{trx.tanggal}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : msg.affectedTransaction ? (
                   <div className="mt-2.5 p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 space-y-1 text-xs text-zinc-700 dark:text-zinc-350">
                     <div className="flex items-center justify-between font-medium">
-                      <span className="flex items-center gap-1.5">
+                      <span className="flex items-center gap-1.5 truncate max-w-[200px] sm:max-w-xs">
                         {msg.affectedTransaction.tipe === 'Pengeluaran' ? (
-                          <TrendingDown className="w-3.5 h-3.5 text-zinc-500" />
+                          <TrendingDown className="w-3.5 h-3.5 text-zinc-500 flex-shrink-0" />
                         ) : (
-                          <TrendingUp className="w-3.5 h-3.5 text-zinc-500" />
+                          <TrendingUp className="w-3.5 h-3.5 text-zinc-500 flex-shrink-0" />
                         )}
-                        {msg.affectedTransaction.deskripsi}
+                        <span className="truncate">{msg.affectedTransaction.deskripsi}</span>
                       </span>
-                      <span className="font-semibold tabular-nums">
+                      <span className="font-semibold tabular-nums flex-shrink-0 ml-2">
                         Rp{Number(msg.affectedTransaction.nominal).toLocaleString('id-ID')}
                       </span>
                     </div>
@@ -259,7 +293,7 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
                       <span>{msg.affectedTransaction.tanggal}</span>
                     </div>
                   </div>
-                )}
+                ) : null}
 
                 {msg.timestamp ? (
                   <div

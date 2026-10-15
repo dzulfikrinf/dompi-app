@@ -320,3 +320,56 @@ export async function undoDeleteTransaction(
     return { success: false, error: 'Terjadi kesalahan sistem saat memulihkan transaksi.' }
   }
 }
+
+/**
+ * 6. Tambah banyak transaksi sekaligus (Batch Insert)
+ */
+export async function createTransactionsBatch(
+  inputs: TransactionInput[],
+  options?: ServiceOptions
+): Promise<ServiceResult<TransactionRecord[]>> {
+  try {
+    if (!inputs || !Array.isArray(inputs) || inputs.length === 0) {
+      return { success: false, error: 'Daftar transaksi tidak boleh kosong.' }
+    }
+
+    const { supabase, user } = await resolveClientAndUser(options)
+    if (!user) {
+      return { success: false, error: 'Sesi Anda tidak valid. Silakan login kembali.' }
+    }
+
+    // Validasi semua transaksi
+    for (let i = 0; i < inputs.length; i++) {
+      const valErr = validateTransactionInput(inputs[i])
+      if (valErr) {
+        return { success: false, error: `Transaksi ke-${i + 1} tidak valid: ${valErr}` }
+      }
+    }
+
+    const payload = inputs.map((item) => ({
+      tanggal: item.tanggal,
+      kategori: item.kategori.trim(),
+      nominal: Math.round(item.nominal),
+      tipe: item.tipe,
+      dompet: item.dompet.trim(),
+      deskripsi: item.deskripsi.trim(),
+      user_id: user.id,
+      deleted_at: null,
+    }))
+
+    const { data, error } = await supabase
+      .from('transactions')
+      .insert(payload)
+      .select()
+
+    if (error || !data) {
+      console.error('Error in createTransactionsBatch:', error)
+      return { success: false, error: 'Gagal menyimpan transaksi jamak ke database.' }
+    }
+
+    return { success: true, data: data as TransactionRecord[] }
+  } catch (err) {
+    console.error('Unexpected error in createTransactionsBatch:', err)
+    return { success: false, error: 'Terjadi kesalahan sistem saat menyimpan transaksi jamak.' }
+  }
+}

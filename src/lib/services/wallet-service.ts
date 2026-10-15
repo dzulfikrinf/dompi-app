@@ -313,3 +313,280 @@ export async function deleteWallet(
   }
 }
 
+export type TransferWalletInput = {
+  fromWalletName: string
+  toWalletName: string
+  nominal: number
+  biayaAdmin?: number
+  catatan?: string
+  tanggal?: string
+}
+
+export type TransferWalletResult = {
+  fromWallet: string
+  toWallet: string
+  nominal: number
+  biayaAdmin: number
+  transferredAt: string
+}
+
+/**
+ * Pindah saldo / Transfer antar dompet (membuat sepasang transaksi Pengeluaran & Pemasukan)
+ */
+export async function transferWalletBalance(
+  input: TransferWalletInput,
+  options?: ServiceOptions
+): Promise<ServiceResult<TransferWalletResult>> {
+  try {
+    const { client, userId } = await resolveClientAndUser(options)
+    if (!userId) {
+      return { success: false, error: 'User tidak terotentikasi.' }
+    }
+
+    const nominal = Math.round(Number(input.nominal))
+    if (isNaN(nominal) || nominal <= 0) {
+      return { success: false, error: 'Nominal transfer harus berupa angka lebih dari 0.' }
+    }
+
+    const cleanFrom = input.fromWalletName?.trim()
+    const cleanTo = input.toWalletName?.trim()
+
+    if (!cleanFrom || !cleanTo) {
+      return { success: false, error: 'Dompet asal dan tujuan transfer wajib diisi.' }
+    }
+
+    if (cleanFrom.toLowerCase() === cleanTo.toLowerCase()) {
+      return { success: false, error: 'Dompet asal dan tujuan tidak boleh sama.' }
+    }
+
+    // Ambil semua dompet user
+    const { data: wallets, error: wErr } = await client
+      .from('wallets')
+      .select('*')
+      .eq('user_id', userId)
+
+    if (wErr || !wallets || wallets.length === 0) {
+      return { success: false, error: 'Gagal memuat data dompet untuk transfer.' }
+    }
+
+    const fromTarget = wallets.find(
+      (w) => w.nama.toLowerCase() === cleanFrom.toLowerCase()
+    )
+    if (!fromTarget) {
+      const avail = wallets.map((w) => w.nama).join(', ')
+      return {
+        success: false,
+        error: `Dompet asal "${cleanFrom}" tidak ditemukan. Pilihan yang ada: ${avail}`,
+      }
+    }
+
+    const toTarget = wallets.find(
+      (w) => w.nama.toLowerCase() === cleanTo.toLowerCase()
+    )
+    if (!toTarget) {
+      const avail = wallets.map((w) => w.nama).join(', ')
+      return {
+        success: false,
+        error: `Dompet tujuan "${cleanTo}" tidak ditemukan. Pilihan yang ada: ${avail}`,
+      }
+    }
+
+    const tanggal = input.tanggal || new Date().toISOString().split('T')[0]
+    const note = input.catatan ? ` (${input.catatan.trim()})` : ''
+    const fee = Math.max(0, Math.round(Number(input.biayaAdmin || 0)))
+
+    const rowsToInsert = [
+      // 1. Pengeluaran dari dompet asal
+      {
+        user_id: userId,
+        tanggal,
+        kategori: 'Transfer Keluar',
+        nominal,
+        tipe: 'Pengeluaran',
+        dompet: fromTarget.nama,
+        deskripsi: `Transfer ke ${toTarget.nama}${note}`,
+        deleted_at: null,
+      },
+      // 2. Pemasukan ke dompet tujuan
+      {
+        user_id: userId,
+        tanggal,
+        kategori: 'Transfer Masuk',
+        nominal,
+        tipe: 'Pemasukan',
+        dompet: toTarget.nama,
+        deskripsi: `Transfer dari ${fromTarget.nama}${note}`,
+        deleted_at: null,
+      },
+    ]
+
+    // 3. Biaya admin jika ada
+    if (fee > 0) {
+      rowsToInsert.push({
+        user_id: userId,
+        tanggal,
+        kategori: 'Biaya Admin',
+        nominal: fee,
+        tipe: 'Pengeluaran',
+        dompet: fromTarget.nama,
+        deskripsi: `Biaya transfer dari ${fromTarget.nama} ke ${toTarget.nama}`,
+        deleted_at: null,
+      })
+    }
+
+    const { error: insertErr } = await client
+      .from('transactions')
+      .insert(rowsToInsert)
+
+    if (insertErr) {
+      console.error('Error inserting transfer transactions:', insertErr)
+      return { success: false, error: 'Gagal mencatat transfer antar dompet.' }
+    }
+
+    return {
+      success: true,
+      data: {
+        fromWallet: fromTarget.nama,
+        toWallet: toTarget.nama,
+        nominal,
+        biayaAdmin: fee,
+        transferredAt: tanggal,
+      },
+    }
+  } catch (err) {
+    console.error('Unhandled error in transferWalletBalance:', err)
+    return { success: false, error: 'Terjadi kesalahan sistem saat memproses transfer.' }
+  }
+}
+
+export type AdjustWalletInput = {
+  walletNameOrId: string | number
+  nominalTarget: number
+  catatan?: string
+  tanggal?: string
+}
+
+export type AdjustWalletResult = {
+  walletNama: string
+  saldoLama: number
+  saldoBaru: number
+  selisih: number
+  tipePenyesuaian: 'Pemasukan' | 'Pengeluaran' | 'Sesuai'
+}
+
+/**
+ * Rekonsiliasi / Penyesuaian saldo riil dompet
+ */
+export async function adjustWalletBalance(
+  input: AdjustWalletInput,
+  options?: ServiceOptions
+): Promise<ServiceResult<AdjustWalletResult>> {
+  try {
+    const { client, userId } = await resolveClientAndUser(options)
+    if (!userId) {
+      return { success: false, error: 'User tidak terotentikasi.' }
+    }
+
+    const targetNominal = Math.round(Number(input.nominalTarget))
+    if (isNaN(targetNominal) || targetNominal < 0) {
+      return { success: false, error: 'Target saldo baru harus berupa angka positif atau nol.' }
+    }
+
+    // Ambil data dompet user
+    const { data: wallets, error: wErr } = await client
+      .from('wallets')
+      .select('*')
+      .eq('user_id', userId)
+
+    if (wErr || !wallets || wallets.length === 0) {
+      return { success: false, error: 'Data dompet tidak ditemukan.' }
+    }
+
+    let targetWallet = null
+    if (typeof input.walletNameOrId === 'number') {
+      targetWallet = wallets.find((w) => Number(w.id) === input.walletNameOrId)
+    } else {
+      const q = String(input.walletNameOrId).trim().toLowerCase()
+      targetWallet = wallets.find((w) => w.nama.toLowerCase() === q)
+    }
+
+    if (!targetWallet) {
+      const avail = wallets.map((w) => w.nama).join(', ')
+      return {
+        success: false,
+        error: `Dompet "${input.walletNameOrId}" tidak ditemukan. Dompet yang tersedia: ${avail}`,
+      }
+    }
+
+    // Ambil semua transaksi aktif untuk dompet ini untuk menghitung saldo saat ini
+    const { data: trxs, error: tErr } = await client
+      .from('transactions')
+      .select('nominal, tipe, deleted_at, dompet')
+      .eq('user_id', userId)
+      .eq('dompet', targetWallet.nama)
+      .is('deleted_at', null)
+
+    if (tErr) {
+      return { success: false, error: 'Gagal menghitung saldo dompet saat ini.' }
+    }
+
+    let currentBalance = Number(targetWallet.saldo_awal || 0)
+    for (const t of trxs || []) {
+      if (t.tipe === 'Pemasukan') currentBalance += Number(t.nominal || 0)
+      if (t.tipe === 'Pengeluaran') currentBalance -= Number(t.nominal || 0)
+    }
+
+    const selisih = targetNominal - currentBalance
+
+    if (selisih === 0) {
+      return {
+        success: true,
+        data: {
+          walletNama: targetWallet.nama,
+          saldoLama: currentBalance,
+          saldoBaru: targetNominal,
+          selisih: 0,
+          tipePenyesuaian: 'Sesuai',
+        },
+      }
+    }
+
+    const tanggal = input.tanggal || new Date().toISOString().split('T')[0]
+    const tipe = selisih > 0 ? 'Pemasukan' : 'Pengeluaran'
+    const absNominal = Math.abs(selisih)
+    const deskripsi =
+      input.catatan?.trim() ||
+      `Penyesuaian saldo riil dompet ${targetWallet.nama} (${selisih > 0 ? '+' : '-'}${absNominal.toLocaleString('id-ID')})`
+
+    const { error: insertErr } = await client.from('transactions').insert({
+      user_id: userId,
+      tanggal,
+      kategori: 'Penyesuaian Saldo',
+      nominal: absNominal,
+      tipe,
+      dompet: targetWallet.nama,
+      deskripsi,
+      deleted_at: null,
+    })
+
+    if (insertErr) {
+      console.error('Error inserting adjust transaction:', insertErr)
+      return { success: false, error: 'Gagal menyimpan transaksi penyesuaian saldo.' }
+    }
+
+    return {
+      success: true,
+      data: {
+        walletNama: targetWallet.nama,
+        saldoLama: currentBalance,
+        saldoBaru: targetNominal,
+        selisih,
+        tipePenyesuaian: tipe,
+      },
+    }
+  } catch (err) {
+    console.error('Unhandled error in adjustWalletBalance:', err)
+    return { success: false, error: 'Terjadi kesalahan sistem saat menyesuaikan saldo.' }
+  }
+}
+
