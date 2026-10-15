@@ -77,14 +77,14 @@ export function calculateWalletBalances(
   let totalPengeluaran = 0
 
   const walletsWithBalance = wallets.map((wallet) => {
-    const wName = wallet.nama.toLowerCase()
+    const wName = wallet.nama.trim().toLowerCase()
 
     const masuk = activeTrx
-      .filter((t) => t.tipe === 'Pemasukan' && t.dompet?.toLowerCase() === wName)
+      .filter((t) => t.tipe === 'Pemasukan' && (t.dompet || '').trim().toLowerCase() === wName)
       .reduce((acc, t) => acc + Number(t.nominal || 0), 0)
 
     const keluar = activeTrx
-      .filter((t) => t.tipe === 'Pengeluaran' && t.dompet?.toLowerCase() === wName)
+      .filter((t) => t.tipe === 'Pengeluaran' && (t.dompet || '').trim().toLowerCase() === wName)
       .reduce((acc, t) => acc + Number(t.nominal || 0), 0)
 
     const saldoTerkini = wallet.saldo_awal + masuk - keluar

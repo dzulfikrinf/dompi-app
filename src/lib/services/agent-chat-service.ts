@@ -1,7 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { createClient as createServerSupabaseClient } from '@/lib/supabase/server'
 import {
-  getTransactions,
   createTransactionsBatch,
   updateTransaction,
   deleteTransaction,
@@ -18,7 +17,11 @@ import {
   transferWalletBalance,
   adjustWalletBalance,
 } from '@/lib/services/wallet-service'
-import { getFinancialAnalysis, AnalyticsPeriod } from '@/lib/services/analytics-service'
+import {
+  getFinancialAnalysis,
+  AnalyticsPeriod,
+  formatFinancialAnalysisFallback,
+} from '@/lib/services/analytics-service'
 import {
   processAgentChat,
   generateFinancialAnalysisNarrative,
@@ -75,11 +78,24 @@ export async function executeFinancialAgent(
 
     const serviceOpts = { client, userId }
 
-    // 1. Ambil transaksi aktif pengguna
-    const trxResult = await getTransactions({ ...serviceOpts, limit: 15 })
-    const activeTransactions = trxResult.success && trxResult.data ? trxResult.data : []
+    // 1. Ambil SEMUA transaksi aktif pengguna untuk kalkulasi saldo & ringkasan yang 100% akurat
+    const { data: allMutationTrx, error: trxErr } = await client
+      .from('transactions')
+      .select('id, tanggal, tipe, dompet, nominal, kategori, deskripsi, deleted_at')
+      .eq('user_id', userId)
+      .is('deleted_at', null)
+      .order('tanggal', { ascending: false })
 
-    // 2. Ambil transaksi terakhir yang dihapus (konteks UNDO)
+    if (trxErr) {
+      console.error('Error fetching transactions for agent context:', trxErr)
+    }
+
+    const allActiveTransactions = allMutationTrx || []
+
+    // 2. Transaksi aktif terbaru untuk konteks prompt (15 transaksi teratas)
+    const activeTransactions = allActiveTransactions.slice(0, 15)
+
+    // 3. Ambil transaksi terakhir yang dihapus (konteks UNDO)
     const { data: latestDeleted } = await client
       .from('transactions')
       .select('*')
@@ -89,27 +105,28 @@ export async function executeFinancialAgent(
       .limit(1)
       .maybeSingle()
 
-    // 3. Ambil data dompet dan hitung saldo terkini
+    // 4. Ambil data dompet dan hitung saldo terkini menggunakan SEMUA transaksi aktif
     const walletsResult = await getWallets(serviceOpts)
     const rawWallets = walletsResult.success && walletsResult.data ? walletsResult.data : []
     const { walletsWithBalance, totalSaldoTerkini } = calculateWalletBalances(
       rawWallets,
-      activeTransactions
+      allActiveTransactions
     )
     const walletNames = rawWallets.map((w) => w.nama)
 
-    // 4. Hitung ringkasan bulan ini
-    const now = new Date()
-    const currentMonthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-    const thisMonthTransactions = activeTransactions.filter((t) =>
+    // 5. Hitung ringkasan bulan ini dengan zona waktu Asia/Jakarta (WIB)
+    const nowWIB = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }))
+    const currentMonthPrefix = `${nowWIB.getFullYear()}-${String(nowWIB.getMonth() + 1).padStart(2, '0')}`
+
+    const thisMonthTransactions = allActiveTransactions.filter((t) =>
       t.tanggal.startsWith(currentMonthPrefix)
     )
     const totalPengeluaran = thisMonthTransactions
-      .filter((t) => t.tipe === 'Pengeluaran' && t.kategori !== 'Transfer Keluar')
-      .reduce((sum, t) => sum + Number(t.nominal), 0)
+      .filter((t) => t.tipe === 'Pengeluaran' && !t.kategori?.toLowerCase().includes('transfer'))
+      .reduce((sum, t) => sum + Number(t.nominal || 0), 0)
     const totalPemasukan = thisMonthTransactions
-      .filter((t) => t.tipe === 'Pemasukan' && t.kategori !== 'Transfer Masuk')
-      .reduce((sum, t) => sum + Number(t.nominal), 0)
+      .filter((t) => t.tipe === 'Pemasukan' && !t.kategori?.toLowerCase().includes('transfer'))
+      .reduce((sum, t) => sum + Number(t.nominal || 0), 0)
 
     const context: GeminiContext = {
       activeTransactions: activeTransactions.map((t) => ({
@@ -366,7 +383,18 @@ export async function executeFinancialAgent(
         }
 
         // Susun narasi analitik mendalam dengan kecerdasan Gemini
-        const narrative = await generateFinancialAnalysisNarrative(analysisDataRes.data, trimmed)
+        let narrative = ''
+        try {
+          narrative = await generateFinancialAnalysisNarrative(analysisDataRes.data, trimmed)
+        } catch (e) {
+          console.warn('generateFinancialAnalysisNarrative failed:', e)
+        }
+
+        // Jika AI mengembalikan pesan gagal atau kosong, gunakan fallback formatter terstruktur
+        if (!narrative || narrative.includes('Terjadi kendala')) {
+          narrative = formatFinancialAnalysisFallback(analysisDataRes.data)
+        }
+
         return {
           success: true,
           reply: narrative,

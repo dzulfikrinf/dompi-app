@@ -329,3 +329,46 @@ export async function getFinancialAnalysis(
     return { success: false, error: 'Terjadi kesalahan sistem saat menganalisis keuangan.' }
   }
 }
+
+/**
+ * Format laporan analitik keuangan ke dalam bentuk teks terstruktur
+ * (digunakan sebagai fallback yang andal jika layanan AI mengalami lonjakan trafik/limit kuota)
+ */
+export function formatFinancialAnalysisFallback(data: FinancialAnalysisResult): string {
+  const isSurplus = data.arusKasBersih >= 0
+  const statusSurplus = isSurplus
+    ? `Surplus Rp${data.arusKasBersih.toLocaleString('id-ID')} ✨`
+    : `Defisit Rp${Math.abs(data.arusKasBersih).toLocaleString('id-ID')} ⚠️`
+
+  const topCats = (data.posTerboros || [])
+    .map((k: { kategori: string; nominal: number; persentase: number }, i: number) => `${i + 1}. **${k.kategori}**: Rp${k.nominal.toLocaleString('id-ID')} (${k.persentase}%)`)
+    .join('\n')
+
+  let perbandinganText = ''
+  if (data.perbandinganBulanSebelumnya) {
+    const p = data.perbandinganBulanSebelumnya
+    const tanda = p.deltaPengeluaranNominal >= 0 ? '+' : ''
+    perbandinganText = `\n• **Dibandingkan ${p.periodeSebelumnyaLabel}**: Pengeluaran ${p.trenPengeluaran} ${tanda}${p.deltaPengeluaranPersen}% (Rp${p.deltaPengeluaranNominal.toLocaleString('id-ID')})`
+  }
+
+  const advice =
+    data.rasioTabunganPersen >= 20
+      ? 'Kondisi finansialmu sehat dengan rasio tabungan yang baik! Pertahankan konsistensi ini ya.'
+      : data.arusKasBersih < 0
+      ? 'Bulan ini pengeluaranmu melebihi pemasukan. Coba rem pos pengeluaran terbesar di atas agar saldo tetap aman.'
+      : 'Arus kasmu positif, namun usahakan tekan pos pengeluaran terbesar agar bisa menabung minimal 20% dari pemasukan.'
+
+  return `📊 **Analisis Keuangan (${data.periodeLabel})**
+
+• **Total Pemasukan**: Rp${data.totalPemasukan.toLocaleString('id-ID')}
+• **Total Pengeluaran**: Rp${data.totalPengeluaran.toLocaleString('id-ID')}
+• **Arus Kas Bersih**: ${statusSurplus}
+• **Rasio Tabungan**: ${data.rasioTabunganPersen}%
+• **Rata-rata Pengeluaran**: Rp${data.rataRataPengeluaranHarian.toLocaleString('id-ID')}/hari${perbandinganText}
+
+🔥 **Pos Pengeluaran Terbesar:**
+${topCats || '- Belum ada data pengeluaran'}
+
+💡 **Saran Dompi:**
+${advice}`
+}

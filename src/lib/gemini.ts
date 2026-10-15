@@ -722,7 +722,8 @@ export async function processAgentChat(
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const today = new Date().toISOString().split('T')[0];
+    const nowWIB = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+    const today = nowWIB.toISOString().split('T')[0];
 
     const availableWallets =
       context.walletDetails && context.walletDetails.length > 0
@@ -735,7 +736,7 @@ export async function processAgentChat(
         : (context.wallets && context.wallets.length > 0 ? context.wallets.join(', ') : 'blu bca, BNI, Cash, BRI');
 
     const recentTrxSummary = (context.activeTransactions || [])
-      .slice(0, 10)
+      .slice(0, 15)
       .map(
         (t) =>
           `ID ${t.id} [${t.tanggal}] ${t.tipe} Rp${Number(t.nominal).toLocaleString('id-ID')} | ${t.kategori} | ${t.dompet || 'Tunai'} | "${t.deskripsi}"`
@@ -746,19 +747,32 @@ export async function processAgentChat(
 Kamu adalah "Dompi", asisten pencatat dan penasihat keuangan pribadi cerdas berbahasa Indonesia santai, ramah, dan suportif.
 Kamu berbicara santai selayaknya teman ngobrol finansial yang cerdas dan solutif.
 
-Tanggal hari ini: ${today}.
+Tanggal hari ini: ${today} (WIB).
 
-Daftar Dompet / Rekening Pengguna Saat Ini:
+Daftar Dompet / Rekening Pengguna Saat Ini (Data Saldo Terkini Akurat):
 ${availableWallets}
 
-Transaksi Aktif Terakhir Pengguna:
+Transaksi Aktif Terakhir Pengguna (15 transaksi terbaru):
 ${recentTrxSummary || 'Belum ada transaksi.'}
 
 Transaksi Terakhir yang Dihapus (Konteks UNDO):
 ${context.latestDeletedTransaction ? `ID ${context.latestDeletedTransaction.id}: ${context.latestDeletedTransaction.deskripsi} Rp${Number(context.latestDeletedTransaction.nominal).toLocaleString('id-ID')}` : 'Tidak ada transaksi yang baru dihapus.'}
 
-Ringkasan Finansial Bulan Ini:
-${context.summary ? `Pemasukan: Rp${Number(context.summary.totalPemasukan).toLocaleString('id-ID')} | Pengeluaran: Rp${Number(context.summary.totalPengeluaran).toLocaleString('id-ID')} | Total Saldo Terkini: Rp${Number(context.summary.totalSaldoTerkini || 0).toLocaleString('id-ID')}` : 'Belum ada ringkasan.'}
+Ringkasan Finansial Bulan Ini (${context.summary?.bulanIni || 'Bulan Ini'}):
+${
+  context.summary
+    ? `- Total Pemasukan: Rp${Number(context.summary.totalPemasukan).toLocaleString('id-ID')}
+- Total Pengeluaran: Rp${Number(context.summary.totalPengeluaran).toLocaleString('id-ID')}
+- Surplus / Defisit Bulan Ini: Rp${Number(context.summary.selisihBulanIni).toLocaleString('id-ID')}
+- Total Seluruh Saldo Terkini: Rp${Number(context.summary.totalSaldoTerkini || 0).toLocaleString('id-ID')}
+- Jumlah Transaksi Bulan Ini: ${context.summary.jumlahTransaksi || 0} transaksi`
+    : 'Belum ada ringkasan.'
+}
+
+PANDUAN AKURASI DATA:
+- Data Saldo Terkini pada Daftar Dompet dan Ringkasan Finansial Bulan Ini di atas adalah data RESMI hasil kalkulasi lengkap database.
+- Saat pengguna bertanya saldo, sisa uang, atau total pengeluaran/pemasukan, gunakan angka di atas secara eksak dan jangan mengarang angka lain.
+- Jika pengguna meminta analisis mendalam per kategori atau perbandingan periode, panggil tool 'get_financial_analysis'.
 
 ATURAN PERILAKU:
 1. PENCATATAN TRANSAKSI (record_transactions):
@@ -787,14 +801,11 @@ ATURAN PERILAKU:
    - Balas langsung dengan teks bahasa Indonesia yang santai, jelas, mengalir natural, dan terstruktur rapi.
 `;
 
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-3.5-flash',
-      tools: AGENT_TOOLS as unknown as Tool[],
-      systemInstruction,
-      generationConfig: {
-        temperature: 0.5,
-      },
-    });
+    const candidateModels = [
+      'gemini-3.5-flash-lite',
+      'gemini-flash-latest',
+      'gemini-flash-lite-latest',
+    ];
 
     // Susun riwayat percakapan untuk chat context
     // Ambil maksimal 8 pesan terakhir agar konteks tetap segar
@@ -803,31 +814,55 @@ ATURAN PERILAKU:
       parts: [{ text: h.text }],
     }));
 
-    // Buat chat session dengan history
-    const chat = model.startChat({
-      history: recentHistory,
-    });
+    let lastError: unknown = null;
 
-    const result = await chat.sendMessage(text);
-    const response = await result.response;
-    const calls = response.functionCalls();
+    for (const modelName of candidateModels) {
+      try {
+        const model = genAI.getGenerativeModel({
+          model: modelName,
+          tools: AGENT_TOOLS as unknown as Tool[],
+          systemInstruction,
+          generationConfig: {
+            temperature: 0.5,
+          },
+        });
 
-    if (calls && calls.length > 0) {
-      const call = calls[0];
-      const callArgs = (call.args || {}) as Record<string, unknown>;
-      return {
-        success: true,
-        toolCall: {
-          name: call.name,
-          args: callArgs,
-        },
-        reply: typeof callArgs.reply === 'string' ? callArgs.reply : undefined,
-      };
+        // Buat chat session dengan history
+        const chat = model.startChat({
+          history: recentHistory,
+        });
+
+        const result = await chat.sendMessage(text);
+        const response = await result.response;
+        const calls = response.functionCalls();
+
+        if (calls && calls.length > 0) {
+          const call = calls[0];
+          const callArgs = (call.args || {}) as Record<string, unknown>;
+          return {
+            success: true,
+            toolCall: {
+              name: call.name,
+              args: callArgs,
+            },
+            reply: typeof callArgs.reply === 'string' ? callArgs.reply : undefined,
+          };
+        }
+
+        return {
+          success: true,
+          reply: response.text().trim(),
+        };
+      } catch (err) {
+        lastError = err;
+        console.warn(`Model ${modelName} failed in processAgentChat, trying next candidate...`, err);
+      }
     }
 
+    console.error('All candidate models failed in processAgentChat:', lastError);
     return {
-      success: true,
-      reply: response.text().trim(),
+      success: false,
+      error: 'Terjadi gangguan saat menghubungkan ke asisten kecerdasan buatan.',
     };
   } catch (err) {
     console.error('Error in processAgentChat:', err);
@@ -852,14 +887,11 @@ export async function generateFinancialAnalysisNarrative(
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-3.5-flash',
-      systemInstruction:
-        'Kamu adalah Dompi, asisten keuangan pribadi yang santai, cerdas, bersahabat, dan solutif. Tugasmu adalah membaca data analitik keuangan riil pengguna, membedah di mana pos bocor halus atau pos terboros, memberikan evaluasi rasio tabungan dan arus kas, serta memberikan tips hemat realistis yang actionable. Gunakan bullet points, heading, dan emoji agar nyaman dibaca.',
-      generationConfig: {
-        temperature: 0.5,
-      },
-    });
+    const candidateModels = [
+      'gemini-3.5-flash-lite',
+      'gemini-flash-latest',
+      'gemini-flash-lite-latest',
+    ];
 
     const prompt = `
 Pertanyaan / Permintaan Pengguna:
@@ -871,9 +903,30 @@ ${JSON.stringify(analysisData, null, 2)}
 Buatlah balasan analisis keuangan yang mendalam, santai, dan bersahabat untuk pengguna!
 `;
 
-    const res = await model.generateContent(prompt);
-    const response = await res.response;
-    return response.text().trim();
+    let lastError: unknown = null;
+
+    for (const modelName of candidateModels) {
+      try {
+        const model = genAI.getGenerativeModel({
+          model: modelName,
+          systemInstruction:
+            'Kamu adalah Dompi, asisten keuangan pribadi yang santai, cerdas, bersahabat, dan solutif. Tugasmu adalah membaca data analitik keuangan riil pengguna, membedah di mana pos bocor halus atau pos terboros, memberikan evaluasi rasio tabungan dan arus kas, serta memberikan tips hemat realistis yang actionable. Gunakan bullet points, heading, dan emoji agar nyaman dibaca.',
+          generationConfig: {
+            temperature: 0.5,
+          },
+        });
+
+        const res = await model.generateContent(prompt);
+        const response = await res.response;
+        return response.text().trim();
+      } catch (err) {
+        lastError = err;
+        console.warn(`Model ${modelName} failed in narrative generation, trying next...`, err);
+      }
+    }
+
+    console.error('All candidate models failed in generateFinancialAnalysisNarrative:', lastError);
+    return 'Terjadi kendala saat menyusun laporan narasi analisis keuangan.';
   } catch (err) {
     console.error('Error generating financial analysis narrative:', err);
     return 'Terjadi kendala saat menyusun laporan narasi analisis keuangan.';
