@@ -79,3 +79,39 @@ WITH CHECK ((select auth.uid()) = user_id);
 CREATE POLICY "Users can delete their own settings"
 ON public.settings FOR DELETE TO authenticated
 USING ((select auth.uid()) = user_id);
+
+-- 4. Tabel Relasi Telegram Multi-User (telegram_connections)
+CREATE TABLE IF NOT EXISTS public.telegram_connections (
+  id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  telegram_chat_id text UNIQUE,
+  telegram_username text,
+  telegram_first_name text,
+  pairing_token text UNIQUE,
+  pairing_token_expires_at timestamptz,
+  linked_at timestamptz,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now(),
+  CONSTRAINT uq_telegram_connections_user_id UNIQUE (user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_tg_conn_chat_id ON public.telegram_connections(telegram_chat_id);
+CREATE INDEX IF NOT EXISTS idx_tg_conn_pairing_token ON public.telegram_connections(pairing_token);
+ALTER TABLE public.telegram_connections ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own telegram connections"
+ON public.telegram_connections FOR SELECT TO authenticated
+USING ((select auth.uid()) = user_id);
+
+CREATE POLICY "Users can insert their own telegram connections"
+ON public.telegram_connections FOR INSERT TO authenticated
+WITH CHECK ((select auth.uid()) = user_id);
+
+CREATE POLICY "Users can update their own telegram connections"
+ON public.telegram_connections FOR UPDATE TO authenticated
+USING ((select auth.uid()) = user_id)
+WITH CHECK ((select auth.uid()) = user_id);
+
+CREATE POLICY "Users can delete their own telegram connections"
+ON public.telegram_connections FOR DELETE TO authenticated
+USING ((select auth.uid()) = user_id);

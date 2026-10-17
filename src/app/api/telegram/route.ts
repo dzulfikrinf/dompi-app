@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
 import {
   validateTelegramWebhookSecret,
-  validateTelegramChatId,
   isDuplicateUpdate,
   sendTelegramMessage,
   createTelegramServerClient,
-  resolveOwnerUserId,
+  pairTelegramAccount,
+  resolveUserByTelegramChatId,
 } from '@/lib/services/telegram-service'
 import { executeFinancialAgent } from '@/lib/services/agent-chat-service'
 
@@ -57,34 +57,104 @@ export async function POST(req: Request) {
     }
 
     const chatId = rawChatId
+    const firstName = message.chat?.first_name || 'Teman'
+    const username = message.chat?.username
 
-    // 3. Validasi TELEGRAM_CHAT_ID pemilik
-    if (!validateTelegramChatId(chatId)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
-    // 4. Deteksi duplikasi update_id (mencegah retry berulang dari Telegram)
+    // 3. Deteksi duplikasi update_id (mencegah retry berulang dari Telegram)
     if (isDuplicateUpdate(update_id)) {
       return NextResponse.json({ ok: true, duplicate: true })
     }
 
-    // 5. Inisialisasi client server dan identifikasi user_id pemilik
+    // Inisialisasi Supabase server client dengan hak service role
     const serverClient = createTelegramServerClient()
-    const ownerUserId = await resolveOwnerUserId(serverClient)
 
-    if (!ownerUserId) {
-      console.error('Owner user_id could not be resolved in Telegram webhook')
-      await sendTelegramMessage(
-        chatId,
-        'Terjadi kendala konfigurasi akun pemilik. Silakan periksa database Anda.'
-      )
+    // 4. Tangani perintah /start (Alur Tautan & Sambutan)
+    if (text.startsWith('/start')) {
+      const parts = text.split(/\s+/)
+      const token = parts[1]?.trim()
+
+      if (token) {
+        // Proses penautan akun dengan token
+        const pairRes = await pairTelegramAccount(
+          token,
+          chatId,
+          { firstName, username },
+          serverClient
+        )
+
+        if (pairRes.success) {
+          const emailNotice = pairRes.userEmail ? ` (${pairRes.userEmail})` : ''
+          const welcomeMessage = `Halo ${firstName}! 🎉
+
+Akun Telegram kamu berhasil terhubung dengan akun Dompi${emailNotice}.
+
+Mulai sekarang, kamu bisa mencatat pengeluaran atau pemasukan langsung dari sini! Coba ketik:
+• 🍜 Makan bakso 25rb Cash
+• ⛽ Beli bensin 50rb blu bca
+• 💸 Pindah saldo 100rb dari blu bca ke Cash
+• 📊 Analisis keuanganku bulan ini
+
+Dompi siap membantumu mengelola keuangan dengan rapi! ✨`
+
+          await sendTelegramMessage(chatId, welcomeMessage)
+          return NextResponse.json({ ok: true, paired: true })
+        } else {
+          await sendTelegramMessage(
+            chatId,
+            `⚠️ ${pairRes.error || 'Kode tautan tidak valid atau sudah kedaluwarsa. Silakan buat tautan baru di menu Pengaturan web Dompi.'}`
+          )
+          return NextResponse.json({ ok: true, pair_failed: true })
+        }
+      }
+
+      // Pengguna mengetik /start tanpa token
+      const existingUserId = await resolveUserByTelegramChatId(chatId, serverClient)
+      if (existingUserId) {
+        await sendTelegramMessage(
+          chatId,
+          `Halo ${firstName}! 👋
+
+Akun Telegram kamu sudah terhubung dengan Dompi. Silakan langsung ketik transaksi atau pertanyaanmu, misalnya:
+• "Catat makan siang 30rb Cash"
+• "Saldo rekeningku sisa berapa?"
+• "Analisis pos boros bulan ini"`
+        )
+      } else {
+        await sendTelegramMessage(
+          chatId,
+          `Halo ${firstName}! 👋 Selamat datang di Dompi.
+
+Akun Telegram kamu belum terhubung dengan akun Dompi manapun.
+
+Cara menghubungkan akun:
+1. Buka aplikasi web Dompi
+2. Buka menu Pengaturan
+3. Klik tombol "Hubungkan ke Telegram"
+4. Klik tautan yang muncul untuk mengaktifkan akunmu di sini.
+
+Setelah terhubung, kamu bisa mencatat keuangan secepat mengetik chat! 🚀`
+        )
+      }
       return NextResponse.json({ ok: true })
     }
 
-    // 6. Eksekusi pesan menggunakan Financial Agent AI
+    // 5. Identifikasi pengguna pemilik chat_id
+    const userId = await resolveUserByTelegramChatId(chatId, serverClient)
+
+    if (!userId) {
+      await sendTelegramMessage(
+        chatId,
+        `Halo ${firstName}! Akun Telegram kamu belum terhubung ke akun Dompi.
+
+Silakan buka menu Pengaturan di aplikasi web Dompi, lalu klik "Hubungkan ke Telegram" agar bisa mencatat transaksi langsung dari sini ya! 😊`
+      )
+      return NextResponse.json({ ok: true, unlinked: true })
+    }
+
+    // 6. Eksekusi pesan menggunakan Financial Agent AI untuk user_id tersebut
     const agentRes = await executeFinancialAgent(text, {
       client: serverClient,
-      userId: ownerUserId,
+      userId,
     })
 
     const botReply =
