@@ -250,7 +250,17 @@ export async function pairTelegramAccount(
       }
     }
 
-    // Hubungkan chat_id ke user_id tersebut
+    // Lepaskan chat_id ini dari akun lain terlebih dahulu jika sebelumnya pernah terhubung
+    await serverClient
+      .from('telegram_connections')
+      .update({
+        telegram_chat_id: null,
+        linked_at: null,
+        updated_at: nowIso,
+      })
+      .eq('telegram_chat_id', String(chatId))
+
+    // Hubungkan chat_id ke user_id yang memegang token ini
     const { error: updateErr } = await serverClient
       .from('telegram_connections')
       .update({
