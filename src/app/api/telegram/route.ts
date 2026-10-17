@@ -157,11 +157,34 @@ Silakan buka menu Pengaturan di aplikasi web Dompi, lalu klik "Hubungkan ke Tele
       userId,
     })
 
-    const botReply =
+    let botReply =
       agentRes.reply ||
       (agentRes.error
         ? `Kendala: ${agentRes.error}`
         : 'Maaf, Dompi belum dapat memproses pesan tersebut saat ini.')
+
+    // Jika berhasil mencatat transaksi dan rincian transaksi belum dicantumkan di reply
+    if (
+      agentRes.actionType === 'RECORD_TRANSACTIONS' &&
+      agentRes.affectedTransactions &&
+      agentRes.affectedTransactions.length > 0
+    ) {
+      const alreadyHasDetails = agentRes.affectedTransactions.some((t) =>
+        botReply.toLowerCase().includes(t.deskripsi.toLowerCase())
+      )
+
+      if (!alreadyHasDetails) {
+        const details = agentRes.affectedTransactions
+          .map((t) => {
+            const prefix = t.tipe === 'Pengeluaran' ? '-' : '+'
+            const dompet = t.dompet ? ` [${t.dompet}]` : ''
+            return `• **${t.deskripsi}**: ${prefix}Rp${Number(t.nominal).toLocaleString('id-ID')}${dompet}`
+          })
+          .join('\n')
+
+        botReply = `${botReply}\n\n**Rincian Catatan:**\n${details}`
+      }
+    }
 
     // 7. Kirim balasan ke Telegram
     await sendTelegramMessage(chatId, botReply)

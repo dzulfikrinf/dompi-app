@@ -19,19 +19,19 @@ import { ThemeToggle } from '@/components/theme-toggle'
 const FAQS = [
   {
     q: 'Apakah Dompi meminta username atau password m-Banking saya?',
-    a: 'Sama sekali TIDAK. Dompi tidak pernah meminta password atau akses login m-Banking. Dompi bekerja secara privat berbasis catatan yang Anda kirim lewat chat atau input santai.',
+    a: 'Sama sekali TIDAK. Dompi tidak pernah meminta password atau akses login bank apa pun. Anda hanya perlu mencatat secara santai lewat chat atau halaman aplikasi.',
   },
   {
     q: 'Bagaimana cara menghubungkan Dompi ke Telegram?',
-    a: 'Sangat mudah! Setelah login ke Dompi, buka menu Pengaturan, klik "Hubungkan ke Telegram", lalu tekan tombol START di Telegram. Akun Anda langsung terhubung secara otomatis.',
+    a: 'Sangat mudah! Setelah masuk ke akun Dompi, buka menu Pengaturan, klik "Hubungkan ke Telegram", lalu tekan tombol START di Telegram. Akun Anda langsung terhubung secara otomatis.',
   },
   {
     q: 'Apakah data keuangan saya aman dan terpisah dari pengguna lain?',
-    a: '100% Aman. Dompi menggunakan Row Level Security (RLS) di tingkat database PostgreSQL Supabase. Hanya akun Anda yang memiliki kunci untuk melihat dan mengelola data Anda sendiri.',
+    a: 'Sangat aman. Setiap akun memiliki ruang data privat masing-masing yang terlindungi sistem keamanan berlapis. Tidak ada pengguna lain yang bisa melihat atau mengakses catatan keuangan Anda.',
   },
   {
-    q: 'Bagaimana jika bahasa yang saya gunakan campur bahasa gaul / daerah?',
-    a: 'Dompi ditenagai oleh model AI canggih (Gemini 3.5 Flash Lite) yang memahami bahasa Indonesia sehari-hari, singkatan (25rb, 50k, 1.5jt), nama dompet, dan waktu alami (kemarin, tadi sore).',
+    q: 'Bagaimana jika cara mengetik saya santai atau pakai singkatan sehari-hari?',
+    a: 'Bisa banget! Dompi mengerti bahasa santai sehari-hari, singkatan angka (seperti 25rb, 50k, 1.5jt), nama dompet yang Anda sebut (Cash, BCA, GoPay), sampai keterangan waktu (kemarin, tadi sore, barusan).',
   },
 ]
 
@@ -68,7 +68,7 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
                 Dompi.
               </span>
               <span className="hidden sm:inline-block text-[10px] font-display font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FFE600] text-[#121212] border-2 border-[#121212]">
-                AI FINANSIAL
+                ASISTEN KEUANGAN
               </span>
             </div>
           </Link>
@@ -91,13 +91,13 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
               href="/panduan"
               className="px-3.5 py-1.5 rounded-full text-xs font-display font-bold text-zinc-800 dark:text-zinc-200 hover:bg-[#FFE600] hover:text-[#121212] border border-transparent hover:border-[#121212] transition"
             >
-              Cheat Sheet
+              Panduan Catat
             </Link>
             <a
               href="#faq"
               className="px-3.5 py-1.5 rounded-full text-xs font-display font-bold text-zinc-800 dark:text-zinc-200 hover:bg-[#FFE600] hover:text-[#121212] border border-transparent hover:border-[#121212] transition"
             >
-              FAQ
+              Tanya Jawab
             </a>
           </nav>
 
@@ -133,28 +133,15 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
         </div>
       </header>
 
-      {/* 2. Notification Ribbon */}
-      <div className="bg-[#00F0FF] border-b-2 border-[#121212] py-2 px-4 text-center text-xs font-bold font-display text-[#121212]">
-        <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 flex-wrap">
-          <span className="px-2 py-0.5 rounded bg-[#FFE600] border border-[#121212] text-[10px] uppercase font-black">
-            RILIS TERBARU
-          </span>
-          <span>Bot Telegram Dompi kini makin sat-set: Catat multi-transaksi & analisis keuangan langsung dari chat.</span>
-          <Link href="/login" className="underline font-black hover:text-white transition">
-            Coba sekarang →
-          </Link>
-        </div>
-      </div>
-
       <main className="space-y-20 sm:space-y-28 py-10 sm:py-16">
-        {/* 3. Hero Section */}
+        {/* 2. Hero Section */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             {/* Left Column: Copy */}
             <div className="lg:col-span-7 space-y-6">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFE600] text-[#121212] border-2 border-[#121212] text-xs font-display font-extrabold shadow-brutal-sm">
                 <Zap className="w-3.5 h-3.5 fill-[#121212]" />
-                <span>BUKAN APLIKASI FINANSIAL YANG BIKIN PUSING</span>
+                <span>CATAT UANG TANPA RIBET</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black font-display tracking-tight text-[#121212] dark:text-zinc-50 leading-[1.08]">
@@ -162,11 +149,11 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
                 <span className="inline-block bg-[#00F0FF] text-[#121212] px-2.5 py-0.5 border-2 border-[#121212] rounded-xl shadow-brutal-sm rotate-[-1deg]">
                   Tanpa Drama.
                 </span>{' '}
-                Kelola Dompet Cerdas Pakai AI.
+                Kelola Dompet Jadi Lebih Santai.
               </h1>
 
               <p className="text-base sm:text-lg text-zinc-700 dark:text-zinc-300 max-w-xl font-medium leading-relaxed">
-                Tinggalkan form input kaku berlembar-lembar. Cukup ketik layaknya chat santai di Web atau Telegram pribadimu, Dompi otomatis sortir pos pengeluaranmu secara akurat.
+                Gak perlu lagi buka tabel rumit atau isi formulir panjang. Cukup ketik seperti nge-chat teman di Web atau Telegram, catatan pemasukan dan pengeluaranmu langsung tersimpan rapi seketika.
               </p>
 
               {/* Action Buttons */}
@@ -182,7 +169,7 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
                   className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-display font-bold text-sm sm:text-base border-2 border-[#121212] dark:border-zinc-700 shadow-brutal btn-brutal transition cursor-pointer"
                 >
                   <MessageSquare className="w-4 h-4 stroke-[2.5]" />
-                  <span>Lihat Demo AI Dompi</span>
+                  <span>Coba Obrolan Langsung</span>
                 </Link>
               </div>
 
@@ -190,15 +177,15 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
               <div className="flex flex-wrap items-center gap-2.5 pt-4 text-xs font-display font-bold">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00FF66]/30 text-emerald-950 dark:text-emerald-300 border border-[#121212] dark:border-emerald-700 shadow-2xs">
                   <Check className="w-3.5 h-3.5 stroke-[3]" />
-                  <span>100% Bebas Ribet</span>
+                  <span>Gampang Digunakan</span>
                 </span>
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00F0FF]/30 text-cyan-950 dark:text-cyan-300 border border-[#121212] dark:border-cyan-700 shadow-2xs">
                   <Bot className="w-3.5 h-3.5 stroke-[2.5]" />
-                  <span>Catat via Web & Telegram</span>
+                  <span>Bisa di Web & Telegram</span>
                 </span>
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFD1DC] text-rose-950 border border-[#121212] shadow-2xs">
                   <ShieldCheck className="w-3.5 h-3.5 stroke-[2.5]" />
-                  <span>Data Privat & Terenkripsi</span>
+                  <span>Data Privat & Aman</span>
                 </span>
               </div>
             </div>
@@ -214,7 +201,7 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
                     <span className="w-3 h-3 rounded-full bg-[#00FF66] border border-[#121212]" />
                   </div>
                   <span className="text-[10px] font-display font-bold tracking-widest uppercase text-zinc-600 dark:text-zinc-400">
-                    ● DOMPI LIVE ENGINE
+                    ● SIMULASI CHAT DOMPI
                   </span>
                 </div>
 
@@ -224,7 +211,7 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
                   <div className="flex justify-end">
                     <div className="bg-[#FFE600] border-2 border-[#121212] rounded-2xl rounded-tr-xs p-3.5 max-w-xs shadow-brutal-sm space-y-1">
                       <span className="text-[9px] font-display font-bold uppercase tracking-wider text-[#121212]/70 block">
-                        KAMU (VIA TELEGRAM)
+                        KAMU (CONTOH VIA TELEGRAM)
                       </span>
                       <p className="text-xs sm:text-sm font-bold text-[#121212] leading-snug">
                         Makan siang bakso 35rb Cash dan beli bensin 30rb Rekening
@@ -244,16 +231,16 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
                             <Bot className="w-3.5 h-3.5 stroke-[2.5]" />
                           </span>
                           <span className="text-[11px] font-display font-bold text-zinc-900 dark:text-zinc-100">
-                            Dompi Bot
+                            Dompi
                           </span>
                         </div>
-                        <span className="text-[9px] font-display font-bold px-1.5 py-0.2 rounded bg-[#00FF66] text-[#121212] border border-[#121212]">
-                          AI PARSED
+                        <span className="text-[9px] font-display font-bold px-1.5 py-0.5 rounded bg-[#00FF66] text-[#121212] border border-[#121212]">
+                          SUDAH TERCATAT
                         </span>
                       </div>
 
                       <p className="text-xs text-zinc-800 dark:text-zinc-200 font-medium">
-                        Siap Bos! 2 pengeluaran berhasil dicatat rapi:
+                        Siap! 2 pengeluaran ini sudah langsung tercatat rapi:
                       </p>
 
                       {/* Receipt items inside chat */}
@@ -270,7 +257,7 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
 
                       <div className="text-[10px] font-display font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                         <Check className="w-3 h-3 stroke-[3]" />
-                        <span>Saldo seluruh pos dompet otomatis disesuaikan!</span>
+                        <span>Saldo di dompet Cash dan Rekening otomatis terpotong.</span>
                       </div>
                     </div>
                   </div>
@@ -279,7 +266,7 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
                   <div className="pt-2">
                     <form onSubmit={handleTestSubmit} className="space-y-2">
                       <label className="text-[10px] font-display font-bold tracking-wider uppercase text-zinc-500 dark:text-zinc-400 block">
-                        COBA KETIK CONTOHMU SENDIRI:
+                        COBA KETIK CATATANMU SENDIRI:
                       </label>
                       <div className="flex gap-2">
                         <input
@@ -305,70 +292,58 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
           </div>
         </section>
 
-        {/* 4. Stats / Metric Bar */}
+        {/* 3. Stats / Keunggulan Sederhana */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="bg-white dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-2xl p-5 shadow-brutal">
               <span className="text-[10px] font-display font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#00FF66] text-[#121212] border border-[#121212]">
-                MUTASI AKTIF
+                HITUNGAN AKURAT
               </span>
               <p className="text-2xl sm:text-3xl font-extrabold font-display text-zinc-950 dark:text-zinc-50 mt-3">
-                100% Rapi
+                100% Pas
               </p>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                Kalkulasi saldo tanpa terpotong batas query
+                Semua uang masuk dan keluar langsung dihitung rapi tanpa ada yang terlewat.
               </p>
             </div>
 
             <div className="bg-white dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-2xl p-5 shadow-brutal">
               <span className="text-[10px] font-display font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FFE600] text-[#121212] border border-[#121212]">
-                INDONESIA
+                PRIVASI TERJAGA
               </span>
               <p className="text-2xl sm:text-3xl font-extrabold font-display text-zinc-950 dark:text-zinc-50 mt-3">
-                Multi-User
+                Ruang Privat
               </p>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                Private per user via Supabase RLS
+                Hanya kamu yang bisa melihat dan mengelola catatan keuanganmu.
               </p>
             </div>
 
             <div className="bg-white dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-2xl p-5 shadow-brutal">
               <span className="text-[10px] font-display font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#00F0FF] text-[#121212] border border-[#121212]">
-                LATENCY
+                RESPON CEPAT
               </span>
               <p className="text-2xl sm:text-3xl font-extrabold font-display text-zinc-950 dark:text-zinc-50 mt-3">
-                0.4 Detik
+                Hitungan Detik
               </p>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                Native Function Calling Gemini AI
-              </p>
-            </div>
-
-            <div className="bg-white dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-2xl p-5 shadow-brutal">
-              <span className="text-[10px] font-display font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FFD1DC] text-[#121212] border border-[#121212]">
-                KEANDALAN
-              </span>
-              <p className="text-2xl sm:text-3xl font-extrabold font-display text-zinc-950 dark:text-zinc-50 mt-3">
-                1.500 RPD
-              </p>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                Hemat kuota gratisan dengan model Lite
+                Kirim chat belanjaan, saldo di dompet langsung otomatis ter-update.
               </p>
             </div>
           </div>
         </section>
 
-        {/* 5. 4-Card Feature Grid: "Kenapa Dompi Beda" */}
+        {/* 4. 4-Card Feature Grid: "Kenapa Dompi Praktis" */}
         <section id="fitur" className="max-w-7xl mx-auto px-4 sm:px-6 space-y-8">
           <div className="space-y-3">
             <span className="inline-block text-xs font-display font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#00FF66] text-[#121212] border-2 border-[#121212] shadow-brutal-sm">
-              KEUNGGULAN TANPA KOMPROMI
+              FITUR UTAMA
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold font-display tracking-tight text-zinc-950 dark:text-zinc-50">
-              Kenapa Dompi Beda dari Aplikasi Bank & Buku Kas Lain?
+              Kenapa Dompi Lebih Gampang Dipakai Sehari-hari?
             </h2>
             <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 max-w-2xl">
-              Dirancang khusus untuk ritme hidup serba cepat di Indonesia: ojol, kopi susu, transfer QRIS, hingga tagihan bulanan.
+              Dirancang praktis buat kamu yang sering jajan, ngopi, bayar QRIS, sampai bayar tagihan bulanan.
             </p>
           </div>
 
@@ -377,18 +352,18 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
             <div className="bg-[#FFE600]/25 dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-2xl p-6 shadow-brutal flex flex-col justify-between hover:-translate-y-1 transition-transform">
               <div className="space-y-3">
                 <span className="text-[10px] font-display font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
-                  01 • NATIVE NLP
+                  01 • KETIK SANTAI
                 </span>
                 <h3 className="text-xl font-extrabold font-display text-zinc-950 dark:text-zinc-50">
-                  Chat & Done
+                  Tinggal Ketik Saja
                 </h3>
                 <p className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
-                  Catat mutasi secepat kirim chat. Gak perlu pilih dropdown 5 kali cuma buat nyatet segelas es teh 5 ribu.
+                  Catat pengeluaran secepat kirim chat. Gak perlu klik tombol atau dropdown berkali-kali cuma buat nyatet segelas es teh lima ribu.
                 </p>
               </div>
               <div className="mt-6 pt-3 border-t border-[#121212]/20 dark:border-zinc-800">
                 <span className="text-[10px] font-display font-bold px-2 py-0.5 rounded-full bg-[#FFE600] text-[#121212] border border-[#121212]">
-                  MULTI-TRANSAKSI SEKALIGUS
+                  BISA CATAT BANYAK SEKALIGUS
                 </span>
               </div>
             </div>
@@ -397,18 +372,18 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
             <div className="bg-[#00F0FF]/25 dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-2xl p-6 shadow-brutal flex flex-col justify-between hover:-translate-y-1 transition-transform">
               <div className="space-y-3">
                 <span className="text-[10px] font-display font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
-                  02 • SMART COACH
+                  02 • KONTROL KEUANGAN
                 </span>
                 <h3 className="text-xl font-extrabold font-display text-zinc-950 dark:text-zinc-50">
-                  Audit Otonom 80/20
+                  Tahu Pos Paling Boros
                 </h3>
                 <p className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
-                  Dompi menerapkan hukum Pareto 80/20 untuk mendeteksi pos belanja yang paling menguras isi dompetmu.
+                  Dompi langsung kasih tahu pos pengeluaran mana yang paling banyak menyedot uangmu, supaya kamu tahu pos mana yang perlu mulai direm.
                 </p>
               </div>
               <div className="mt-6 pt-3 border-t border-[#121212]/20 dark:border-zinc-800">
                 <span className="text-[10px] font-display font-bold px-2 py-0.5 rounded-full bg-[#00F0FF] text-[#121212] border border-[#121212]">
-                  DETEKSI POS BONCOS
+                  PANTAU POS BELANJA UTAMA
                 </span>
               </div>
             </div>
@@ -417,18 +392,18 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
             <div className="bg-white dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-2xl p-6 shadow-brutal flex flex-col justify-between hover:-translate-y-1 transition-transform">
               <div className="space-y-3">
                 <span className="text-[10px] font-display font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
-                  03 • MULTI-DOMPET
+                  03 • SATU TEMPAT
                 </span>
                 <h3 className="text-xl font-extrabold font-display text-zinc-950 dark:text-zinc-50">
-                  Semua Rekening
+                  Semua Dompet & Tabungan
                 </h3>
                 <p className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
-                  Konsolidasikan saldo uang tunai (Cash), rekening bank, hingga e-wallet dalam satu pandangan utuh.
+                  Pantau uang tunai (Cash), tabungan bank, sampai dompet digital (GoPay, OVO, ShopeePay) dalam satu layar yang gampang dipahami.
                 </p>
               </div>
               <div className="mt-6 pt-3 border-t border-[#121212]/20 dark:border-zinc-800">
                 <span className="text-[10px] font-display font-bold px-2 py-0.5 rounded-full bg-zinc-200 text-[#121212] border border-[#121212]">
-                  TRANSFER & KOREKSI FISIK
+                  PINDAH SALDO & TARIK TUNAI
                 </span>
               </div>
             </div>
@@ -437,25 +412,25 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
             <div className="bg-[#FFD1DC]/40 dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-2xl p-6 shadow-brutal flex flex-col justify-between hover:-translate-y-1 transition-transform">
               <div className="space-y-3">
                 <span className="text-[10px] font-display font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
-                  04 • NEO-BRUTALISM
+                  04 • TAMPILAN JELAS
                 </span>
                 <h3 className="text-xl font-extrabold font-display text-zinc-950 dark:text-zinc-50">
-                  Grafik Anti-Boring
+                  Laporan Gampang Dibaca
                 </h3>
                 <p className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
-                  Diagram kontras tinggi dengan warna pop-art. Pahami kondisi dompet dalam 3 detik tanpa kening berkerut.
+                  Grafik dan ringkasan keuangan yang simpel dan jelas. Dalam sekejap kamu langsung tahu apakah bulan ini lagi hemat atau lagi banyak keluar.
                 </p>
               </div>
               <div className="mt-6 pt-3 border-t border-[#121212]/20 dark:border-zinc-800">
                 <span className="text-[10px] font-display font-bold px-2 py-0.5 rounded-full bg-[#FF4365] text-white border border-[#121212]">
-                  RULE 50 / 30 / 20
+                  PANTAU ARUS KAS BULANAN
                 </span>
               </div>
             </div>
           </div>
         </section>
 
-        {/* 6. Cara Kerja (3 Langkah Sat-Set) */}
+        {/* 5. Cara Kerja (3 Langkah Cepat) */}
         <section id="cara-kerja" className="max-w-7xl mx-auto px-4 sm:px-6 space-y-8">
           <div className="space-y-3 text-center max-w-2xl mx-auto">
             <span className="inline-block text-xs font-display font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#FFE600] text-[#121212] border-2 border-[#121212] shadow-brutal-sm">
@@ -475,7 +450,7 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
                 Daftar Akun Gratis
               </h3>
               <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                Buat akun dengan email Anda. Dompi otomatis menyiapkan 2 dompet dasar: <strong>Cash</strong> dan <strong>Rekening Utama</strong>.
+                Daftar pakai email dalam hitungan detik. Dompi langsung menyiapkan dompet awal: <strong>Cash</strong> dan <strong>Rekening</strong>.
               </p>
             </div>
 
@@ -484,10 +459,10 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
                 2
               </div>
               <h3 className="text-lg font-extrabold font-display text-zinc-950 dark:text-zinc-50">
-                Hubungkan ke Telegram
+                Sambungkan ke Telegram
               </h3>
               <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                Buka menu Pengaturan, klik &ldquo;Hubungkan ke Telegram&rdquo; dan tekan START di bot <strong>@dompi25_bot</strong>.
+                Buka menu Pengaturan, klik &ldquo;Hubungkan ke Telegram&rdquo; dan tekan tombol START di bot <strong>@dompi25_bot</strong>.
               </p>
             </div>
 
@@ -496,23 +471,23 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
                 3
               </div>
               <h3 className="text-lg font-extrabold font-display text-zinc-950 dark:text-zinc-50">
-                Chat Kapan Saja
+                Mulai Catat Sambil Chat
               </h3>
               <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                Tiap ada pengeluaran atau pemasukan, cukup ketik chat santai. Dompi urus semua pembukuan secara otomatis.
+                Tiap habis jajan, transfer uang, atau terima gaji, tinggal kirim pesan santai. Dompi urus pencatatannya sampai beres.
               </p>
             </div>
           </div>
         </section>
 
-        {/* 7. FAQ Section */}
+        {/* 6. FAQ Section */}
         <section id="faq" className="max-w-4xl mx-auto px-4 sm:px-6 space-y-6">
           <div className="text-center space-y-2">
             <span className="inline-block text-xs font-display font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#FFE600] text-[#121212] border-2 border-[#121212] shadow-brutal-sm">
-              PERTANYAAN UMUM
+              TANYA JAWAB
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold font-display tracking-tight text-zinc-950 dark:text-zinc-50">
-              Masih Punya Pertanyaan? Kami Jawab Terang-terangan.
+              Pertanyaan yang Sering Ditanyakan
             </h2>
           </div>
 
@@ -530,9 +505,8 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
                   >
                     <span>{faq.q}</span>
                     <ChevronDown
-                      className={`w-4 h-4 stroke-[2.5] flex-shrink-0 transition-transform ${
-                        isOpen ? 'rotate-180' : ''
-                      }`}
+                      className={`w-4 h-4 stroke-[2.5] flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''
+                        }`}
                     />
                   </button>
                   {isOpen && (
@@ -546,7 +520,7 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
           </div>
         </section>
 
-        {/* 8. Final CTA Banner */}
+        {/* 7. Final CTA Banner */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="bg-[#FFE600] border-2 border-[#121212] rounded-3xl p-8 sm:p-12 shadow-brutal-xl flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="space-y-4 max-w-2xl text-center lg:text-left">
@@ -554,10 +528,10 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
                 MULAI DALAM 60 DETIK
               </span>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black font-display tracking-tight text-[#121212] leading-tight">
-                Siap Ucapkan Selamat Tinggal Pada Dompet Tekor?
+                Siap Kelola Uang dengan Lebih Tenang?
               </h2>
               <p className="text-xs sm:text-base text-[#121212]/90 font-medium">
-                Bergabunglah dengan pemuda cerdas yang sudah menata masa depan finansial tanpa stres dan tanpa rumus excel rumit.
+                Atur keuangan harian dan bulanan tanpa ribet bikin rumus Excel atau kumpulin tumpukan nota belanja.
               </p>
             </div>
 
@@ -566,17 +540,17 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
                 href={userEmail ? '/beranda' : '/login'}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-[#121212] text-white hover:bg-zinc-800 text-sm sm:text-base font-display font-extrabold shadow-brutal btn-brutal transition cursor-pointer"
               >
-                <span>{userEmail ? 'Buka Beranda Sekarang →' : 'Buka Dompi Sekarang →'}</span>
+                <span>{userEmail ? 'Buka Beranda Sekarang →' : 'Mulai Pakai Dompi Sekarang →'}</span>
               </Link>
               <span className="text-[11px] font-display font-bold text-[#121212]/80">
-                100% Gratis • Data Terenkripsi
+                100% Gratis Digunakan • Aman & Privat
               </span>
             </div>
           </div>
         </section>
       </main>
 
-      {/* 9. Footer */}
+      {/* 8. Footer */}
       <footer className="border-t-2 border-[#121212] dark:border-zinc-800 bg-white dark:bg-zinc-950 py-12 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -595,7 +569,7 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
               </span>
             </div>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              Asisten keuangan digital nomor satu untuk generasi melek finansial Indonesia.
+              Pencatat keuangan praktis dan santai untuk siapa saja di Indonesia.
             </p>
           </div>
 

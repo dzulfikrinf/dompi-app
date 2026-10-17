@@ -779,7 +779,7 @@ ATURAN PERILAKU:
    - Jika pengguna menyebut pengeluaran atau pemasukan (bisa 1 transaksi maupun banyak transaksi dalam satu kalimat/list), PANGGIL fungsi 'record_transactions'.
    - Ekstrak semua transaksi secara akurat ke dalam array 'items'.
    - Cocokkan nama dompet dengan Daftar Dompet Pengguna. Jika tidak disebut, gunakan dompet default yang paling wajar (misal "Cash" atau "blu bca").
-   - Berikan 'reply' konfirmasi yang ramah, hangat, dan sebutkan rincian apa saja yang sudah berhasil dicatat dengan emoji yang relevan.
+   - Berikan 'reply' konfirmasi yang ramah, hangat, dan sebutkan rincian apa saja yang sudah berhasil dicatat secara rapi.
 
 2. TRANSFER SALDO ANTAR DOMPET (transfer_wallet_balance):
    - Jika pengguna ingin memindahkan uang, top-up e-wallet, atau tarik tunai (misal: "pindahin 100rb dari blu bca ke Cash"), PANGGIL 'transfer_wallet_balance'.
@@ -799,6 +799,12 @@ ATURAN PERILAKU:
 7. OBROLAN UMUM / EDUKASI / CURHAT FINANSIAL:
    - Jika pengguna sekadar menyapa, bertanya tips keuangan, rumus alokasi gaji (misal 50-30-20), atau ngobrol bebas, JANGAN panggil tool apapun.
    - Balas langsung dengan teks bahasa Indonesia yang santai, jelas, mengalir natural, dan terstruktur rapi.
+
+PANDUAN FORMAT TAMPILAN & READABILITY:
+- Susun teks balasan dengan bersih, rapi, dan nyaman dibaca (hindari paragraf panjang yang menumpuk).
+- Gunakan poin bullet (•) untuk daftar/rincian.
+- Jangan gunakan simbol bintang berlebihan atau membungkus setiap kata dengan tanda bintang ganda (**). Cukup gunakan penekanan secara wajar pada judul bagian atau angka kunci.
+- Hindari penggunaan emotikon berlebihan agar teks tetap elegan dan profesional.
 `;
 
     const candidateModels = [
@@ -910,7 +916,7 @@ Buatlah balasan analisis keuangan yang mendalam, santai, dan bersahabat untuk pe
         const model = genAI.getGenerativeModel({
           model: modelName,
           systemInstruction:
-            'Kamu adalah Dompi, asisten keuangan pribadi yang santai, cerdas, bersahabat, dan solutif. Tugasmu adalah membaca data analitik keuangan riil pengguna, membedah di mana pos bocor halus atau pos terboros, memberikan evaluasi rasio tabungan dan arus kas, serta memberikan tips hemat realistis yang actionable. Gunakan bullet points, heading, dan emoji agar nyaman dibaca.',
+            'Kamu adalah Dompi, asisten keuangan pribadi yang santai, cerdas, bersahabat, dan solutif. Tugasmu adalah membaca data analitik keuangan riil pengguna, membedah di mana pos bocor halus atau pos terboros, memberikan evaluasi rasio tabungan dan arus kas, serta memberikan tips hemat realistis yang actionable. Gunakan bullet points (•), heading yang jelas, dan susunan paragraf yang rapi dan nyaman dibaca tanpa emotikon atau simbol bintang berlebihan.',
           generationConfig: {
             temperature: 0.5,
           },

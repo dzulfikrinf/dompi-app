@@ -51,6 +51,50 @@ const SAMPLE_PROMPTS = [
   'Gimana tips mengatur budget keuangan pribadi?',
 ]
 
+function renderFormattedChatMessage(text: string) {
+  if (!text) return null
+
+  const lines = text.split('\n')
+  return (
+    <div className="space-y-1">
+      {lines.map((line, lineIdx) => {
+        // Normalisasi list bullet point
+        const bulletMatch = line.match(/^[ \t]*[\*\-\+]\s+(.+)$/)
+        const lineContent = bulletMatch ? `• ${bulletMatch[1]}` : line
+
+        // Pecah token bold (**...**) dan inline code (`...`)
+        const tokens = lineContent.split(/(\*\*[\s\S]+?\*\*|`[^`]+`)/g)
+
+        return (
+          <div key={lineIdx} className={line === '' ? 'h-2' : ''}>
+            {tokens.map((token, tokenIdx) => {
+              if (token.startsWith('**') && token.endsWith('**')) {
+                return (
+                  <strong key={tokenIdx} className="font-bold">
+                    {token.slice(2, -2).replace(/\*/g, '')}
+                  </strong>
+                )
+              }
+              if (token.startsWith('`') && token.endsWith('`')) {
+                return (
+                  <code
+                    key={tokenIdx}
+                    className="font-mono bg-zinc-200 dark:bg-zinc-800 px-1 py-0.5 rounded text-[11px]"
+                  >
+                    {token.slice(1, -1)}
+                  </code>
+                )
+              }
+              // Hapus sisa tanda bintang liar
+              return token.replace(/\*{1,}/g, '')
+            })}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function ChatClient({ userEmail }: { userEmail?: string }) {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -251,7 +295,9 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
                 )}
 
                 {/* Message text */}
-                <div className="whitespace-pre-wrap font-medium">{msg.text}</div>
+                <div className="font-medium text-xs sm:text-sm leading-relaxed">
+                  {renderFormattedChatMessage(msg.text)}
+                </div>
 
                 {/* Operation result details if transactions affected */}
                 {msg.affectedTransactions && msg.affectedTransactions.length > 0 ? (

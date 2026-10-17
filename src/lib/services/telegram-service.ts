@@ -54,7 +54,90 @@ export function isDuplicateUpdate(updateId?: number): boolean {
 }
 
 /**
+ * Format teks markdown menjadi HTML yang kompatibel dan aman untuk Telegram Bot API.
+ * Mengubah **teks tebal** menjadi <b>teks tebal</b>, list * / - menjadi •,
+ * dan membersihkan sisa simbol bintang yang tidak berpasangan.
+ */
+export function formatTextForTelegram(text: string): string {
+  if (!text) return ''
+
+  // 1. Normalisasi baris baru dan trim
+  let result = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim()
+
+  // 2. Escape karakter khusus HTML (&, <, >) terlebih dahulu
+  result = result
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+
+  // 3. Blok kode (```...```) -> <pre>...</pre>
+  result = result.replace(/```(?:[a-zA-Z0-9_-]+)?\n?([\s\S]*?)```/g, '<pre>$1</pre>')
+
+  // 4. Inline code (`...`) -> <code>...</code>
+  result = result.replace(/`([^`\n]+)`/g, '<code>$1</code>')
+
+  // 5. Heading markdown (# Header, ## Header, ### Header) -> <b>Header</b>
+  result = result.replace(/^(?:#{1,6})\s+(.+)$/gm, '<b>$1</b>')
+
+  // 6. Bold + Italic (***teks*** atau ___teks___) -> <b><i>teks</i></b>
+  result = result.replace(/\*\*\*([\s\S]+?)\*\*\*/g, '<b><i>$1</i></b>')
+  result = result.replace(/___([\s\S]+?)___/g, '<b><i>$1</i></b>')
+
+  // 7. Bold (**teks** atau __teks__) -> <b>teks</b>
+  result = result.replace(/\*\*([\s\S]+?)\*\*/g, '<b>$1</b>')
+  result = result.replace(/__([\s\S]+?)__/g, '<b>$1</b>')
+
+  // 8. Bullet points di awal baris (* item, - item, + item) -> • item
+  result = result.replace(/^[ \t]*[\*\-\+]\s+(.+)$/gm, '• $1')
+
+  // 9. Italic (*teks* atau _teks_)
+  result = result.replace(
+    /(?<=^|[\s([{.,:;!?'"“‘\n])\*([^*\n\r]+?)\*(?=[\s)\]}.,:;!?'"”’\n]|$)/g,
+    '<i>$1</i>'
+  )
+  result = result.replace(
+    /(?<=^|[\s([{.,:;!?'"“‘\n])_([^_\n\r]+?)_(?=[\s)\]}.,:;!?'"”’\n]|$)/g,
+    '<i>$1</i>'
+  )
+
+  // 10. Strikethrough (~~teks~~) -> <s>teks</s>
+  result = result.replace(/~~(.+?)~~/g, '<s>$1</s>')
+
+  // 11. Hapus sisa tanda bintang liar / yatim yang tidak tertutup rapi
+  result = result.replace(/\*{1,}/g, '')
+
+  // 12. Normalisasi spasi dan baris baru (maksimal 2 baris kosong berurutan)
+  result = result.replace(/\n{3,}/g, '\n\n')
+
+  return result.trim()
+}
+
+/**
+ * Pembersih cadangan: menghapus semua format markdown menjadi teks polos bersih
+ * tanpa ada tanda bintang atau simbol aneh jika Telegram menolak parsing HTML.
+ */
+export function stripMarkdownFormatting(text: string): string {
+  if (!text) return ''
+  return text
+    .replace(/```(?:[a-zA-Z0-9_-]+)?\n?([\s\S]*?)```/g, '$1')
+    .replace(/`([^`\n]+)`/g, '$1')
+    .replace(/^(?:#{1,6})\s+(.+)$/gm, '$1')
+    .replace(/\*\*([\s\S]+?)\*\*/g, '$1')
+    .replace(/__([\s\S]+?)__/g, '$1')
+    .replace(/^[ \t]*[\*\-\+]\s+(.+)$/gm, '• $1')
+    .replace(/(?<=^|[\s([{.,:;!?'"“‘\n])\*([^*\n\r]+?)\*(?=[\s)\]}.,:;!?'"”’\n]|$)/g, '$1')
+    .replace(/(?<=^|[\s([{.,:;!?'"“‘\n])_([^_\n\r]+?)_(?=[\s)\]}.,:;!?'"”’\n]|$)/g, '$1')
+    .replace(/~~(.+?)~~/g, '$1')
+    .replace(/\*{1,}/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
+/**
  * 3. Kirim pesan balasan ke Telegram menggunakan Bot API
+ * Pesan diformat secara otomatis dengan HTML parse_mode agar teks tebal,
+ * bullet point, dan baris baru terbaca rapi tanpa karakter asterik (**).
+ * Dilengkapi dengan fallback otomatis ke teks polos bersih jika parsing gagal.
  */
 export async function sendTelegramMessage(
   chatId: string | number,
@@ -67,6 +150,9 @@ export async function sendTelegramMessage(
   }
 
   const url = `https://api.telegram.org/bot${token}/sendMessage`
+  const formattedHtml = formatTextForTelegram(text)
+
+  // 1. Percobaan pengiriman utama: menggunakan parse_mode HTML
   try {
     const res = await fetch(url, {
       method: 'POST',
@@ -75,20 +161,48 @@ export async function sendTelegramMessage(
       },
       body: JSON.stringify({
         chat_id: chatId,
-        text,
+        text: formattedHtml,
+        parse_mode: 'HTML',
       }),
     })
 
-    if (!res.ok) {
-      const errBody = await res.text()
-      console.error('Telegram API response error status:', res.status, errBody)
+    if (res.ok) {
+      return true
+    }
+
+    const errBody = await res.text()
+    console.warn('Telegram HTML parse rejected, attempting clean plain text fallback:', errBody)
+  } catch (err) {
+    console.warn(
+      'Network error when sending HTML Telegram message, falling back:',
+      err instanceof Error ? err.message : 'Unknown error'
+    )
+  }
+
+  // 2. Fallback: kirim teks polos yang sudah dibersihkan dari simbol bintang
+  try {
+    const cleanPlain = stripMarkdownFormatting(text)
+    const fallbackRes = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: cleanPlain,
+      }),
+    })
+
+    if (!fallbackRes.ok) {
+      const errBody = await fallbackRes.text()
+      console.error('Telegram plain text fallback failed:', fallbackRes.status, errBody)
       return false
     }
 
     return true
   } catch (err) {
     console.error(
-      'Network error when sending Telegram message:',
+      'Network error on plain fallback Telegram message:',
       err instanceof Error ? err.message : 'Unknown error'
     )
     return false
