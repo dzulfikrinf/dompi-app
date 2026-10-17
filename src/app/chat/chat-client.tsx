@@ -60,7 +60,12 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
       timestamp: 'Baru saja',
     },
   ])
-  const [inputValue, setInputValue] = useState('')
+  const [inputValue, setInputValue] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return new URLSearchParams(window.location.search).get('q') || ''
+    }
+    return ''
+  })
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -74,6 +79,13 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
   useEffect(() => {
     scrollToBottom()
   }, [messages, isLoading])
+
+  // Focus input jika ada teks awalan dari halaman Panduan (?q=...)
+  useEffect(() => {
+    if (inputValue) {
+      inputRef.current?.focus()
+    }
+  }, [inputValue])
 
   const handleSendMessage = async (textToSend?: string) => {
     const text = (textToSend || inputValue).trim()

@@ -12,6 +12,7 @@ import {
   BarChart2,
   CheckSquare,
   MessageSquare,
+  BookOpen,
   Settings,
   Plus,
   LogOut,
@@ -35,6 +36,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: '/laporan', label: 'Laporan', icon: BarChart2 },
   { href: '/target', label: 'Target Tabungan', icon: Target },
   { href: '/tagihan', label: 'Tagihan Rutin', icon: CheckSquare },
+  { href: '/panduan', label: 'Panduan & Tips', icon: BookOpen },
   { href: '/pengaturan', label: 'Pengaturan', icon: Settings },
 ]
 
