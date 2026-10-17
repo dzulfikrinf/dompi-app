@@ -15,7 +15,7 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
 
   if (!mounted) {
     return (
-      <div className={`w-9 h-9 rounded-lg border border-zinc-200 dark:border-zinc-800 ${className}`} />
+      <div className={`w-10 h-10 rounded-xl border-2 border-[#121212] dark:border-zinc-700 ${className}`} />
     )
   }
 
@@ -27,12 +27,12 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       aria-label={isDark ? 'Ganti ke tema terang' : 'Ganti ke tema gelap'}
       title={isDark ? 'Mode Terang' : 'Mode Gelap'}
-      className={`inline-flex items-center justify-center w-9 h-9 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer active:scale-95 focus:outline-none ${className}`}
+      className={`inline-flex items-center justify-center w-10 h-10 rounded-xl border-2 border-[#121212] dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-brutal-sm btn-brutal transition cursor-pointer ${className}`}
     >
       {isDark ? (
-        <Sun className="w-4 h-4 stroke-[1.8]" />
+        <Sun className="w-4 h-4 stroke-[2.5]" />
       ) : (
-        <Moon className="w-4 h-4 stroke-[1.8]" />
+        <Moon className="w-4 h-4 stroke-[2.5]" />
       )}
     </button>
   )

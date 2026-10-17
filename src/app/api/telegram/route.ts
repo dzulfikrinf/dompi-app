@@ -84,24 +84,24 @@ export async function POST(req: Request) {
 
         if (pairRes.success) {
           const emailNotice = pairRes.userEmail ? ` (${pairRes.userEmail})` : ''
-          const welcomeMessage = `Halo ${firstName}! 🎉
+          const welcomeMessage = `Halo ${firstName}!
 
 Akun Telegram kamu berhasil terhubung dengan akun Dompi${emailNotice}.
 
 Mulai sekarang, kamu bisa mencatat pengeluaran atau pemasukan langsung dari sini! Coba ketik:
-• 🍜 Makan bakso 25rb Cash
-• ⛽ Beli bensin 50rb blu bca
-• 💸 Pindah saldo 100rb dari blu bca ke Cash
-• 📊 Analisis keuanganku bulan ini
+• Makan bakso 25rb Cash
+• Beli bensin 50rb blu bca
+• Pindah saldo 100rb dari blu bca ke Cash
+• Analisis keuanganku bulan ini
 
-Dompi siap membantumu mengelola keuangan dengan rapi! ✨`
+Dompi siap membantumu mengelola keuangan dengan rapi.`
 
           await sendTelegramMessage(chatId, welcomeMessage)
           return NextResponse.json({ ok: true, paired: true })
         } else {
           await sendTelegramMessage(
             chatId,
-            `⚠️ ${pairRes.error || 'Kode tautan tidak valid atau sudah kedaluwarsa. Silakan buat tautan baru di menu Pengaturan web Dompi.'}`
+            `${pairRes.error || 'Kode tautan tidak valid atau sudah kedaluwarsa. Silakan buat tautan baru di menu Pengaturan web Dompi.'}`
           )
           return NextResponse.json({ ok: true, pair_failed: true })
         }
@@ -112,7 +112,7 @@ Dompi siap membantumu mengelola keuangan dengan rapi! ✨`
       if (existingUserId) {
         await sendTelegramMessage(
           chatId,
-          `Halo ${firstName}! 👋
+          `Halo ${firstName}!
 
 Akun Telegram kamu sudah terhubung dengan Dompi. Silakan langsung ketik transaksi atau pertanyaanmu, misalnya:
 • "Catat makan siang 30rb Cash"
@@ -122,7 +122,7 @@ Akun Telegram kamu sudah terhubung dengan Dompi. Silakan langsung ketik transaks
       } else {
         await sendTelegramMessage(
           chatId,
-          `Halo ${firstName}! 👋 Selamat datang di Dompi.
+          `Halo ${firstName}! Selamat datang di Dompi.
 
 Akun Telegram kamu belum terhubung dengan akun Dompi manapun.
 
@@ -132,7 +132,7 @@ Cara menghubungkan akun:
 3. Klik tombol "Hubungkan ke Telegram"
 4. Klik tautan yang muncul untuk mengaktifkan akunmu di sini.
 
-Setelah terhubung, kamu bisa mencatat keuangan secepat mengetik chat! 🚀`
+Setelah terhubung, kamu bisa mencatat keuangan secepat mengetik chat.`
         )
       }
       return NextResponse.json({ ok: true })
@@ -146,7 +146,7 @@ Setelah terhubung, kamu bisa mencatat keuangan secepat mengetik chat! 🚀`
         chatId,
         `Halo ${firstName}! Akun Telegram kamu belum terhubung ke akun Dompi.
 
-Silakan buka menu Pengaturan di aplikasi web Dompi, lalu klik "Hubungkan ke Telegram" agar bisa mencatat transaksi langsung dari sini ya! 😊`
+Silakan buka menu Pengaturan di aplikasi web Dompi, lalu klik "Hubungkan ke Telegram" agar bisa mencatat transaksi langsung dari sini.`
       )
       return NextResponse.json({ ok: true, unlinked: true })
     }

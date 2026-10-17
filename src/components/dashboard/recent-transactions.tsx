@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import { ShoppingBag, Coffee, Car, DollarSign, Tag, ArrowUpRight } from 'lucide-react'
 
 type Transaction = {
   id: number
@@ -26,67 +26,89 @@ const formatRupiah = (angka: number) => {
   }).format(angka)
 }
 
+function getCategoryIcon(kategori: string, tipe: string) {
+  const cat = kategori.toLowerCase()
+  if (tipe === 'Pemasukan') return <DollarSign className="w-4 h-4 text-[#121212] stroke-[2.5]" />
+  if (cat.includes('makan') || cat.includes('kopi') || cat.includes('kafe')) return <Coffee className="w-4 h-4 text-[#121212] stroke-[2.5]" />
+  if (cat.includes('bensin') || cat.includes('ojol') || cat.includes('transport')) return <Car className="w-4 h-4 text-[#121212] stroke-[2.5]" />
+  if (cat.includes('belanja') || cat.includes('supermarket')) return <ShoppingBag className="w-4 h-4 text-[#121212] stroke-[2.5]" />
+  return <Tag className="w-4 h-4 text-[#121212] stroke-[2.5]" />
+}
+
 export default function RecentTransactions({ transactions }: RecentTransactionsProps) {
   const displayItems = transactions.slice(0, 5)
 
   return (
-    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 sm:p-6 shadow-xs">
+    <div className="bg-white dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-2xl p-5 sm:p-6 shadow-brutal">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-100 dark:border-zinc-800">
-        <div>
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50 tracking-tight">
+      <div className="flex items-center justify-between mb-4 pb-3 border-b-2 border-[#121212] dark:border-zinc-800">
+        <div className="flex items-center gap-2.5">
+          <h2 className="text-base font-extrabold font-display tracking-tight text-zinc-950 dark:text-zinc-50">
             Transaksi Terkini
           </h2>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Aktivitas mutasi pemasukan dan pengeluaran terbaru
-          </p>
+          <span className="text-[10px] font-display font-bold px-2 py-0.5 rounded-full bg-[#FFE600] text-[#121212] border border-[#121212] shadow-2xs">
+            {displayItems.length} Baru
+          </span>
         </div>
 
         <Link
           href="/transaksi"
-          className="inline-flex items-center gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-50 transition"
+          className="inline-flex items-center gap-1 text-xs font-display font-bold text-[#006970] dark:text-[#00F0FF] hover:underline"
         >
-          <span>Semua Transaksi</span>
-          <ArrowRight className="w-3 h-3" />
+          <span>Lihat Semua</span>
+          <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
         </Link>
       </div>
 
       {/* Transaction Rows */}
-      <div className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
+      <div className="divide-y-2 divide-[#121212]/10 dark:divide-zinc-800">
         {displayItems.length > 0 ? (
           displayItems.map((trx) => {
             const isIncome = trx.tipe === 'Pemasukan'
             return (
               <div
                 key={trx.id}
-                className="py-3 flex items-center justify-between gap-3 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/20 px-2 -mx-2 rounded-lg transition"
+                className="py-3.5 flex items-center justify-between gap-3 hover:bg-[#FBF9F4] dark:hover:bg-zinc-800/40 px-2.5 -mx-2.5 rounded-xl transition"
               >
-                <div className="min-w-0 pr-2">
-                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate mb-0.5">
-                    {trx.deskripsi}
-                  </p>
-                  <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-                    <span className="font-mono">{trx.tanggal}</span>
-                    <span>•</span>
-                    <span className="px-1.5 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-[11px] font-mono">
-                      {trx.dompet || 'Tunai'}
-                    </span>
-                    <span>•</span>
-                    <span className="text-zinc-400">{trx.kategori}</span>
+                <div className="flex items-center gap-3 min-w-0 pr-2">
+                  <div className={`w-9 h-9 rounded-xl border-2 border-[#121212] flex items-center justify-center flex-shrink-0 shadow-brutal-sm ${
+                    isIncome ? 'bg-[#00FF66]' : 'bg-[#FFE600]'
+                  }`}>
+                    {getCategoryIcon(trx.kategori, trx.tipe)}
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">
+                      {trx.deskripsi}
+                    </p>
+                    <div className="flex items-center gap-2 text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 flex-wrap">
+                      <span className="font-mono">{trx.tanggal}</span>
+                      <span>•</span>
+                      <span className="font-display font-bold px-1.5 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 text-[10px]">
+                        {trx.dompet || 'Cash'}
+                      </span>
+                      <span>•</span>
+                      <span className="truncate">{trx.kategori}</span>
+                    </div>
                   </div>
                 </div>
 
                 <div className="text-right flex-shrink-0">
                   <p
-                    className={`text-sm font-semibold font-mono ${
+                    className={`text-sm sm:text-base font-extrabold font-display ${
                       isIncome
-                        ? 'text-zinc-900 dark:text-zinc-100'
-                        : 'text-zinc-500 dark:text-zinc-400'
+                        ? 'text-[#006970] dark:text-[#00F0FF]'
+                        : 'text-[#FF4365]'
                     }`}
                   >
                     {isIncome ? '+' : '-'}
                     {formatRupiah(trx.nominal)}
                   </p>
+                  <span className={`inline-block text-[9px] font-display font-bold px-1.5 py-0.2 rounded-full border border-[#121212] mt-0.5 ${
+                    isIncome ? 'bg-[#00FF66] text-[#121212]' : 'bg-[#FFD1DC] text-[#121212]'
+                  }`}>
+                    {isIncome ? 'PEMASUKAN' : 'PENGELUARAN'}
+                  </span>
                 </div>
               </div>
             )

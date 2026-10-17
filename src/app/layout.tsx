@@ -1,21 +1,23 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Space_Grotesk, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
+  weight: ["500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "Dompi - Pencatat Keuangan",
-  description: "Aplikasi pencatat keuangan pintar",
+  title: "Dompi - Pencatat Keuangan Cerdas Tanpa Drama",
+  description: "Kelola dompet cerdas pakai AI. Catat transaksi semudah chat santai.",
   icons: {
     icon: "/logo.png",
     shortcut: "/logo.png",
@@ -29,8 +31,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-      <body className="bg-background text-foreground min-h-screen transition-colors duration-200">
+    <html
+      lang="id"
+      suppressHydrationWarning
+      className={`${spaceGrotesk.variable} ${plusJakartaSans.variable} antialiased`}
+    >
+      <body className="bg-background text-foreground min-h-screen transition-colors duration-150">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
         </ThemeProvider>

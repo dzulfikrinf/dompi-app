@@ -38,7 +38,7 @@ export default function AppLayout({
   }
 
   return (
-    <div className="flex h-screen bg-zinc-100/60 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 overflow-hidden font-sans selection:bg-zinc-800 selection:text-white dark:selection:bg-zinc-200 dark:selection:text-zinc-900 relative">
+    <div className="flex h-screen bg-[#FBF9F4] dark:bg-[#0F1011] text-[#121212] dark:text-[#FBF9F4] overflow-hidden font-sans selection:bg-[#FFE600] selection:text-[#121212] relative">
       {/* 1. Desktop Collapsible Sidebar */}
       <Sidebar
         collapsed={collapsed}

@@ -337,8 +337,8 @@ export async function getFinancialAnalysis(
 export function formatFinancialAnalysisFallback(data: FinancialAnalysisResult): string {
   const isSurplus = data.arusKasBersih >= 0
   const statusSurplus = isSurplus
-    ? `Surplus Rp${data.arusKasBersih.toLocaleString('id-ID')} ✨`
-    : `Defisit Rp${Math.abs(data.arusKasBersih).toLocaleString('id-ID')} ⚠️`
+    ? `Surplus Rp${data.arusKasBersih.toLocaleString('id-ID')}`
+    : `Defisit Rp${Math.abs(data.arusKasBersih).toLocaleString('id-ID')}`
 
   const topCats = (data.posTerboros || [])
     .map((k: { kategori: string; nominal: number; persentase: number }, i: number) => `${i + 1}. **${k.kategori}**: Rp${k.nominal.toLocaleString('id-ID')} (${k.persentase}%)`)
@@ -358,7 +358,7 @@ export function formatFinancialAnalysisFallback(data: FinancialAnalysisResult): 
       ? 'Bulan ini pengeluaranmu melebihi pemasukan. Coba rem pos pengeluaran terbesar di atas agar saldo tetap aman.'
       : 'Arus kasmu positif, namun usahakan tekan pos pengeluaran terbesar agar bisa menabung minimal 20% dari pemasukan.'
 
-  return `📊 **Analisis Keuangan (${data.periodeLabel})**
+  return `**Analisis Keuangan (${data.periodeLabel})**
 
 • **Total Pemasukan**: Rp${data.totalPemasukan.toLocaleString('id-ID')}
 • **Total Pengeluaran**: Rp${data.totalPengeluaran.toLocaleString('id-ID')}
@@ -366,9 +366,9 @@ export function formatFinancialAnalysisFallback(data: FinancialAnalysisResult): 
 • **Rasio Tabungan**: ${data.rasioTabunganPersen}%
 • **Rata-rata Pengeluaran**: Rp${data.rataRataPengeluaranHarian.toLocaleString('id-ID')}/hari${perbandinganText}
 
-🔥 **Pos Pengeluaran Terbesar:**
+**Pos Pengeluaran Terbesar:**
 ${topCats || '- Belum ada data pengeluaran'}
 
-💡 **Saran Dompi:**
+**Saran Dompi:**
 ${advice}`
 }

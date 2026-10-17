@@ -48,10 +48,10 @@ export default function MobileNav({
   }, [isDrawerOpen])
 
   const DRAWER_ITEMS = [
-    { href: '/', label: 'Beranda', icon: Home },
+    { href: '/beranda', label: 'Beranda', icon: Home },
     { href: '/transaksi', label: 'Transaksi', icon: List },
-    { href: '/chat', label: 'Chat Dompi', icon: MessageSquare, badge: 'AI' },
-    { href: '/dompet', label: 'Dompet', icon: Wallet },
+    { href: '/chat', label: 'Chat AI Dompi', icon: MessageSquare, badge: 'PRO' },
+    { href: '/dompet', label: 'Dompet & Bank', icon: Wallet },
     { href: '/anggaran', label: 'Anggaran', icon: PieChartIcon },
     { href: '/laporan', label: 'Laporan', icon: BarChart2 },
     { href: '/target', label: 'Target Tabungan', icon: Target },
@@ -63,30 +63,28 @@ export default function MobileNav({
   return (
     <>
       {/* 1. Mobile Fixed Bottom Bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-800 z-40 px-4 flex items-center justify-around shadow-sm">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-zinc-950 border-t-2 border-[#121212] dark:border-zinc-800 z-40 px-3 flex items-center justify-around shadow-brutal">
         <Link
-          href="/"
+          href="/beranda"
           prefetch={true}
-          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-lg ${
-            currentPath === '/'
-              ? 'text-zinc-950 dark:text-zinc-50 font-bold'
-              : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
-          }`}
+          className={`flex flex-col items-center gap-1 text-[11px] font-display transition py-1 px-2.5 rounded-lg ${currentPath === '/beranda'
+              ? 'text-zinc-950 dark:text-zinc-50 font-black'
+              : 'text-zinc-500 dark:text-zinc-400 font-bold hover:text-zinc-900 dark:hover:text-zinc-100'
+            }`}
         >
-          <Home className="w-4 h-4" />
+          <Home className="w-4 h-4 stroke-[2.2]" />
           <span>Beranda</span>
         </Link>
 
         <Link
           href="/transaksi"
           prefetch={true}
-          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-lg ${
-            currentPath === '/transaksi'
-              ? 'text-zinc-950 dark:text-zinc-50 font-bold'
-              : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
-          }`}
+          className={`flex flex-col items-center gap-1 text-[11px] font-display transition py-1 px-2.5 rounded-lg ${currentPath === '/transaksi'
+              ? 'text-zinc-950 dark:text-zinc-50 font-black'
+              : 'text-zinc-500 dark:text-zinc-400 font-bold hover:text-zinc-900 dark:hover:text-zinc-100'
+            }`}
         >
-          <List className="w-4 h-4" />
+          <List className="w-4 h-4 stroke-[2.2]" />
           <span>Transaksi</span>
         </Link>
 
@@ -94,31 +92,30 @@ export default function MobileNav({
         <Link
           href="/transaksi?action=create"
           prefetch={true}
-          aria-label="Catat Transaksi Baru"
-          className="w-11 h-11 -mt-5 rounded-full bg-zinc-900 dark:bg-zinc-50 text-white dark:text-zinc-900 flex items-center justify-center shadow-md transition active:scale-95 border-2 border-white dark:border-zinc-950"
+          aria-label="Catat Cepat Transaksi"
+          className="w-12 h-12 -mt-6 rounded-full bg-[#FFE600] text-[#121212] border-2 border-[#121212] flex items-center justify-center shadow-brutal btn-brutal transition active:scale-95"
         >
-          <Plus className="w-5 h-5 stroke-[2.5]" />
+          <Plus className="w-6 h-6 stroke-[3]" />
         </Link>
 
         <Link
           href="/chat"
           prefetch={true}
-          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition py-1 px-2 rounded-lg ${
-            currentPath === '/chat'
-              ? 'text-zinc-950 dark:text-zinc-50 font-bold'
-              : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
-          }`}
+          className={`flex flex-col items-center gap-1 text-[11px] font-display transition py-1 px-2.5 rounded-lg ${currentPath === '/chat'
+              ? 'text-zinc-950 dark:text-zinc-50 font-black'
+              : 'text-zinc-500 dark:text-zinc-400 font-bold hover:text-zinc-900 dark:hover:text-zinc-100'
+            }`}
         >
-          <MessageSquare className="w-4 h-4" />
-          <span>Chat</span>
+          <MessageSquare className="w-4 h-4 stroke-[2.2]" />
+          <span>Chat AI</span>
         </Link>
 
         <button
           onClick={() => setIsDrawerOpen(true)}
           aria-label="Buka menu navigasi lainnya"
-          className="flex flex-col items-center gap-1 text-[11px] font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition py-1 px-2 rounded-lg cursor-pointer"
+          className="flex flex-col items-center gap-1 text-[11px] font-display font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition py-1 px-2.5 rounded-lg cursor-pointer"
         >
-          <Menu className="w-4 h-4" />
+          <Menu className="w-4 h-4 stroke-[2.2]" />
           <span>Menu</span>
         </button>
       </div>
@@ -134,12 +131,16 @@ export default function MobileNav({
           />
 
           {/* Drawer content */}
-          <div className="relative ml-auto w-4/5 max-w-xs h-full bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 p-5 flex flex-col justify-between shadow-xl z-10 overflow-y-auto">
+          <div className="relative ml-auto w-4/5 max-w-xs h-full bg-white dark:bg-zinc-950 border-l-2 border-[#121212] dark:border-zinc-800 p-5 flex flex-col justify-between shadow-2xl z-10 overflow-y-auto">
             <div>
               {/* Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center p-1">
+              <div className="flex items-center justify-between pb-4 border-b-2 border-[#121212] dark:border-zinc-800">
+                <Link
+                  href="/beranda"
+                  onClick={() => setIsDrawerOpen(false)}
+                  className="flex items-center gap-2"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-[#FFE600] border-2 border-[#121212] flex items-center justify-center p-1 shadow-brutal-sm">
                     <Image
                       src="/logo.png"
                       alt="Logo Dompi"
@@ -148,24 +149,26 @@ export default function MobileNav({
                       className="w-5 h-5 object-contain"
                     />
                   </div>
-                  <span className="text-base font-bold text-zinc-900 dark:text-zinc-50">
-                    dompi
-                  </span>
-                </div>
+                  <div>
+                    <span className="text-base font-bold font-display text-zinc-900 dark:text-zinc-50 block leading-tight">
+                      Dompi
+                    </span>
+                  </div>
+                </Link>
                 <div className="flex items-center gap-1">
                   <ThemeToggle />
                   <button
                     onClick={() => setIsDrawerOpen(false)}
                     aria-label="Tutup menu"
-                    className="p-1 rounded-md text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                    className="p-1.5 rounded-lg border border-[#121212] dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-[#FFE600] dark:hover:bg-zinc-800 cursor-pointer"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-4 h-4 stroke-[2.5]" />
                   </button>
                 </div>
               </div>
 
               {/* Navigation list */}
-              <nav className="mt-4 space-y-1">
+              <nav className="mt-4 space-y-1.5">
                 {DRAWER_ITEMS.map((item) => {
                   const Icon = item.icon
                   const isActive = currentPath === item.href
@@ -176,18 +179,17 @@ export default function MobileNav({
                       href={item.href}
                       prefetch={true}
                       onClick={() => setIsDrawerOpen(false)}
-                      className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition ${
-                        isActive
-                          ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-950 dark:text-zinc-50 font-bold'
-                          : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-50 hover:bg-zinc-50 dark:hover:bg-zinc-900'
-                      }`}
+                      className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-display tracking-tight transition ${isActive
+                          ? 'bg-[#FFE600] text-[#121212] border-2 border-[#121212] shadow-brutal-sm font-black'
+                          : 'font-bold text-zinc-700 dark:text-zinc-300 border-2 border-transparent hover:border-[#121212] dark:hover:border-zinc-700 hover:bg-[#FBF9F4] dark:hover:bg-zinc-900'
+                        }`}
                     >
                       <div className="flex items-center gap-3">
-                        <Icon className="w-4 h-4" />
+                        <Icon className="w-4 h-4 stroke-[2.2]" />
                         <span>{item.label}</span>
                       </div>
                       {item.badge && (
-                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                        <span className="text-[10px] font-display font-black px-1.5 py-0.5 rounded-full bg-[#00F0FF] text-[#121212] border border-[#121212]">
                           {item.badge}
                         </span>
                       )}
@@ -198,16 +200,16 @@ export default function MobileNav({
             </div>
 
             {/* User info & Logout */}
-            <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-xs">
-              <span className="text-zinc-500 truncate max-w-[150px]">{userEmail || 'Pengguna'}</span>
+            <div className="pt-4 border-t-2 border-[#121212] dark:border-zinc-800 flex items-center justify-between text-xs">
+              <span className="text-zinc-500 font-mono truncate max-w-[150px]">{userEmail || 'Pengguna'}</span>
               <button
                 onClick={() => {
                   setIsDrawerOpen(false)
                   onLogout()
                 }}
-                className="flex items-center gap-1 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium"
+                className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-bold font-display hover:underline cursor-pointer"
               >
-                <LogOut className="w-3.5 h-3.5" />
+                <LogOut className="w-3.5 h-3.5 stroke-[2.2]" />
                 <span>Keluar</span>
               </button>
             </div>

@@ -8,8 +8,10 @@ import MobileNav from '@/components/dashboard/mobile-nav'
 import Header from '@/components/dashboard/header'
 import SummaryCards from '@/components/dashboard/summary-cards'
 import CashflowChart from '@/components/dashboard/cashflow-chart'
+import CategoryAllocation from '@/components/dashboard/category-allocation'
 import RecentTransactions from '@/components/dashboard/recent-transactions'
 import WalletSummary from '@/components/dashboard/wallet-summary'
+import AiCoachBanner from '@/components/dashboard/ai-coach-banner'
 import { OnboardingCard } from '@/components/dashboard/onboarding-card'
 import { LogoutModal } from '@/components/ui/logout-modal'
 
@@ -123,26 +125,31 @@ export default function DashboardUI({
   if (!mounted) return null
 
   return (
-    <div className="flex h-screen bg-zinc-100/60 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 overflow-hidden font-sans selection:bg-zinc-800 selection:text-white dark:selection:bg-zinc-200 dark:selection:text-zinc-900 relative">
+    <div className="flex h-screen bg-[#FBF9F4] dark:bg-[#0F1011] text-[#121212] dark:text-[#FBF9F4] overflow-hidden font-sans selection:bg-[#FFE600] selection:text-[#121212] relative">
       {/* 1. Desktop Collapsible Sidebar */}
       <Sidebar
         collapsed={collapsed}
         onToggleCollapse={() => setCollapsed(!collapsed)}
-        currentPath="/"
+        currentPath="/beranda"
         userEmail={userEmail}
         onLogout={() => setShowLogoutModal(true)}
       />
 
       {/* 2. Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7 space-y-5 lg:space-y-6 pb-24 lg:pb-10 animate-fade-in max-w-[1600px] mx-auto w-full">
-          {/* Top Header */}
-          <Header userEmail={userEmail} />
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7 space-y-5 pb-24 lg:pb-12 animate-fade-in max-w-[1600px] mx-auto w-full">
+          {/* Top Header & Greeting */}
+          <Header
+            userEmail={userEmail}
+            saldo={saldo}
+            pemasukanBulanIni={pemasukanBulanIni}
+            pengeluaranBulanIni={pengeluaranBulanIni}
+          />
 
           {/* Onboarding Quick Start for New Users */}
           <OnboardingCard hasTransactions={data.length > 0} />
 
-          {/* 3 Summary Metrics Cards */}
+          {/* 4 Neo-Brutalist Summary Metrics Cards */}
           <SummaryCards
             saldo={saldo}
             pemasukanBulanIni={pemasukanBulanIni}
@@ -151,7 +158,7 @@ export default function DashboardUI({
             totalPengeluaran={totalPengeluaran}
           />
 
-          {/* Grafik Arus Kas & Ringkasan Dompet */}
+          {/* Middle Row: Grafik Arus Kas & Alokasi Kategori */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
             <div className="lg:col-span-8 flex flex-col">
               <CashflowChart
@@ -161,18 +168,28 @@ export default function DashboardUI({
               />
             </div>
             <div className="lg:col-span-4 flex flex-col">
+              <CategoryAllocation transactions={data} />
+            </div>
+          </div>
+
+          {/* Bottom Row: Transaksi Terbaru & Dompet 2x2 Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+            <div className="lg:col-span-7 flex flex-col">
+              <RecentTransactions transactions={data} />
+            </div>
+            <div className="lg:col-span-5 flex flex-col">
               <WalletSummary wallets={wallets} transactions={data} />
             </div>
           </div>
 
-          {/* Transaksi Terbaru */}
-          <RecentTransactions transactions={data} />
+          {/* Bottom Banner: Tips Cerdas Dompi */}
+          <AiCoachBanner />
         </main>
       </div>
 
-      {/* 3. Mobile Navigation Bottom Bar & Drawer */}
+      {/* 3. Mobile Navigation Dock & Drawer */}
       <MobileNav
-        currentPath="/"
+        currentPath="/beranda"
         userEmail={userEmail}
         onLogout={() => setShowLogoutModal(true)}
       />

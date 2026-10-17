@@ -9,6 +9,7 @@ import {
   Target,
   CheckSquare,
   Wallet,
+  Check,
 } from 'lucide-react'
 
 const ICON_MAP = {
@@ -41,71 +42,78 @@ export default function FeatureStatusCard({
   return (
     <div className="max-w-3xl mx-auto space-y-6 py-6 px-4 sm:px-6">
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
+      <div className="flex items-center justify-between pb-4 border-b-2 border-[#121212] dark:border-zinc-800">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-850 text-zinc-900 dark:text-zinc-100 flex items-center justify-center border border-zinc-200 dark:border-zinc-800">
-            <IconComponent className="w-5 h-5" />
+          <div className="w-12 h-12 rounded-xl bg-[#FFE600] text-[#121212] flex items-center justify-center border-2 border-[#121212] shadow-brutal-sm">
+            <IconComponent className="w-6 h-6 stroke-[2.5]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{title}</h1>
-              <span className="text-[10px] font-medium uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 px-2 py-0.5 rounded flex items-center gap-1">
-                <Clock className="w-3 h-3" />
+              <h1 className="text-xl sm:text-2xl font-black font-display tracking-tight text-zinc-950 dark:text-zinc-50">
+                {title}
+              </h1>
+              <span className="text-[10px] font-display font-black uppercase tracking-wider bg-[#FFD1DC] text-[#121212] border-2 border-[#121212] px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+                <Clock className="w-3 h-3 stroke-[2.5]" />
                 Segera Hadir
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">{description}</p>
+            <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-0.5 font-medium">
+              {description}
+            </p>
           </div>
         </div>
 
         <Link
-          href="/"
-          className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 py-1.5 px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
+          href="/beranda"
+          className="hidden sm:flex items-center gap-1.5 text-xs font-display font-bold text-zinc-900 dark:text-zinc-100 py-2 px-3.5 rounded-xl bg-white dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 shadow-brutal-sm btn-brutal transition"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
+          <ArrowLeft className="w-3.5 h-3.5 stroke-[2.5]" />
           <span>Beranda</span>
         </Link>
       </div>
 
       {/* Status Notice Box */}
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 space-y-4">
-        <div className="flex items-center gap-2 text-sm font-medium text-zinc-900 dark:text-zinc-100">
-          <Sparkles className="w-4 h-4 text-zinc-500" />
+      <div className="bg-white dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-2xl p-6 shadow-brutal space-y-4">
+        <div className="flex items-center gap-2 text-sm font-extrabold font-display text-zinc-950 dark:text-zinc-50 border-b border-zinc-200 dark:border-zinc-800 pb-2.5">
+          <Sparkles className="w-4 h-4 text-[#006970] dark:text-[#00F0FF] stroke-[2.5]" />
           <span>Rencana Pengembangan Fitur Ini:</span>
         </div>
-        <ul className="space-y-2 text-xs sm:text-sm text-zinc-600 dark:text-zinc-350">
+        <ul className="space-y-2.5 text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 font-medium">
           {plannedFeatures.map((item, idx) => (
             <li key={idx} className="flex items-start gap-2.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 mt-2 flex-shrink-0" />
-              <span>{item}</span>
+              <span className="w-5 h-5 rounded-md bg-[#00FF66] border border-[#121212] text-[#121212] flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Check className="w-3 h-3 stroke-[3]" />
+              </span>
+              <span className="leading-relaxed">{item}</span>
             </li>
           ))}
         </ul>
 
-        <div className="mt-4 pt-3 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/60 p-3.5 rounded-lg">
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            <strong className="text-zinc-900 dark:text-zinc-100 font-medium">Aksi Saat Ini:</strong> {currentAlternative}
+        <div className="mt-4 pt-3 border-t-2 border-[#121212]/20 dark:border-zinc-800 bg-[#FFE600]/20 dark:bg-zinc-950 border-2 border-[#121212] p-4 rounded-xl shadow-brutal-sm">
+          <p className="text-xs text-zinc-900 dark:text-zinc-200 font-medium leading-relaxed">
+            <strong className="font-display font-black text-[#121212] dark:text-[#FFE600] block mb-0.5">Aksi Alternatif Saat Ini:</strong>{' '}
+            {currentAlternative}
           </p>
         </div>
       </div>
 
       {/* Action links */}
-      <div className="flex flex-wrap items-center gap-2.5 pt-1">
+      <div className="flex flex-wrap items-center gap-3 pt-2">
         <Link
           href="/transaksi"
-          className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-medium text-xs sm:text-sm py-2 px-3.5 rounded-lg transition"
+          className="bg-[#FFE600] hover:bg-[#ffe81a] text-[#121212] border-2 border-[#121212] font-display font-black text-xs sm:text-sm py-2.5 px-4 rounded-xl shadow-brutal btn-brutal transition cursor-pointer"
         >
           Buka Riwayat Transaksi
         </Link>
         <Link
           href="/chat"
-          className="bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800 font-medium text-xs sm:text-sm py-2 px-3.5 rounded-lg transition"
+          className="bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-950 dark:text-zinc-50 border-2 border-[#121212] dark:border-zinc-700 font-display font-bold text-xs sm:text-sm py-2.5 px-4 rounded-xl shadow-brutal btn-brutal transition cursor-pointer"
         >
           Tanya Asisten Dompi
         </Link>
         <Link
-          href="/"
-          className="sm:hidden text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 py-2 px-2.5"
+          href="/beranda"
+          className="sm:hidden text-xs font-display font-bold text-zinc-600 hover:text-zinc-900 dark:hover:text-zinc-100 py-2 px-2.5 underline"
         >
           Kembali ke Beranda
         </Link>

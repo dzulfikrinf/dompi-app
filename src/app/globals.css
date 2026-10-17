@@ -3,39 +3,104 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #fafafa;
-  --foreground: #09090b;
+  --background: #fbf9f4;
+  --foreground: #121212;
   --card: #ffffff;
-  --card-foreground: #09090b;
-  --border: #e4e4e7;
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
+  --card-foreground: #121212;
+  --border: #121212;
+  --muted: #eae8e3;
+  --muted-foreground: #4b4731;
+
+  /* Neo-Brutalist Core Colors */
+  --neo-yellow: #ffe600;
+  --neo-cyan: #00f0ff;
+  --neo-pink: #ff4365;
+  --neo-green: #00ff66;
+  --neo-cream: #fbf9f4;
+  --neo-ink: #121212;
 }
 
 .dark {
-  --background: #09090b;
-  --foreground: #fafafa;
-  --card: #0e0f11;
-  --card-foreground: #fafafa;
-  --border: #27272a;
-  --muted: #18181b;
+  --background: #0f1011;
+  --foreground: #fbf9f4;
+  --card: #18191c;
+  --card-foreground: #fbf9f4;
+  --border: #2a2b2f;
+  --muted: #222327;
   --muted-foreground: #a1a1aa;
+
+  --neo-yellow: #ffe600;
+  --neo-cyan: #00eefc;
+  --neo-pink: #ff4365;
+  --neo-green: #00ff66;
+  --neo-cream: #18191c;
+  --neo-ink: #ffffff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-space-grotesk), sans-serif;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography Utility for Headlines & Currency */
+.font-display {
+  font-family: var(--font-space-grotesk), sans-serif;
+}
+
+/* ========================================================
+   Neo-Brutalist Mechanical Shadow & Border Utilities
+   ======================================================== */
+.shadow-brutal {
+  box-shadow: 4px 4px 0px #121212;
+}
+
+.shadow-brutal-sm {
+  box-shadow: 2px 2px 0px #121212;
+}
+
+.shadow-brutal-lg {
+  box-shadow: 6px 6px 0px #121212;
+}
+
+.shadow-brutal-xl {
+  box-shadow: 8px 8px 0px #121212;
+}
+
+.dark .shadow-brutal {
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.9);
+}
+
+.dark .shadow-brutal-sm {
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.9);
+}
+
+.dark .shadow-brutal-lg {
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.9);
+}
+
+/* Interactive Push State */
+.btn-brutal {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.btn-brutal:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #121212;
+}
+
+.dark .btn-brutal:active {
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.9);
 }
 
 /* ========================================================

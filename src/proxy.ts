@@ -34,22 +34,27 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // Allow public API webhook for Telegram
-  if (pathname.startsWith('/api/telegram')) {
-    return supabaseResponse
-  }
+  // Allow public routes:
+  // - '/' (Landing page publik)
+  // - '/login' dan '/auth' (Halaman autentikasi)
+  // - '/api/telegram' (Webhook publik bot Telegram)
+  const isPublicRoute =
+    pathname === '/' ||
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/auth') ||
+    pathname.startsWith('/api/telegram')
 
-  // Redirect unauthenticated users to /login
-  if (!user && !pathname.startsWith('/login') && !pathname.startsWith('/auth')) {
+  // Redirect unauthenticated users trying to access protected routes to /login
+  if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
-  // Redirect authenticated users away from /login to dashboard
+  // Redirect authenticated users away from /login to /beranda
   if (user && pathname.startsWith('/login')) {
     const url = request.nextUrl.clone()
-    url.pathname = '/'
+    url.pathname = '/beranda'
     return NextResponse.redirect(url)
   }
 
