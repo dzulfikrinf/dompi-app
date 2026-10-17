@@ -1,9 +1,10 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import AppLayout from '@/components/layout/app-layout'
+import { LogoutModal } from '@/components/ui/logout-modal'
 import {
   Settings,
   User,
@@ -24,12 +25,21 @@ export default function PengaturanClient({
   userId,
 }: PengaturanClientProps) {
   const router = useRouter()
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
-  const handleLogout = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/login')
-    router.refresh()
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      const supabase = createClient()
+      await supabase.auth.signOut()
+      router.push('/login')
+      router.refresh()
+    } catch (err) {
+      console.error('Error logging out:', err)
+      setIsLoggingOut(false)
+      setShowLogoutModal(false)
+    }
   }
 
   return (
@@ -129,7 +139,7 @@ export default function PengaturanClient({
             </p>
           </div>
           <button
-            onClick={handleLogout}
+            onClick={() => setShowLogoutModal(true)}
             className="flex items-center justify-center gap-2 py-2 px-3.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 text-xs font-medium transition cursor-pointer flex-shrink-0"
           >
             <LogOut className="w-3.5 h-3.5" />
@@ -143,6 +153,13 @@ export default function PengaturanClient({
           <span>Dompi MVP v1.0 • Pencatat Keuangan Pribadi</span>
         </div>
       </div>
+
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => !isLoggingOut && setShowLogoutModal(false)}
+        onConfirm={handleConfirmLogout}
+        isLoading={isLoggingOut}
+      />
     </AppLayout>
   )
 }

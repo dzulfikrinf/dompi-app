@@ -1,6 +1,7 @@
 import { requireAuthUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import DashboardUI from "@/components/dashboard-ui";
+import { getWallets, WalletRecord } from "@/lib/services/wallet-service";
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +12,7 @@ export default async function Home() {
   // Ambil transaksi aktif dan daftar dompet milik user secara paralel dari database
   const [
     { data: transactions, error: trxError },
-    { data: walletsData, error: walletError },
+    walletsResult,
   ] = await Promise.all([
     supabase
       .from("transactions")
@@ -20,27 +21,14 @@ export default async function Home() {
       .is("deleted_at", null)
       .order("tanggal", { ascending: false })
       .order("id", { ascending: false }),
-    supabase
-      .from("wallets")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("id", { ascending: true }),
+    getWallets({ client: supabase, userId: user.id }),
   ]);
 
   if (trxError) {
     console.error("Gagal mengambil data transaksi dari Supabase:", trxError);
   }
-  if (walletError) {
-    console.error("Gagal mengambil data dompet dari Supabase:", walletError);
-  }
 
-  // Gunakan data murni 100% dari database
-  const wallets = (walletsData || []).map((w) => ({
-    id: Number(w.id),
-    nama: w.nama,
-    tipe: w.tipe,
-    saldo_awal: Number(w.saldo_awal || 0),
-  }));
+  const wallets: WalletRecord[] = walletsResult.success && walletsResult.data ? walletsResult.data : [];
 
   return (
     <DashboardUI

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Sidebar from '@/components/dashboard/sidebar'
 import MobileNav from '@/components/dashboard/mobile-nav'
+import { LogoutModal } from '@/components/ui/logout-modal'
 
 type AppLayoutProps = {
   currentPath: string
@@ -19,12 +20,21 @@ export default function AppLayout({
 }: AppLayoutProps) {
   const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
-  const handleLogout = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/login')
-    router.refresh()
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      const supabase = createClient()
+      await supabase.auth.signOut()
+      router.push('/login')
+      router.refresh()
+    } catch (err) {
+      console.error('Error logging out:', err)
+      setIsLoggingOut(false)
+      setShowLogoutModal(false)
+    }
   }
 
   return (
@@ -35,7 +45,7 @@ export default function AppLayout({
         onToggleCollapse={() => setCollapsed(!collapsed)}
         currentPath={currentPath}
         userEmail={userEmail}
-        onLogout={handleLogout}
+        onLogout={() => setShowLogoutModal(true)}
       />
 
       {/* 2. Main Content Wrapper */}
@@ -49,7 +59,15 @@ export default function AppLayout({
       <MobileNav
         currentPath={currentPath}
         userEmail={userEmail}
-        onLogout={handleLogout}
+        onLogout={() => setShowLogoutModal(true)}
+      />
+
+      {/* 4. Modal Konfirmasi Logout */}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => !isLoggingOut && setShowLogoutModal(false)}
+        onConfirm={handleConfirmLogout}
+        isLoading={isLoggingOut}
       />
     </div>
   )

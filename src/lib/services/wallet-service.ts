@@ -37,7 +37,60 @@ async function resolveClientAndUser(options?: ServiceOptions) {
 }
 
 /**
- * Mengambil seluruh dompet milik user
+ * Memastikan pengguna memiliki setidaknya 2 dompet dasar (Cash dan Rekening Utama).
+ * Jika pengguna belum memiliki dompet sama sekali, fungsi ini akan membuatnya secara otomatis.
+ */
+export async function ensureDefaultWallets(
+  userId: string,
+  client: SupabaseClient
+): Promise<WalletRecord[]> {
+  try {
+    const { data: existing, error: checkError } = await client
+      .from('wallets')
+      .select('*')
+      .eq('user_id', userId)
+      .order('id', { ascending: true })
+
+    if (!checkError && existing && existing.length > 0) {
+      return existing.map((w) => ({
+        id: Number(w.id),
+        user_id: w.user_id,
+        nama: w.nama,
+        tipe: w.tipe,
+        saldo_awal: Number(w.saldo_awal || 0),
+      }))
+    }
+
+    const defaultWallets = [
+      { user_id: userId, nama: 'Cash', tipe: 'Uang Tunai', saldo_awal: 0 },
+      { user_id: userId, nama: 'Rekening Utama', tipe: 'Rekening Bank', saldo_awal: 0 },
+    ]
+
+    const { data: inserted, error: insertError } = await client
+      .from('wallets')
+      .insert(defaultWallets)
+      .select('*')
+
+    if (insertError || !inserted) {
+      console.error('Error auto-seeding default wallets for user:', userId, insertError)
+      return []
+    }
+
+    return inserted.map((w) => ({
+      id: Number(w.id),
+      user_id: w.user_id,
+      nama: w.nama,
+      tipe: w.tipe,
+      saldo_awal: Number(w.saldo_awal || 0),
+    }))
+  } catch (err) {
+    console.error('Unexpected error in ensureDefaultWallets:', err)
+    return []
+  }
+}
+
+/**
+ * Mengambil seluruh dompet milik user (dan memastikan dompet dasar tersedia)
  */
 export async function getWallets(
   options?: ServiceOptions
@@ -58,6 +111,13 @@ export async function getWallets(
     if (error) {
       console.error('Error fetching wallets:', error)
       return { success: false, error: 'Gagal mengambil data dompet.' }
+    }
+
+    if (!data || data.length === 0) {
+      const seeded = await ensureDefaultWallets(userId, client)
+      if (seeded.length > 0) {
+        return { success: true, data: seeded }
+      }
     }
 
     const formatted: WalletRecord[] = (data || []).map((w) => ({

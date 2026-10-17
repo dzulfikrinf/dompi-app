@@ -10,6 +10,8 @@ import SummaryCards from '@/components/dashboard/summary-cards'
 import CashflowChart from '@/components/dashboard/cashflow-chart'
 import RecentTransactions from '@/components/dashboard/recent-transactions'
 import WalletSummary from '@/components/dashboard/wallet-summary'
+import { OnboardingCard } from '@/components/dashboard/onboarding-card'
+import { LogoutModal } from '@/components/ui/logout-modal'
 
 type Transaction = {
   id: number
@@ -48,6 +50,8 @@ export default function DashboardUI({
 }: DashboardUIProps) {
   const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const mounted = useSyncExternalStore(
     () => () => {},
@@ -55,11 +59,18 @@ export default function DashboardUI({
     () => false
   )
 
-  const handleLogout = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/login')
-    router.refresh()
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      const supabase = createClient()
+      await supabase.auth.signOut()
+      router.push('/login')
+      router.refresh()
+    } catch (err) {
+      console.error('Error logging out:', err)
+      setIsLoggingOut(false)
+      setShowLogoutModal(false)
+    }
   }
 
   // 1. Perhitungan Saldo & Ringkasan Arus Kas dari Database
@@ -119,7 +130,7 @@ export default function DashboardUI({
         onToggleCollapse={() => setCollapsed(!collapsed)}
         currentPath="/"
         userEmail={userEmail}
-        onLogout={handleLogout}
+        onLogout={() => setShowLogoutModal(true)}
       />
 
       {/* 2. Main Content Area */}
@@ -127,6 +138,9 @@ export default function DashboardUI({
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7 space-y-5 lg:space-y-6 pb-24 lg:pb-10 animate-fade-in max-w-[1600px] mx-auto w-full">
           {/* Top Header */}
           <Header userEmail={userEmail} />
+
+          {/* Onboarding Quick Start for New Users */}
+          <OnboardingCard hasTransactions={data.length > 0} />
 
           {/* 3 Summary Metrics Cards */}
           <SummaryCards
@@ -160,7 +174,15 @@ export default function DashboardUI({
       <MobileNav
         currentPath="/"
         userEmail={userEmail}
-        onLogout={handleLogout}
+        onLogout={() => setShowLogoutModal(true)}
+      />
+
+      {/* 4. Modal Konfirmasi Logout */}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => !isLoggingOut && setShowLogoutModal(false)}
+        onConfirm={handleConfirmLogout}
+        isLoading={isLoggingOut}
       />
     </div>
   )
