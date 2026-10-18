@@ -44,7 +44,7 @@ export default function LoginForm() {
       const supabase = createClient()
 
       if (mode === "login") {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password,
         })
@@ -53,10 +53,18 @@ export default function LoginForm() {
           if (signInError.message.toLowerCase().includes("invalid login credentials")) {
             setError("Email atau kata sandi tidak valid.")
           } else if (signInError.message.toLowerCase().includes("email not confirmed")) {
-            setError("Email Anda belum dikonfirmasi. Silakan buka tautan konfirmasi di kotak masuk email Anda.")
+            setError("Email Anda belum dikonfirmasi. Silakan buka tautan konfirmasi di kotak masuk email Anda terlebih dahulu.")
           } else {
             setError(signInError.message)
           }
+          setLoading(false)
+          return
+        }
+
+        // Validasi ketat jika email belum terkonfirmasi
+        if (data.user && !data.user.email_confirmed_at) {
+          await supabase.auth.signOut()
+          setError("Email Anda belum diverifikasi. Silakan periksa tautan konfirmasi di kotak masuk email Anda sebelum masuk.")
           setLoading(false)
           return
         }
@@ -89,7 +97,27 @@ export default function LoginForm() {
         })
 
         if (signUpError) {
-          setError(signUpError.message)
+          if (
+            signUpError.message.toLowerCase().includes("already registered") ||
+            signUpError.message.toLowerCase().includes("already exists") ||
+            signUpError.message.toLowerCase().includes("user already")
+          ) {
+            setError("Email ini sudah terdaftar. Silakan beralih ke tab 'Masuk' untuk masuk ke akun Anda.")
+          } else {
+            setError(signUpError.message)
+          }
+          setLoading(false)
+          return
+        }
+
+        // Deteksi proteksi anti-enumeration Supabase:
+        // Jika email sudah pernah terdaftar, Supabase mengembalikan data.user dengan identities: []
+        if (
+          data.user &&
+          Array.isArray(data.user.identities) &&
+          data.user.identities.length === 0
+        ) {
+          setError("Email ini sudah terdaftar. Silakan beralih ke tab 'Masuk' untuk masuk ke akun Anda.")
           setLoading(false)
           return
         }
@@ -99,7 +127,7 @@ export default function LoginForm() {
           router.refresh()
         } else {
           setMessage(
-            "Pendaftaran berhasil! Jika konfirmasi email aktif, silakan periksa kotak masuk Anda atau coba masuk."
+            "Pendaftaran berhasil! Tautan konfirmasi telah dikirim ke email Anda. Silakan klik tautan di kotak masuk untuk mengaktifkan akun."
           )
           setLoading(false)
         }
