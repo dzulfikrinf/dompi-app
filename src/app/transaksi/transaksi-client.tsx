@@ -331,18 +331,18 @@ export default function TransaksiClient({
   return (
     <div className="min-h-screen bg-[#FBF9F4] dark:bg-[#0F1011] text-[#121212] dark:text-[#FBF9F4] flex flex-col font-sans selection:bg-[#FFE600] selection:text-[#121212]">
       {/* Top Navbar */}
-      <header className="h-16 sm:h-20 border-b-2 border-[#121212] dark:border-zinc-800 bg-[#FBF9F4]/90 dark:bg-[#0F1011]/90 backdrop-blur-md px-3 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30">
+      <header className="h-16 sm:h-20 border-b-2 border-[#121212] dark:border-zinc-800 bg-[#FBF9F4]/90 dark:bg-[#0F1011]/90 backdrop-blur-md px-3 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30 gap-2">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Link
             href="/beranda"
-            className="inline-flex items-center justify-center w-10 h-10 rounded-xl border-2 border-[#121212] dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-brutal-sm btn-brutal transition flex-shrink-0"
+            className="inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 border-[#121212] dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-brutal-sm btn-brutal transition flex-shrink-0"
             title="Kembali ke Dashboard"
           >
             <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
           </Link>
 
           <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-[#FFE600] border-2 border-[#121212] flex items-center justify-center p-1.5 shadow-brutal-sm flex-shrink-0">
+            <div className="hidden sm:flex w-10 h-10 rounded-xl bg-[#FFE600] border-2 border-[#121212] items-center justify-center p-1.5 shadow-brutal-sm flex-shrink-0">
               <Image
                 src="/logo.png"
                 alt="Logo Dompi"
@@ -352,7 +352,7 @@ export default function TransaksiClient({
               />
             </div>
             <div className="min-w-0">
-              <h1 className="text-base sm:text-lg font-black font-display tracking-tight leading-none text-zinc-950 dark:text-zinc-50 truncate">
+              <h1 className="text-sm sm:text-base md:text-lg font-black font-display tracking-tight leading-none text-zinc-950 dark:text-zinc-50 truncate">
                 Riwayat Transaksi
               </h1>
               <p className="hidden sm:block text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 truncate max-w-[200px] font-medium">
@@ -362,11 +362,11 @@ export default function TransaksiClient({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
           <ThemeToggle />
           <button
             onClick={handleOpenCreateModal}
-            className="inline-flex items-center justify-center h-10 px-4 rounded-xl bg-[#FFE600] hover:bg-[#ffe81a] text-[#121212] font-display font-extrabold border-2 border-[#121212] shadow-brutal btn-brutal transition cursor-pointer text-xs sm:text-sm"
+            className="inline-flex items-center justify-center h-9 sm:h-10 px-2.5 sm:px-4 rounded-xl bg-[#FFE600] hover:bg-[#ffe81a] text-[#121212] font-display font-extrabold border-2 border-[#121212] shadow-brutal btn-brutal transition cursor-pointer text-xs sm:text-sm"
             title="Tambah Transaksi Baru"
             aria-label="Tambah Transaksi Baru"
           >

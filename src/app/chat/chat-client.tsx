@@ -212,24 +212,24 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
   return (
     <div className="min-h-screen bg-[#FBF9F4] dark:bg-[#0F1011] text-[#121212] dark:text-[#FBF9F4] flex flex-col font-sans selection:bg-[#FFE600] selection:text-[#121212]">
       {/* Top Header */}
-      <header className="h-16 sm:h-20 border-b-2 border-[#121212] dark:border-zinc-800 bg-[#FBF9F4]/90 dark:bg-[#0F1011]/90 backdrop-blur-md px-3 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30">
+      <header className="h-16 sm:h-20 border-b-2 border-[#121212] dark:border-zinc-800 bg-[#FBF9F4]/90 dark:bg-[#0F1011]/90 backdrop-blur-md px-3 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30 gap-2">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Link
             href="/beranda"
-            className="inline-flex items-center justify-center w-10 h-10 rounded-xl border-2 border-[#121212] dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-brutal-sm btn-brutal transition flex-shrink-0"
+            className="inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 border-[#121212] dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-brutal-sm btn-brutal transition flex-shrink-0"
             title="Kembali ke Dashboard"
           >
             <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
           </Link>
 
           <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-[#FFE600] border-2 border-[#121212] flex items-center justify-center text-[#121212] shadow-brutal-sm flex-shrink-0">
+            <div className="hidden sm:flex w-10 h-10 rounded-xl bg-[#FFE600] border-2 border-[#121212] items-center justify-center text-[#121212] shadow-brutal-sm flex-shrink-0">
               <Sparkles className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-base font-extrabold font-display tracking-tight leading-none flex items-center gap-1.5 truncate text-zinc-950 dark:text-zinc-50">
-                <span>Chat Dompi</span>
-                <span className="text-[10px] font-black bg-[#00F0FF] text-[#121212] border border-[#121212] px-1.5 py-0.2 rounded uppercase">
+              <h1 className="text-sm sm:text-base font-extrabold font-display tracking-tight leading-none flex items-center gap-1.5 text-zinc-950 dark:text-zinc-50">
+                <span className="truncate">Chat Dompi</span>
+                <span className="hidden sm:inline-block text-[10px] font-black bg-[#00F0FF] text-[#121212] border border-[#121212] px-1.5 py-0.2 rounded uppercase flex-shrink-0">
                   AI AGENT
                 </span>
               </h1>
@@ -240,12 +240,12 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
           <ThemeToggle />
           <button
             onClick={handleUndo}
             disabled={isLoading}
-            className="inline-flex items-center justify-center h-10 px-3 sm:px-4 rounded-xl bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-2 border-[#121212] dark:border-zinc-700 text-xs font-display font-bold shadow-brutal-sm btn-brutal transition cursor-pointer disabled:opacity-40"
+            className="inline-flex items-center justify-center w-9 h-9 sm:w-auto sm:h-10 sm:px-4 rounded-xl bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-2 border-[#121212] dark:border-zinc-700 text-xs font-display font-bold shadow-brutal-sm btn-brutal transition cursor-pointer disabled:opacity-40"
             title="Pulihkan transaksi terakhir yang baru dihapus"
             aria-label="Batalkan penghapusan terakhir"
           >
@@ -254,12 +254,12 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
           </button>
           <Link
             href="/transaksi"
-            className="inline-flex items-center justify-center h-10 px-3 sm:px-4 rounded-xl bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-2 border-[#121212] dark:border-zinc-700 text-xs font-display font-bold shadow-brutal-sm btn-brutal transition"
+            className="hidden sm:inline-flex items-center justify-center h-10 px-4 rounded-xl bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-2 border-[#121212] dark:border-zinc-700 text-xs font-display font-bold shadow-brutal-sm btn-brutal transition"
             title="Buka Riwayat Transaksi"
             aria-label="Buka Riwayat Transaksi"
           >
             <List className="w-4 h-4 stroke-[2.5]" />
-            <span className="hidden sm:inline ml-1.5">Riwayat</span>
+            <span className="ml-1.5">Riwayat</span>
           </Link>
         </div>
       </header>

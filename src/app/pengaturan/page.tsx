@@ -9,12 +9,15 @@ export default async function PengaturanPage() {
   const user = await requireAuthUser()
   const supabase = await createClient()
 
-  const telegramInfo = await getUserTelegramConnection(user.id, supabase)
+  const [telegramInfo, { data: authData }] = await Promise.all([
+    getUserTelegramConnection(user.id, supabase),
+    supabase.auth.getUser(),
+  ])
 
   return (
     <PengaturanClient
       userEmail={user.email}
-      userId={user.id}
+      userCreatedAt={authData?.user?.created_at}
       initialTelegramInfo={telegramInfo}
     />
   )

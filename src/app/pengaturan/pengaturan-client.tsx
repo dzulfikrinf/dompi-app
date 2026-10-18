@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { useTheme } from 'next-themes'
 import { createClient } from '@/lib/supabase/client'
 import AppLayout from '@/components/layout/app-layout'
 import { LogoutModal } from '@/components/ui/logout-modal'
@@ -16,7 +18,6 @@ import {
   User,
   ShieldCheck,
   Send,
-  Sparkles,
   LogOut,
   Info,
   ExternalLink,
@@ -26,20 +27,28 @@ import {
   Loader2,
   Unlink,
   CheckCircle2,
+  Sun,
+  Moon,
+  BookOpen,
+  Sliders,
+  Lock,
 } from 'lucide-react'
 
 type PengaturanClientProps = {
   userEmail?: string
-  userId?: string
+  userCreatedAt?: string
   initialTelegramInfo?: TelegramConnectionInfo
 }
 
 export default function PengaturanClient({
   userEmail,
-  userId,
+  userCreatedAt,
   initialTelegramInfo,
 }: PengaturanClientProps) {
   const router = useRouter()
+  const { setTheme, resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
+
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
@@ -135,6 +144,15 @@ export default function PengaturanClient({
     }
   }
 
+  // Format tanggal bergabung ramah
+  const formattedJoinDate = userCreatedAt
+    ? new Date(userCreatedAt).toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    : 'Pengguna Dompi'
+
   return (
     <AppLayout currentPath="/pengaturan" userEmail={userEmail}>
       <div className="max-w-4xl mx-auto space-y-6 text-zinc-900 dark:text-zinc-100 pb-16">
@@ -145,47 +163,53 @@ export default function PengaturanClient({
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-zinc-950 dark:text-zinc-50">
-              Pengaturan Akun & Sistem
+              Pengaturan
             </h1>
             <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-0.5 font-medium">
-              Informasi profil pengguna, status integrasi bot, dan konfigurasi aplikasi.
+              Kelola profil akun, sambungan bot Telegram, dan preferensi aplikasi.
             </p>
           </div>
         </div>
 
         {/* 1. Profil Pengguna */}
         <div className="bg-white dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-3xl p-6 sm:p-7 space-y-4 shadow-brutal">
-          <div className="flex items-center gap-2.5 text-sm sm:text-base font-black font-display border-b-2 border-zinc-100 dark:border-zinc-800 pb-3 text-zinc-950 dark:text-zinc-50">
-            <div className="w-7 h-7 rounded-lg bg-[#FFE600] border border-[#121212] flex items-center justify-center text-[#121212]">
-              <User className="w-4 h-4 stroke-[2.5]" />
+          <div className="flex items-center justify-between border-b-2 border-zinc-100 dark:border-zinc-800 pb-3">
+            <div className="flex items-center gap-2.5 text-sm sm:text-base font-black font-display text-zinc-950 dark:text-zinc-50">
+              <div className="w-7 h-7 rounded-lg bg-[#FFE600] border border-[#121212] flex items-center justify-center text-[#121212]">
+                <User className="w-4 h-4 stroke-[2.5]" />
+              </div>
+              <span>Profil Akun</span>
             </div>
-            <span>Profil Pengguna & Sesi</span>
+            <span className="inline-flex items-center gap-1.5 text-xs text-[#121212] font-display font-black bg-[#00FF66] border-2 border-[#121212] px-3 py-0.5 rounded-full shadow-2xs">
+              <Check className="w-3.5 h-3.5 stroke-[3]" />
+              Akun Aktif
+            </span>
           </div>
 
           <div className="space-y-3 text-xs sm:text-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-b border-zinc-100 dark:border-zinc-800 gap-2">
-              <span className="text-zinc-600 dark:text-zinc-400 font-display font-bold">Email Akun</span>
+              <span className="text-zinc-600 dark:text-zinc-400 font-display font-bold">Alamat Email</span>
               <span className="font-bold font-mono bg-[#FBF9F4] dark:bg-zinc-950 px-3 py-1 rounded-xl border border-[#121212] dark:border-zinc-800">
                 {userEmail || 'Pengguna'}
               </span>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-b border-zinc-100 dark:border-zinc-800 gap-2">
-              <span className="text-zinc-600 dark:text-zinc-400 font-display font-bold">User ID (Supabase Auth)</span>
-              <span className="text-zinc-500 font-mono text-xs truncate max-w-xs bg-[#FBF9F4] dark:bg-zinc-950 px-3 py-1 rounded-xl border border-[#121212] dark:border-zinc-800">
-                {userId || '-'}
+              <span className="text-zinc-600 dark:text-zinc-400 font-display font-bold">Terdaftar Sejak</span>
+              <span className="font-bold text-zinc-800 dark:text-zinc-200">
+                {formattedJoinDate}
               </span>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between py-2 gap-2">
-              <span className="text-zinc-600 dark:text-zinc-400 font-display font-bold">Status Keamanan Database</span>
-              <span className="inline-flex items-center gap-1.5 text-xs text-[#121212] font-display font-black bg-[#00FF66] border-2 border-[#121212] px-3 py-1 rounded-full shadow-2xs">
-                <ShieldCheck className="w-4 h-4 stroke-[2.5]" />
-                Row Level Security (RLS) Aktif
+              <span className="text-zinc-600 dark:text-zinc-400 font-display font-bold">Keamanan Akun</span>
+              <span className="inline-flex items-center gap-1.5 font-bold text-zinc-800 dark:text-zinc-200">
+                <Lock className="w-3.5 h-3.5 stroke-[2.5] text-emerald-600" />
+                Dilindungi Kata Sandi
               </span>
             </div>
           </div>
         </div>
 
-        {/* 2. Integrasi Bot Telegram Multi-User */}
+        {/* 2. Integrasi Bot Telegram */}
         <div className="bg-white dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-3xl p-6 sm:p-7 space-y-4 shadow-brutal">
           <div className="flex items-center justify-between border-b-2 border-zinc-100 dark:border-zinc-800 pb-3">
             <div className="flex items-center gap-2.5 text-sm sm:text-base font-black font-display text-zinc-950 dark:text-zinc-50">
@@ -208,7 +232,7 @@ export default function PengaturanClient({
 
           <div className="space-y-4 text-xs sm:text-sm text-zinc-600 dark:text-zinc-300">
             <p className="leading-relaxed font-medium">
-              Hubungkan akun Telegram pribadimu dengan Dompi agar kamu bisa langsung mencatat pengeluaran, mengecek saldo, atau minta analisis bulanan hanya lewat pesan chat.
+              Sambungkan akun Telegram pribadimu dengan Dompi agar kamu bisa mencatat pengeluaran, mengecek saldo dompet, atau menanyakan rekap keuangan langsung lewat obrolan Telegram.
             </p>
 
             {errorMsg && (
@@ -235,16 +259,11 @@ export default function PengaturanClient({
                       </span>
                     </div>
                   )}
-                  <div className="flex justify-between items-center py-1 border-b border-zinc-200 dark:border-zinc-800">
-                    <span className="font-display font-bold text-zinc-600 dark:text-zinc-400">Telegram Chat ID:</span>
-                    <span className="font-mono text-zinc-600 dark:text-zinc-400">
-                      {telegramInfo.telegramChatId || '-'}
-                    </span>
-                  </div>
                   <div className="flex justify-between items-center py-1">
-                    <span className="font-display font-bold text-zinc-600 dark:text-zinc-400">Status Keamanan:</span>
-                    <span className="text-emerald-700 dark:text-emerald-400 font-display font-extrabold">
-                      Terkunci Khusus Akun Anda
+                    <span className="font-display font-bold text-zinc-600 dark:text-zinc-400">Status Sambungan:</span>
+                    <span className="text-emerald-700 dark:text-emerald-400 font-display font-extrabold flex items-center gap-1">
+                      <ShieldCheck className="w-3.5 h-3.5 stroke-[2.5]" />
+                      Khusus Terhubung ke Akun Ini
                     </span>
                   </div>
                 </div>
@@ -256,7 +275,7 @@ export default function PengaturanClient({
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-[#FFE600] text-[#121212] hover:bg-[#ffe81a] border-2 border-[#121212] text-xs font-display font-black shadow-brutal btn-brutal transition cursor-pointer"
                   >
-                    <span>Buka Chat di Telegram</span>
+                    <span>Buka Bot di Telegram</span>
                     <ExternalLink className="w-3.5 h-3.5 stroke-[2.5]" />
                   </a>
                   <button
@@ -280,7 +299,7 @@ export default function PengaturanClient({
                         Langkah Menghubungkan ke Telegram:
                       </p>
                       <p className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">
-                        Klik tombol di bawah untuk langsung membuka bot Telegram, atau salin kode perintah ke obrolan bot.
+                        Klik tombol di bawah untuk membuka bot Telegram secara langsung, atau salin kode perintah ke obrolan bot.
                       </p>
                     </div>
 
@@ -352,31 +371,114 @@ export default function PengaturanClient({
           </div>
         </div>
 
-        {/* 3. Asisten AI Dompi */}
-        <div className="bg-white dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-3xl p-6 sm:p-7 space-y-3 shadow-brutal">
-          <div className="flex items-center justify-between border-b-2 border-zinc-100 dark:border-zinc-800 pb-3">
-            <div className="flex items-center gap-2.5 text-sm sm:text-base font-black font-display text-zinc-950 dark:text-zinc-50">
-              <div className="w-7 h-7 rounded-lg bg-[#FFE600] border border-[#121212] flex items-center justify-center text-[#121212]">
-                <Sparkles className="w-4 h-4 stroke-[2.5]" />
-              </div>
-              <span>Asisten Natural Language</span>
+        {/* 3. Preferensi Tampilan & Format */}
+        <div className="bg-white dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-3xl p-6 sm:p-7 space-y-4 shadow-brutal">
+          <div className="flex items-center gap-2.5 text-sm sm:text-base font-black font-display border-b-2 border-zinc-100 dark:border-zinc-800 pb-3 text-zinc-950 dark:text-zinc-50">
+            <div className="w-7 h-7 rounded-lg bg-[#FFE600] border border-[#121212] flex items-center justify-center text-[#121212]">
+              <Sliders className="w-4 h-4 stroke-[2.5]" />
             </div>
-            <span className="text-xs font-black font-display text-[#121212] bg-[#00F0FF] border-2 border-[#121212] px-3 py-0.5 rounded-full shadow-2xs">
-              Gemini 3.5 Flash Lite
-            </span>
+            <span>Preferensi & Tampilan</span>
           </div>
 
-          <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
-            Mendukung pemahaman bahasa Indonesia sehari-hari untuk mencatat pengeluaran jamak, transfer saldo, penyesuaian nominal riil, evaluasi arus kas, serta saran keuangan yang dapat langsung diterapkan.
+          <div className="space-y-3 text-xs sm:text-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-b border-zinc-100 dark:border-zinc-800 gap-2">
+              <div>
+                <span className="text-zinc-800 dark:text-zinc-200 font-display font-bold block">Mode Tampilan</span>
+                <span className="text-xs text-zinc-500 dark:text-zinc-400">Pilih tema terang atau gelap sesuai kenyamanan matamu.</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setTheme('light')}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#121212] text-xs font-display font-bold transition cursor-pointer ${
+                    !isDark
+                      ? 'bg-[#FFE600] text-[#121212] shadow-brutal-sm'
+                      : 'bg-white text-zinc-700 hover:bg-zinc-100'
+                  }`}
+                >
+                  <Sun className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span>Terang</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTheme('dark')}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#121212] text-xs font-display font-bold transition cursor-pointer ${
+                    isDark
+                      ? 'bg-[#FFE600] text-[#121212] shadow-brutal-sm'
+                      : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
+                  }`}
+                >
+                  <Moon className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span>Gelap</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-b border-zinc-100 dark:border-zinc-800 gap-2">
+              <div>
+                <span className="text-zinc-800 dark:text-zinc-200 font-display font-bold block">Mata Uang Utama</span>
+                <span className="text-xs text-zinc-500 dark:text-zinc-400">Standar mata uang seluruh pencatatan transaksi.</span>
+              </div>
+              <span className="font-bold font-mono bg-[#FBF9F4] dark:bg-zinc-950 px-3 py-1 rounded-xl border border-[#121212] dark:border-zinc-800">
+                IDR (Rupiah Rp)
+              </span>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between py-2 gap-2">
+              <div>
+                <span className="text-zinc-800 dark:text-zinc-200 font-display font-bold block">Format Angka</span>
+                <span className="text-xs text-zinc-500 dark:text-zinc-400">Pemisah ribuan menggunakan tanda titik.</span>
+              </div>
+              <span className="font-bold font-mono text-zinc-700 dark:text-zinc-300">
+                Rp 25.000
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* 4. Pusat Bantuan & Panduan Cepat */}
+        <div className="bg-[#FFE600]/20 dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-3xl p-6 sm:p-7 space-y-3 shadow-brutal">
+          <div className="flex items-center justify-between border-b-2 border-[#121212]/20 dark:border-zinc-800 pb-3">
+            <div className="flex items-center gap-2.5 text-sm sm:text-base font-black font-display text-zinc-950 dark:text-zinc-50">
+              <div className="w-7 h-7 rounded-lg bg-[#FFE600] border border-[#121212] flex items-center justify-center text-[#121212]">
+                <BookOpen className="w-4 h-4 stroke-[2.5]" />
+              </div>
+              <span>Butuh Bantuan Cara Pakai?</span>
+            </div>
+            <Link
+              href="/panduan"
+              className="inline-flex items-center gap-1.5 text-xs font-display font-black bg-[#FFE600] text-[#121212] border-2 border-[#121212] px-3.5 py-1.5 rounded-xl shadow-brutal-sm btn-brutal transition cursor-pointer"
+            >
+              <span>Buka Panduan</span>
+              <ExternalLink className="w-3.5 h-3.5 stroke-[2.5]" />
+            </Link>
+          </div>
+
+          <p className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
+            Bingung format mengetik transaksi jamak, transfer uang antar dompet, atau cara meminta analisis keuangan bulanan? Lihat contoh kalimat dan cheat sheet lengkap di menu Panduan.
           </p>
         </div>
 
-        {/* 4. Keluar dari Akun */}
+        {/* 5. Privasi & Keamanan Data */}
+        <div className="bg-white dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-3xl p-6 sm:p-7 space-y-3 shadow-brutal">
+          <div className="flex items-center gap-2.5 text-sm sm:text-base font-black font-display border-b-2 border-zinc-100 dark:border-zinc-800 pb-3 text-zinc-950 dark:text-zinc-50">
+            <div className="w-7 h-7 rounded-lg bg-[#00FF66] border border-[#121212] flex items-center justify-center text-[#121212]">
+              <ShieldCheck className="w-4 h-4 stroke-[2.5]" />
+            </div>
+            <span>Jaminan Privasi Data</span>
+          </div>
+
+          <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
+            Seluruh catatan dompet dan transaksi keuanganmu bersifat 100% pribadi. Dompi tidak pernah membagikan atau menjual data keuanganmu kepada pihak mana pun.
+          </p>
+        </div>
+
+        {/* 6. Keluar dari Akun */}
         <div className="bg-white dark:bg-zinc-900 border-2 border-[#121212] dark:border-zinc-700 rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-brutal">
           <div>
             <h2 className="text-base font-black font-display text-zinc-950 dark:text-zinc-50">Keluar dari Akun</h2>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-medium">
-              Mengakhiri sesi aktif di peramban ini dan kembali ke halaman login.
+              Mengakhiri sesi aktif di perangkat ini dan kembali ke halaman login.
             </p>
           </div>
           <button
@@ -388,10 +490,10 @@ export default function PengaturanClient({
           </button>
         </div>
 
-        {/* 5. Info Versi */}
+        {/* 7. Info Footer */}
         <div className="flex items-center justify-center gap-1.5 text-xs text-zinc-400 pt-2 font-display font-bold">
           <Info className="w-3.5 h-3.5 stroke-[2.5]" />
-          <span>Dompi • Pencatat Keuangan Pribadi</span>
+          <span>Dompi • Asisten Keuangan Pribadi Indonesia</span>
         </div>
       </div>
 
