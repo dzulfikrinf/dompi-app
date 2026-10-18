@@ -52,6 +52,8 @@ export default function LoginForm() {
         if (signInError) {
           if (signInError.message.toLowerCase().includes("invalid login credentials")) {
             setError("Email atau kata sandi tidak valid.")
+          } else if (signInError.message.toLowerCase().includes("email not confirmed")) {
+            setError("Email Anda belum dikonfirmasi. Silakan buka tautan konfirmasi di kotak masuk email Anda.")
           } else {
             setError(signInError.message)
           }
