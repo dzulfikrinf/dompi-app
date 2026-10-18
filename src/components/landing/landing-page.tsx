@@ -50,9 +50,9 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
     <div className="min-h-screen bg-[#FBF9F4] dark:bg-[#0F1011] text-[#121212] dark:text-[#FBF9F4] font-sans selection:bg-[#FFE600] selection:text-[#121212]">
       {/* 1. Header & Navigation Bar */}
       <header className="sticky top-0 z-50 bg-[#FBF9F4]/90 dark:bg-[#0F1011]/90 backdrop-blur-md border-b-2 border-[#121212] dark:border-zinc-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3 sm:gap-4">
           {/* Logo & Brand */}
-          <Link href="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0">
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#FFE600] border-2 border-[#121212] flex items-center justify-center p-1.5 shadow-brutal-sm">
               <Image
                 src="/logo.png"
@@ -102,12 +102,12 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
           </nav>
 
           {/* Action CTAs */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <ThemeToggle />
             {userEmail ? (
               <Link
                 href="/beranda"
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-[#FFE600] hover:bg-[#ffe81a] text-[#121212] font-display font-black text-xs sm:text-sm border-2 border-[#121212] shadow-brutal btn-brutal transition cursor-pointer"
+                className="inline-flex items-center justify-center gap-1.5 h-9 px-3 sm:h-10 sm:px-4 rounded-xl bg-[#FFE600] hover:bg-[#ffe81a] text-[#121212] font-display font-black text-xs sm:text-sm border-2 border-[#121212] shadow-brutal-sm sm:shadow-brutal btn-brutal transition cursor-pointer whitespace-nowrap"
               >
                 <span>Buka Beranda</span>
                 <ArrowRight className="w-3.5 h-3.5 stroke-[3]" />
@@ -116,15 +116,16 @@ export default function LandingPage({ userEmail }: { userEmail?: string } = {}) 
               <>
                 <Link
                   href="/login"
-                  className="px-3.5 py-2 text-xs font-display font-bold text-zinc-900 dark:text-zinc-100 hover:underline"
+                  className="hidden sm:inline-block px-3.5 py-2 text-xs font-display font-bold text-zinc-900 dark:text-zinc-100 hover:underline whitespace-nowrap"
                 >
                   Masuk
                 </Link>
                 <Link
                   href="/login"
-                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-[#FFE600] hover:bg-[#ffe81a] text-[#121212] font-display font-bold text-xs sm:text-sm border-2 border-[#121212] shadow-brutal btn-brutal transition cursor-pointer"
+                  className="inline-flex items-center justify-center gap-1.5 h-9 px-3.5 sm:h-10 sm:px-4 rounded-xl bg-[#FFE600] hover:bg-[#ffe81a] text-[#121212] font-display font-bold text-xs sm:text-sm border-2 border-[#121212] shadow-brutal-sm sm:shadow-brutal btn-brutal transition cursor-pointer whitespace-nowrap"
                 >
-                  <span>Mulai Sekarang</span>
+                  <span className="hidden sm:inline">Mulai Sekarang</span>
+                  <span className="sm:hidden">Masuk</span>
                   <ArrowRight className="w-3.5 h-3.5 stroke-[3]" />
                 </Link>
               </>
