@@ -63,7 +63,7 @@ export default function Sidebar({
       <div>
         {/* Logo & Toggle Header */}
         <div className="h-16 flex items-center justify-between px-4 border-b-2 border-[#121212] dark:border-zinc-800">
-          <Link href="/beranda" className="flex items-center gap-2.5 overflow-hidden group">
+          <Link href="/beranda" className="flex items-center gap-2.5 py-1 group">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#FFE600] border-2 border-[#121212] p-1 shadow-brutal-sm">
               <Image
                 src="/logo.png"
@@ -116,8 +116,8 @@ export default function Sidebar({
                   prefetch={true}
                   title={collapsed ? item.label : undefined}
                   className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-display tracking-tight transition ${isActive
-                      ? 'bg-[#FFE600] text-[#121212] border-2 border-[#121212] shadow-brutal-sm font-black'
-                      : 'font-bold text-zinc-700 dark:text-zinc-300 border-2 border-transparent hover:border-[#121212] dark:hover:border-zinc-700 hover:bg-[#FBF9F4] dark:hover:bg-zinc-900'
+                    ? 'bg-[#FFE600] text-[#121212] border-2 border-[#121212] shadow-brutal-sm font-black'
+                    : 'font-bold text-zinc-700 dark:text-zinc-300 border-2 border-transparent hover:border-[#121212] dark:hover:border-zinc-700 hover:bg-[#FBF9F4] dark:hover:bg-zinc-900'
                     } ${collapsed ? 'justify-center px-0' : ''}`}
                 >
                   <Icon className="w-4 h-4 flex-shrink-0 stroke-[2.2]" />

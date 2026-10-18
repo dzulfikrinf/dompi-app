@@ -138,7 +138,7 @@ export default function MobileNav({
                 <Link
                   href="/beranda"
                   onClick={() => setIsDrawerOpen(false)}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 py-1"
                 >
                   <div className="w-8 h-8 rounded-lg bg-[#FFE600] border-2 border-[#121212] flex items-center justify-center p-1 shadow-brutal-sm">
                     <Image
