@@ -1,25 +1,47 @@
 import { requireAuthUser } from '@/lib/auth'
-import AppLayout from '@/components/layout/app-layout'
-import FeatureStatusCard from '@/components/common/feature-status-card'
+import {
+  getFinancialAnalysis,
+  FinancialAnalysisResult,
+} from '@/lib/services/analytics-service'
+import LaporanClient from './laporan-client'
 
 export const dynamic = 'force-dynamic'
+
+const DEFAULT_EMPTY_ANALYSIS: FinancialAnalysisResult = {
+  periodeLabel: 'Bulan Ini',
+  totalPemasukan: 0,
+  totalPengeluaran: 0,
+  arusKasBersih: 0,
+  rasioTabunganPersen: 0,
+  rataRataPengeluaranHarian: 0,
+  jumlahHariDalamPeriode: 30,
+  totalTransaksi: 0,
+  kategoriPengeluaran: [],
+  kategoriPemasukan: [],
+  posTerboros: [],
+  transaksiTerbesar: [],
+  ringkasanDompet: {
+    totalSaldoTerkini: 0,
+    rincian: [],
+  },
+  trenHarian: [],
+  daftarTransaksi: [],
+}
 
 export default async function LaporanPage() {
   const user = await requireAuthUser()
 
+  const analysisRes = await getFinancialAnalysis('this_month', {
+    userId: user.id,
+  })
+
+  const initialAnalysis =
+    analysisRes.success && analysisRes.data ? analysisRes.data : DEFAULT_EMPTY_ANALYSIS
+
   return (
-    <AppLayout currentPath="/laporan" userEmail={user.email}>
-      <FeatureStatusCard
-        title="Laporan & Analitik Keuangan"
-        icon="chart"
-        description="Analisis mendalam tren keuangan, ekspor data CSV/PDF, dan perbandingan performa antar-bulan."
-        plannedFeatures={[
-          'Ekspor pembukuan keuangan ke format PDF dan CSV/Excel untuk pelaporan pajak atau arsip.',
-          'Grafik komposisi pengeluaran per kategori secara visual dan persentase detail.',
-          'Insight AI otomatis mengenai kebiasaan belanja dan rekomendasi penghematan bulanan.',
-        ]}
-        currentAlternative="Anda dapat memantau grafik arus kas harian di Beranda atau melakukan pencarian dan filter transaksi berdasarkan tanggal di menu Transaksi."
-      />
-    </AppLayout>
+    <LaporanClient
+      initialAnalysis={initialAnalysis}
+      userEmail={user.email}
+    />
   )
 }

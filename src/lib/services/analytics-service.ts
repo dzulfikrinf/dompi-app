@@ -16,6 +16,23 @@ export type CategoryStat = {
   jumlahTransaksi: number
 }
 
+export type DailyCashflowPoint = {
+  tanggal: string
+  label: string
+  pemasukan: number
+  pengeluaran: number
+}
+
+export type TransactionExportItem = {
+  id: number
+  tanggal: string
+  tipe: 'Pemasukan' | 'Pengeluaran'
+  kategori: string
+  nominal: number
+  deskripsi: string
+  dompet: string
+}
+
 export type FinancialAnalysisResult = {
   periodeLabel: string
   totalPemasukan: number
@@ -48,6 +65,8 @@ export type FinancialAnalysisResult = {
     totalSaldoTerkini: number
     rincian: Array<{ nama: string; tipe: string; saldo: number; persentaseDariTotal: number }>
   }
+  trenHarian?: DailyCashflowPoint[]
+  daftarTransaksi?: TransactionExportItem[]
 }
 
 async function resolveClientAndUser(options?: ServiceOptions) {
@@ -302,6 +321,45 @@ export async function getFinancialAnalysis(
       }
     })
 
+    // Agregasi tren arus kas harian untuk grafik
+    const dailyMap: Record<string, { pemasukan: number; pengeluaran: number }> = {}
+    for (const t of periodTransactions) {
+      const tgl = t.tanggal || ''
+      if (!dailyMap[tgl]) {
+        dailyMap[tgl] = { pemasukan: 0, pengeluaran: 0 }
+      }
+      if (t.tipe === 'Pemasukan' && t.kategori !== 'Transfer Masuk') {
+        dailyMap[tgl].pemasukan += Number(t.nominal || 0)
+      } else if (t.tipe === 'Pengeluaran' && t.kategori !== 'Transfer Keluar') {
+        dailyMap[tgl].pengeluaran += Number(t.nominal || 0)
+      }
+    }
+
+    const trenHarian: DailyCashflowPoint[] = Object.keys(dailyMap)
+      .sort()
+      .map((dateStr) => {
+        const parts = dateStr.split('-')
+        const day = parts[2] || dateStr
+        const month = parts[1] || ''
+        return {
+          tanggal: dateStr,
+          label: `${day}/${month}`,
+          pemasukan: dailyMap[dateStr].pemasukan,
+          pengeluaran: dailyMap[dateStr].pengeluaran,
+        }
+      })
+
+    // Daftar transaksi untuk ekspor CSV
+    const daftarTransaksi: TransactionExportItem[] = periodTransactions.map((t) => ({
+      id: Number(t.id),
+      tanggal: t.tanggal,
+      tipe: t.tipe as 'Pemasukan' | 'Pengeluaran',
+      kategori: t.kategori || 'Umum',
+      nominal: Number(t.nominal || 0),
+      deskripsi: t.deskripsi || '',
+      dompet: t.dompet || 'Cash',
+    }))
+
     return {
       success: true,
       data: {
@@ -322,6 +380,8 @@ export async function getFinancialAnalysis(
           totalSaldoTerkini,
           rincian: rincianDompet,
         },
+        trenHarian,
+        daftarTransaksi,
       },
     }
   } catch (err) {
