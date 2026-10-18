@@ -11,6 +11,10 @@ import {
   TrendingDown,
   TrendingUp,
   List,
+  Check,
+  RefreshCw,
+  Trash2,
+  ArrowRightLeft,
 } from 'lucide-react'
 import { sendChatMessageAction, ChatActionResult } from './actions'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -50,6 +54,85 @@ const SAMPLE_PROMPTS = [
   'Koreksi saldo Cash asliku sekarang jadi 50.000',
   'Gimana tips mengatur budget keuangan pribadi?',
 ]
+
+function getActionBadge(actionType?: string) {
+  if (!actionType) return null
+
+  switch (actionType) {
+    case 'RECORD_TRANSACTIONS':
+    case 'record_transactions':
+      return {
+        label: 'Tersimpan',
+        color: 'bg-[#00FF66] text-[#121212]',
+        icon: Check,
+      }
+    case 'UPDATE_TRANSACTION':
+    case 'update_transaction':
+      return {
+        label: 'Diperbarui',
+        color: 'bg-[#00F0FF] text-[#121212]',
+        icon: RefreshCw,
+      }
+    case 'DELETE_TRANSACTION':
+    case 'delete_transaction':
+      return {
+        label: 'Dihapus',
+        color: 'bg-[#FF4365] text-white',
+        icon: Trash2,
+      }
+    case 'UNDO_TRANSACTION':
+    case 'undo_transaction':
+      return {
+        label: 'Dipulihkan',
+        color: 'bg-[#FFE600] text-[#121212]',
+        icon: RotateCcw,
+      }
+    case 'TRANSFER_WALLET':
+    case 'transfer_wallet_balance':
+      return {
+        label: 'Transfer Berhasil',
+        color: 'bg-[#00F0FF] text-[#121212]',
+        icon: ArrowRightLeft,
+      }
+    case 'ADJUST_WALLET':
+    case 'adjust_wallet_balance':
+      return {
+        label: 'Saldo Disesuaikan',
+        color: 'bg-[#FFE600] text-[#121212]',
+        icon: RefreshCw,
+      }
+    case 'CREATE_WALLET':
+    case 'create_wallet':
+      return {
+        label: 'Dompet Baru',
+        color: 'bg-[#00FF66] text-[#121212]',
+        icon: Check,
+      }
+    case 'UPDATE_WALLET':
+    case 'update_wallet':
+      return {
+        label: 'Dompet Diperbarui',
+        color: 'bg-[#00F0FF] text-[#121212]',
+        icon: RefreshCw,
+      }
+    case 'DELETE_WALLET':
+    case 'delete_wallet':
+      return {
+        label: 'Dompet Dihapus',
+        color: 'bg-[#FF4365] text-white',
+        icon: Trash2,
+      }
+    case 'FINANCIAL_ANALYSIS':
+    case 'financial_analysis':
+      return {
+        label: 'Analisis Keuangan',
+        color: 'bg-[#FFE600] text-[#121212]',
+        icon: Sparkles,
+      }
+    default:
+      return null
+  }
+}
 
 function renderFormattedChatMessage(text: string) {
   if (!text) return null
@@ -285,14 +368,20 @@ export default function ChatClient({ userEmail }: { userEmail?: string }) {
                 }`}
               >
                 {/* Header tag for assistant actions */}
-                {msg.sender === 'assistant' && msg.action && (
-                  <div className="flex items-center gap-2 mb-2 pb-2 border-b border-zinc-200 dark:border-zinc-800">
-                    <span className="text-[10px] font-display font-black px-2 py-0.5 rounded bg-[#00FF66] text-[#121212] border border-[#121212] uppercase tracking-wider">
-                      {msg.action}
-                    </span>
-                    <span className="text-xs text-zinc-500 font-bold font-display">Dompi AI</span>
-                  </div>
-                )}
+                {msg.sender === 'assistant' && (() => {
+                  const badge = getActionBadge(msg.action || msg.actionType)
+                  if (!badge) return null
+                  const BadgeIcon = badge.icon
+                  return (
+                    <div className="flex items-center gap-2 mb-2 pb-2 border-b border-zinc-200 dark:border-zinc-800">
+                      <span className={`inline-flex items-center gap-1 text-[10px] font-display font-black px-2 py-0.5 rounded-md border border-[#121212] tracking-wider ${badge.color}`}>
+                        <BadgeIcon className="w-3 h-3 stroke-[3]" />
+                        <span>{badge.label}</span>
+                      </span>
+                      <span className="text-xs text-zinc-500 dark:text-zinc-400 font-bold font-display">Dompi</span>
+                    </div>
+                  )
+                })()}
 
                 {/* Message text */}
                 <div className="font-medium text-xs sm:text-sm leading-relaxed">
