@@ -14,8 +14,25 @@ export default function LoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [message, setMessage] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      const errParam = new URLSearchParams(window.location.search).get("error")
+      if (errParam) return decodeURIComponent(errParam)
+    }
+    return null
+  })
+  const [message, setMessage] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      const verifiedParam = params.get("verified")
+      const msgParam = params.get("message")
+      if (verifiedParam === "true") {
+        return "Email Anda berhasil diverifikasi! Silakan masuk ke akun Anda."
+      }
+      if (msgParam) return decodeURIComponent(msgParam)
+    }
+    return null
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,9 +68,22 @@ export default function LoginForm() {
           return
         }
 
+        // Dapatkan origin saat ini (misal https://dompi.app atau http://localhost:3000)
+        const redirectOrigin =
+          typeof window !== "undefined" && window.location.origin
+            ? window.location.origin
+            : process.env.NEXT_PUBLIC_APP_URL || ""
+
+        const emailRedirectTo = redirectOrigin
+          ? `${redirectOrigin}/auth/callback?next=/beranda`
+          : undefined
+
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo,
+          },
         })
 
         if (signUpError) {
