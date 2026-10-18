@@ -1,4 +1,4 @@
-# 💰 Dompi - Asisten Pintar Pencatat Keuangan Pribadi
+# Dompi - Asisten Cerdas Pencatat Keuangan Pribadi
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.3-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-blue?style=flat&logo=react)](https://react.dev/)
@@ -8,328 +8,279 @@
 [![Google Gemini](https://img.shields.io/badge/Google%20Gemini-3.5%20Flash%20Lite-8E75B2?style=flat&logo=google)](https://ai.google.dev/)
 [![Telegram Bot](https://img.shields.io/badge/Telegram-Bot%20API-2CA5E0?style=flat&logo=telegram)](https://core.telegram.org/bots/api)
 
-**Dompi** adalah aplikasi web modern pencatat keuangan pribadi terintegrasi yang dilengkapi dengan **Asisten AI (Google Gemini)** dan **Bot Telegram**. Dompi dirancang untuk memudahkan siapa saja mencatat arus kas (pemasukan & pengeluaran), mengelola multi-rekening/dompet, memantau anggaran, serta membuat laporan keuangan komprehensif baik melalui antarmuka web yang intuitif maupun percakapan bahasa alami (*natural language*) di Telegram.
+**Dompi** adalah aplikasi pencatat keuangan pribadi modern dengan antarmuka **Neo-Brutalism**, asisten cerdas berbasis **Google Gemini**, dan integrasi **Bot Telegram multi-pengguna**. Dirancang untuk memudahkan siapa saja mencatat pengeluaran harian, memantau saldo multi-dompet, dan menganalisis arus kas tanpa kerumitan formulir yang kaku.
 
 ---
 
-## 📌 Daftar Isi
+## Daftar Isi
 
-1. [Tentang Aplikasi](#-tentang-aplikasi)
-2. [Fitur-Fitur Utama](#-fitur-fitur-utama)
-3. [Tech Stack](#-tech-stack)
-4. [Alur & Flow Aplikasi](#-alur--flow-aplikasi)
-5. [Struktur Direktori](#-struktur-direktori)
-6. [Prasyarat Sistem](#-prasyarat-sistem)
-7. [Panduan Instalasi & Menjalankan](#-panduan-instalasi--menjalankan)
-8. [Konfigurasi Environment Variables](#-konfigurasi-environment-variables)
-9. [Panduan Integrasi Telegram Bot](#-panduan-integrasi-telegram-bot)
-10. [Contoh Perintah Bahasa Alami (Dompi AI)](#-contoh-perintah-bahasa-alami-dompi-ai)
-11. [Lisensi](#-lisensi)
-
----
-
-## 🌟 Tentang Aplikasi
-
-Banyak orang kesulitan mencatat keuangan secara konsisten karena proses input transaksi manual yang kaku dan merepotkan. **Dompi** memecahkan masalah ini dengan menyediakan dua jalur pencatatan yang saling tersinkronisasi secara *real-time*:
-
-1. **Web Dashboard Interaktif**: Visualisasi grafik arus kas, ringkasan saldo per dompet, manajemen anggaran kategori, target tabungan, dan laporan tren pengeluaran bulanan.
-2. **Chat Asisten AI & Telegram Bot**: Cukup ketik kalimat sehari-hari seperti *"Makan siang bakso 35rb pake BCA"* atau *"tambah saldo dompet BCA 500rb"*, Dompi akan otomatis memahami konteks, mencatat mutasi, mengupdate saldo dompet, dan mengonfirmasi seketika.
+1. [Tentang Dompi](#tentang-dompi)
+2. [Desain Sistem Neo-Brutalism](#desain-sistem-neo-brutalism)
+3. [Fitur-Fitur Utama](#fitur-fitur-utama)
+4. [Tech Stack](#tech-stack)
+5. [Arsitektur & Alur Sistem](#arsitektur--alur-sistem)
+6. [Struktur Direktori](#struktur-direktori)
+7. [Prasyarat Sistem](#prasyarat-sistem)
+8. [Panduan Instalasi Lokal](#panduan-instalasi-lokal)
+9. [Konfigurasi Environment Variables](#konfigurasi-environment-variables)
+10. [Panduan Integrasi Telegram Multi-User](#panduan-integrasi-telegram-multi-user)
+11. [Contoh Percakapan & Perintah Alami](#contoh-percakapan--perintah-alami)
+12. [Lisensi](#lisensi)
 
 ---
 
-## ✨ Fitur-Fitur Utama
+## Tentang Dompi
 
-* 📊 **Dashboard Finansial Real-Time**: Ringkasan total saldo, pemasukan bulanan, pengeluaran bulanan, grafik arus kas (*cashflow*), serta daftar transaksi terkini.
-* 💳 **Manajemen Multi-Dompet & Rekening**:
-  * Kelola berbagai jenis rekening: Bank (BCA, Mandiri, dll.), Dompet Digital (GoPay, OVO, ShopeePay), Uang Tunai / Fisik, maupun Reksa Dana / Investasi.
-  * **Perhitungan Saldo Dinamis**: Saldo terkini dihitung secara matematis dan akurat dari formula:
-    $$\text{Saldo Terkini} = \text{Saldo Awal} + \sum \text{Pemasukan} - \sum \text{Pengeluaran}$$
-  * Dukungan CRUD lengkap (buat dompet baru, tambah saldo, ubah nama/tipe, hapus).
-* 📝 **Manajemen Transaksi (Pemasukan & Pengeluaran)**:
-  * Input manual via formulir web atau otomatis via AI Chat.
-  * Tagging dompet/rekening sumber dan kategori pengeluaran/pemasukan.
-  * Fitur pencarian, filter tanggal, serta *Soft Delete* dengan kemampuan **Undo / Pulihkan Transaksi**.
-* 🤖 **Asisten AI "Dompi" (NLU Web & Telegram)**:
-  * Ditenagai model **Google Gemini 3.5 Flash Lite**.
-  * Mampu memahami bahasa santai, singkatan nominal (50rb, 2jt, 1.5jt), serta konteks percakapan.
-  * Menghasilkan rekap keuangan menyeluruh (Pemasukan, Pengeluaran, Arus Kas Bersih, Total Saldo, dan Rincian per Dompet).
-* 🎯 **Target Tabungan (Savings Goals)**: Lacak progress tabungan untuk impian atau dana darurat dengan persentase capaian dan tenggat waktu.
-* 📉 **Anggaran Bulanan (Budgeting)**: Batasi pengeluaran per kategori dengan indikator visual dan peringatan saat mendekati batas anggaran.
-* 📅 **Pengingat Tagihan (Bills & Subscriptions)**: Catat tagihan rutin bulanan (WiFi, listrik, langganan Netflix/Spotify) agar tidak telat bayar.
-* 📈 **Laporan & Analisis Statistik**: Visualisasi diagram lingkaran (*pie chart*) proporsi pengeluaran per kategori dan perbandingan historis.
-* 🌓 **Dark & Light Mode**: Desain antarmuka modern, nyaman di mata, dan responsif di perangkat mobile maupun desktop.
+Mencatat keuangan sering kali terhenti di tengah jalan karena formulir input yang merepotkan dan banyaknya rincian manual yang harus diisi. **Dompi** menghadirkan pengalaman pencatatan yang fleksibel melalui dua jalur terpadu:
+
+1. **Web App Interaktif**: Tampilan visual berbasis *Neo-Brutalism* yang memuat ringkasan saldo, mutasi transaksi, alokasi pengeluaran, transfer saldo antar-dompet, dan grafik arus kas.
+2. **Asisten AI & Bot Telegram Multi-User**: Cukup kirim kalimat santai seperti *"Makan siang 25rb tunai, beli bensin 50rb pake bca, parkir 2rb"* atau *"Transfer 300rb dari BCA ke Mandiri"*. Dompi akan memproses konteks, mencatat transaksi sekaligus, dan memperbarui saldo seketika.
 
 ---
 
-## 🛠️ Tech Stack
+## Desain Sistem Neo-Brutalism
 
-### Frontend & Core Framework
-* **[Next.js 16](https://nextjs.org/)** (App Router, Turbopack, Server Actions, Server Components)
-* **[React 19](https://react.dev/)**
-* **[TypeScript](https://www.typescriptlang.org/)** (Strict Typing)
-* **[Tailwind CSS v4](https://tailwindcss.com/)** & **Lucide React** (Ikon UI)
-* **[Recharts](https://recharts.org/)** (Komponen Grafik & Visualisasi Data)
-* **[next-themes](https://github.com/pacocoursey/next-themes)** (Tema Gelap & Terang)
-
-### Backend, Database & Autentikasi
-* **[Supabase](https://supabase.com/)**:
-  * PostgreSQL Database dengan relasi tabel terstruktur.
-  * Supabase Auth & SSR Session via `@supabase/ssr`.
-  * Row Level Security (RLS) untuk isolasi data pengguna yang aman.
-
-### Kecerdasan Buatan (AI) & Bot Engine
-* **[Google Generative AI SDK](https://www.npmjs.com/package/@google/generative-ai)**: Model `gemini-3.5-flash-lite` dengan prompt engineering JSON terstruktur.
-* **Telegram Bot API**: Endpoint Webhook Next.js (`/api/telegram`) dengan sistem deduplikasi update ID, validasi rahasia (*secret token*), dan verifikasi Chat ID pemilik.
+Antarmuka Dompi dibangun dengan konsep estetika **Neo-Brutalism / Pop-Modern**:
+* **Garis & Kontur Tegas**: Border solid `2px` hingga `3px` hitam pekat (`#121212`) pada light mode dan kontras tinggi pada dark mode.
+* **Hard Offset Shadows**: Bayangan jatuh tegas zero-blur (`shadow-brutal` `4px 4px 0px #121212`).
+* **Palet Warna Pop-Art**: Aksen kuning elektrik (`#FFE600`), cyan neon (`#00F0FF`), hijau mint (`#00FF66`), dan merah karang (`#FF4365`).
+* **Tipografi Karakter**: Font tampilan **Space Grotesk** (`font-display`) untuk judul dan angka tabular, dipadukan dengan **Plus Jakarta Sans** (`font-sans`) untuk kenyamanan membaca teks panjang.
+* **Responsif Layar Sempit**: Header dan komponen navigasi dioptimasi khusus untuk kenyamanan perangkat mobile (termasuk viewport sempit seperti iPhone SE 375px).
 
 ---
 
-## 🔄 Alur & Flow Aplikasi
+## Fitur-Fitur Utama
+
+* **Landing Page Publik & Proteksi Rute**: Halaman utama publik (`/`) yang informatif dan ramah pengguna, dengan pengalihan otomatis ke beranda interaktif (`/beranda`) setelah masuk.
+* **Dashboard Finansial Real-Time**: Ringkasan saldo aktif, pemasukan bulan berjalan, pengeluaran terkendali, dan grafik visual mutasi.
+* **Manajemen Multi-Dompet**:
+  * Kelola berbagai kategori dompet: Rekening Bank, Dompet Digital (E-Wallet), Uang Tunai, maupun Tabungan.
+  * Formula saldo matematis yang menghitung mutasi secara real-time tanpa batas historis.
+  * Mendukung mutasi transfer saldo antar-dompet.
+* **Pencatatan Jamak Sekaligus (Batch Transactions)**: Mampu memecah satu pesan panjang menjadi beberapa mutasi transaksi independen dalam satu aksi.
+* **Integrasi Bot Telegram Multi-Pengguna**:
+  * Sistem pairing dinamis berbasis token `/start <token>` berbatas waktu 15 menit.
+  * Setiap pengguna dapat menautkan akun Telegram pribadi secara mandiri tanpa konfigurasi manual di server.
+  * Pesan konfirmasi Telegram menggunakan format HTML terstruktur (`<b>`, `•`) yang rapi dan mudah dibaca.
+* **Alur Konfirmasi Email PKCE**:
+  * Endpoint callback server (`/auth/callback`) untuk pertukaran kode otentikasi Supabase dan verifikasi OTP email secara dinamis di domain produksi maupun lokal.
+* **Pusat Panduan & Cheat Sheet (`/panduan`)**: Dokumentasi interaktif contoh perintah bahasa sehari-hari untuk mempermudah pengguna baru.
+* **Pengaturan Ramah Pengguna (`/pengaturan`)**: Informasi profil, manajemen sambungan Telegram, pilihan mode tampilan (Terang / Gelap), dan jaminan privasi data tanpa istilah teknis yang membingungkan.
+
+---
+
+## Tech Stack
+
+### Frontend
+* **Next.js 16.3** (App Router, Turbopack, Server Actions, Server Components)
+* **React 19**
+* **TypeScript** (Strict Type-Safety)
+* **Tailwind CSS v4** & **Lucide React** (Ikon UI)
+* **next-themes** (Dukungan Mode Terang & Gelap)
+
+### Database & Autentikasi
+* **Supabase PostgreSQL**: Skema tabel relasional (`transactions`, `wallets`, `telegram_connections`).
+* **Supabase Auth & SSR**: Manajemen sesi aman berbasis cookie (`@supabase/ssr`) dengan proteksi Row Level Security (RLS).
+
+### Kecerdasan Buatan (AI)
+* **Google Generative AI SDK**: Model `gemini-3.5-flash-lite` dengan arsitektur multi-turn function calling untuk mengeksekusi operasi transaksi secara deterministik.
+
+---
+
+## Arsitektur & Alur Sistem
 
 ```
-                                      ┌─────────────────────────────────┐
-                                      │         PENGGUNA (USER)         │
-                                      └────────┬───────────────┬────────┘
-                                               │               │
-                        Akses via Web Browser  │               │ Kirim Pesan Chat
-                                               ▼               ▼
-                                   ┌────────────────┐   ┌───────────────┐
-                                   │  Next.js App   │   │ Telegram Bot  │
-                                   │ (Web Dashboard)│   └───────┬───────┘
-                                   └───────┬────────┘           │ Webhook POST
-                                           │                    ▼
-                                           │            ┌────────────────────────┐
-                                           │            │ /api/telegram (Server) │
-                                           │            └───────┬────────────────┘
-                                           │                    │
-                                           ▼                    ▼
-                               ┌─────────────────────────────────────────┐
-                               │     Prompt Context Engine & Gemini      │
-                               │        (gemini-3.5-flash-lite)          │
-                               └───────────────────┬─────────────────────┘
-                                                   │ Ekstraksi JSON (Action, Nominal,
-                                                   │ Dompet, Kategori, Rekap, dll.)
-                                                   ▼
-                               ┌─────────────────────────────────────────┐
-                               │   Transaction & Wallet Service Layer    │
-                               │          (Business Logic & CRUD)        │
-                               └───────────────────┬─────────────────────┘
-                                                   │ Query / Mutasi
-                                                   ▼
-                               ┌─────────────────────────────────────────┐
-                               │       Supabase PostgreSQL Database      │
-                               │  (transactions, wallets, budgets, etc.) │
-                               └─────────────────────────────────────────┘
+                                 +-----------------------------+
+                                 |       PENGGUNA (USER)       |
+                                 +--------------+--------------+
+                                                |
+                        +-----------------------+-----------------------+
+                        | Akses Web Browser                             | Pesan Telegram
+                        v                                               v
+              +-------------------+                           +-------------------+
+              |    Next.js App    |                           |   Telegram Bot    |
+              | (Landing/Beranda) |                           +---------+---------+
+              +---------+---------+                                     | Webhook POST
+                        |                                               v
+                        |                                     +-------------------+
+                        |                                     |   /api/telegram   |
+                        +-----------------------+-------------+-------------------+
+                                                |
+                                                v
+                               +---------------------------------+
+                               |    Agentic Chat & Context       |
+                               |    (gemini-3.5-flash-lite)      |
+                               +----------------+----------------+
+                                                | Function Calling / Tools Dispatch
+                                                v
+                               +---------------------------------+
+                               |    Service Layer (TS/Actions)   |
+                               |  - Transaction Service (Batch)  |
+                               |  - Wallet Service (Transfer)    |
+                               |  - Analytics Service            |
+                               +----------------+----------------+
+                                                |
+                                                v
+                               +---------------------------------+
+                               |   Supabase PostgreSQL & RLS     |
+                               +---------------------------------+
 ```
-
-### 1. Flow Pencatatan via Telegram Bot
-1. Pengguna mengirim pesan teks di Telegram (misal: *"Beli kopi 25rb bayar pake GoPay"*).
-2. Telegram meneruskan update ke endpoint Webhook Next.js (`POST /api/telegram`).
-3. Endpoint memvalidasi:
-   * Header `X-Telegram-Bot-Api-Secret-Token` sesuai `TELEGRAM_WEBHOOK_SECRET`.
-   * `chat_id` pengirim sesuai dengan `TELEGRAM_CHAT_ID` pemilik.
-   * `update_id` belum pernah diproses (mencegah eksekusi ganda jika Telegram mengirim retry).
-4. Server mengambil konteks data terbaru pemilik (daftar dompet, transaksi aktif, ringkasan saldo bulan berjalan).
-5. Konteks dan pesan dikirim ke **Gemini 3.5 Flash Lite** untuk Natural Language Understanding (NLU).
-6. Gemini mengembalikan format JSON terstandar (`TAMBAH`, `UBAH`, `HAPUS`, `UNDO`, `UBAH_DOMPET`, `RINGKASAN`, dll.).
-7. Server mengeksekusi operasi database di Supabase dan mengirimkan pesan balasan konfirmasi yang ramah kembali ke Telegram pengguna.
-
-### 2. Flow Rekap Keuangan Komprehensif
-1. Pengguna meminta rekap (misal: *"rekap keuangan"* atau *"ringkasan bulan ini"*).
-2. Sistem mengumpulkan total pemasukan, total pengeluaran, selisih arus kas, total saldo terkini dari seluruh dompet, dan saldo spesifik masing-masing dompet.
-3. Gemini dan safeguard sistem menyusun laporan rapi berformat:
-   * Periode bulan berjalan
-   * Total Pemasukan & Pengeluaran
-   * Arus Kas Bersih (Surplus / Defisit)
-   * **Total Saldo Saat Ini** (seluruh uang yang dimiliki)
-   * **Rincian Saldo masing-masing Dompet** (BCA, GoPay, Tunai, dsb.)
 
 ---
 
-## 📁 Struktur Direktori
+## Struktur Direktori
 
 ```text
 pencatat-keuangan/
-├── public/                     # Aset statis, favicon, logo karakter dompet
+├── public/                       # Aset gambar, favicon, dan logo
 ├── src/
-│   ├── app/                    # Next.js App Router
-│   │   ├── (auth)/login/       # Halaman login & otentikasi Supabase
-│   │   ├── anggaran/           # Halaman manajemen anggaran bulanan
+│   ├── app/                      # Next.js App Router
 │   │   ├── api/
-│   │   │   └── telegram/       # Webhook endpoint Telegram Bot API
-│   │   ├── chat/               # Antarmuka web asisten AI Dompi
-│   │   ├── dompet/             # Halaman CRUD Dompet & Rekening Bank
-│   │   ├── laporan/            # Halaman laporan & grafik statistik keuangan
-│   │   ├── pengaturan/         # Pengaturan profil & preferensi
-│   │   ├── tagihan/            # Pelacak tagihan rutin & langganan
-│   │   ├── target/             # Pelacak target tabungan (savings goals)
-│   │   ├── transaksi/          # Daftar riwayat transaksi & formulir input
-│   │   ├── globals.css         # Styling global & token Tailwind CSS v4
-│   │   ├── layout.tsx          # Root layout aplikasi & tema
-│   │   ├── loading.tsx         # Global loading skeleton
-│   │   └── page.tsx            # Dashboard utama
-│   ├── components/             # Komponen UI modular
-│   │   ├── dashboard/          # Kartu ringkasan saldo, grafik, sidebar, navbar
-│   │   ├── ui/                 # Komponen UI dasar (button, modal, card)
-│   │   └── theme-provider.tsx  # Dark mode provider
-│   └── lib/                    # Utilitas, konfigurasi, & service logic
-│       ├── auth.ts             # Helper otentikasi cepat
-│       ├── gemini.ts           # Konfigurasi Google Gemini SDK, prompt NLU, & validator
-│       ├── services/           # Service layer database
-│       │   ├── telegram-service.ts  # Utilitas bot Telegram, verifikasi, deduplikasi
-│       │   ├── transaction-service.ts # Logika transaksi (CRUD, soft delete, undo)
-│       │   └── wallet-service.ts    # Logika dompet & kalkulasi saldo matematis
-│       ├── supabase/           # Client Supabase (Server, Client, Middleware)
-│       └── types/              # Deklarasi tipe TypeScript (Transaction, Wallet, dll.)
-├── .env.example                # Template konfigurasi environment variables
-├── next.config.ts              # Konfigurasi Next.js
-├── package.json                # Dependensi & skrip proyek
-└── tsconfig.json               # Konfigurasi TypeScript
+│   │   │   └── telegram/         # Webhook handler bot Telegram
+│   │   ├── auth/
+│   │   │   └── callback/         # Endpoint penukaran token PKCE & OTP Supabase
+│   │   ├── beranda/              # Dashboard utama setelah masuk
+│   │   ├── chat/                 # Antarmuka web asisten AI Dompi
+│   │   ├── dompet/               # Manajemen dompet & rekening bank
+│   │   ├── login/                # Form pendaftaran dan masuk akun
+│   │   ├── panduan/              # Halaman panduan & contoh perintah
+│   │   ├── pengaturan/           # Preferensi profil & pairing Telegram
+│   │   ├── transaksi/            # Riwayat mutasi & formulir transaksi
+│   │   ├── globals.css           # Token desain & utilitas Neo-Brutalism
+│   │   ├── layout.tsx            # Root layout & penyedia tema
+│   │   └── page.tsx              # Landing page publik
+│   ├── components/
+│   │   ├── dashboard/            # Komponen kartu KPI, grafik, sidebar, mobile nav
+│   │   ├── landing/              # Komponen landing page publik
+│   │   ├── layout/               # Layout wrapper aplikasi
+│   │   └── ui/                   # Komponen modal, toggle tema, & tombol
+│   └── lib/
+│       ├── auth.ts               # Helper sesi autentikasi pengguna
+│       ├── gemini.ts             # Definisi tool calling & prompt AI Gemini
+│       ├── services/             # Logika bisnis database
+│       │   ├── agent-chat-service.ts  # Dispatcher multi-turn function calling
+│       │   ├── analytics-service.ts   # Analisis Pareto & rasio tabungan
+│       │   ├── telegram-service.ts    # Format pesan HTML & sanitasi bot
+│       │   ├── transaction-service.ts # Mutasi transaksi & batch insert
+│       │   └── wallet-service.ts      # Saldo real-time & transfer saldo
+│       └── supabase/             # Inisialisasi client Supabase
+├── .env.example                  # Template variabel lingkungan
+├── next.config.ts                # Konfigurasi Next.js
+├── package.json                  # Dependensi proyek
+└── tsconfig.json                 # Konfigurasi TypeScript
 ```
 
 ---
 
-## 📋 Prasyarat Sistem
+## Prasyarat Sistem
 
-Sebelum menjalankan proyek, pastikan perangkat Anda telah terinstal:
 * **Node.js**: Versi `18.18.0` atau yang lebih baru (disarankan Node.js 20 LTS).
 * **Package Manager**: `npm`, `pnpm`, atau `yarn`.
-* **Akun Supabase**: Untuk database PostgreSQL dan autentikasi.
-* **Google AI Studio API Key**: Untuk akses model Gemini 3.5 Flash Lite ([Dapatkan di sini](https://aistudio.google.com/)).
-* **Telegram Bot Token** *(Opsional bila ingin mengaktifkan bot)*: Dari [@BotFather](https://t.me/botfather).
+* **Akun Supabase**: Database PostgreSQL dan layanan Auth ([supabase.com](https://supabase.com/)).
+* **Google AI Studio API Key**: Kunci API untuk model Gemini 3.5 Flash Lite ([aistudio.google.com](https://aistudio.google.com/)).
+* **Telegram Bot Token**: Didapat dari [@BotFather](https://t.me/botfather).
 
 ---
 
-## 🚀 Panduan Instalasi & Menjalankan
+## Panduan Instalasi Lokal
 
-### 1. Clone Repositori
+### 1. Kloning Repositori
 ```bash
 git clone https://github.com/dzulfikrinf/dompi-app.git
 cd dompi-app
 ```
 
-### 2. Install Dependensi
+### 2. Pasang Dependensi
 ```bash
 npm install
 ```
 
-### 3. Konfigurasi Environment Variables
-Salin file `.env.example` menjadi `.env.local`:
+### 3. Salin Variabel Lingkungan
 ```bash
 cp .env.example .env.local
 ```
-Buka `.env.local` pada editor Anda dan isi nilai konfigurasi sesuai kebutuhan (lihat rincian di bagian [Environment Variables](#-konfigurasi-environment-variables)).
+Sesuaikan nilai di `.env.local` dengan kredensial Supabase dan API Key Gemini Anda.
 
-### 4. Jalankan Development Server
+### 4. Jalankan Server Development
 ```bash
 npm run dev
 ```
+Buka aplikasi di peramban Anda melalui [http://localhost:3000](http://localhost:3000).
 
-Buka peramban Anda di [http://localhost:3000](http://localhost:3000).
-
-### 5. Build untuk Produksi
-Untuk memastikan kompilasi tipe dan bundle siap produksi:
+### 5. Verifikasi Build & Lint
 ```bash
+npm run lint
 npm run build
-npm run start
 ```
 
 ---
 
-## 🔐 Konfigurasi Environment Variables
+## Konfigurasi Environment Variables
 
-Berikut adalah tabel rincian variabel lingkungan pada `.env.local`:
+File `.env.local` membutuhkan konfigurasi berikut:
 
-| Nama Variabel | Wajib? | Deskripsi & Sumber Nilai |
+| Variabel | Wajib? | Keterangan |
 | :--- | :---: | :--- |
-| `NEXT_PUBLIC_SUPABASE_URL` | **Ya** | URL project Supabase Anda (contoh: `https://xyzcompany.supabase.co`). Didapat dari *Project Settings > API* di dashboard Supabase. |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **Ya** | Kunci publik/anonim Supabase untuk interaksi client-side. Didapat dari *Project Settings > API*. |
-| `SUPABASE_SERVICE_ROLE_KEY` | **Ya\*** | Kunci rahasia Service Role Supabase. Digunakan oleh webhook Telegram di server untuk mengeksekusi mutasi data pemilik secara aman dengan hak akses penuh. |
-| `GEMINI_API_KEY` | **Ya** | API Key Google Gemini. Digunakan untuk memproses bahasa alami NLU pada chat web dan Telegram ([Google AI Studio](https://aistudio.google.com/)). |
-| `TELEGRAM_BOT_TOKEN` | Opsional | Token Bot Telegram yang didapatkan saat membuat bot melalui [@BotFather](https://t.me/botfather). |
-| `TELEGRAM_CHAT_ID` | Opsional | ID Numerik akun Telegram pemilik bot. Menjamin hanya pemilik sah yang bisa mencatat dan melihat data keuangan. Didapat via [@userinfobot](https://t.me/userinfobot). |
-| `TELEGRAM_WEBHOOK_SECRET` | Opsional | String acak rahasia untuk memverifikasi bahwa request webhook yang masuk benar-benar berasal dari server Telegram resmi. |
-
-> **Catatan Keamanan:** Jangan pernah melakukan commit file `.env.local` atau membagikan `SUPABASE_SERVICE_ROLE_KEY` dan `TELEGRAM_BOT_TOKEN` ke repositori publik!
+| `NEXT_PUBLIC_SUPABASE_URL` | **Ya** | URL Project Supabase Anda (`https://<project-id>.supabase.co`). |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **Ya** | Anon / Public API Key Supabase untuk sisi client. |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Ya** | Service Role Key Supabase untuk webhook Telegram dan migrasi background. |
+| `GEMINI_API_KEY` | **Ya** | API Key Google Gemini untuk pemrosesan asisten cerdas. |
+| `TELEGRAM_BOT_TOKEN` | Opsional | Token Bot Telegram dari [@BotFather](https://t.me/botfather). |
+| `TELEGRAM_WEBHOOK_SECRET` | Opsional | Token rahasia acak untuk memvalidasi request resmi dari Telegram. |
 
 ---
 
-## 🤖 Panduan Integrasi Telegram Bot
+## Panduan Integrasi Telegram Multi-User
 
-Agar dapat mencatat keuangan langsung lewat Telegram:
+Dompi mendukung penghubungan akun Telegram secara otomatis untuk banyak pengguna tanpa perlu mengatur konfigurasi manual per user:
 
-1. **Buat Bot Telegram**:
-   * Buka Telegram dan cari [@BotFather](https://t.me/botfather).
-   * Kirim perintah `/newbot`, ikuti petunjuk nama dan username bot.
-   * Simpan token yang diberikan ke variabel `TELEGRAM_BOT_TOKEN` di `.env.local`.
+1. **Buat Bot di BotFather**:
+   * Buka [@BotFather](https://t.me/botfather) di Telegram dan jalankan perintah `/newbot`.
+   * Masukkan nama dan username bot (misalnya `@dompi_keuangan_bot`).
+   * Salin token bot yang diberikan ke variabel `TELEGRAM_BOT_TOKEN`.
 
-2. **Dapatkan Chat ID Akun Anda**:
-   * Buka [@userinfobot](https://t.me/userinfobot) di Telegram dan klik *Start*.
-   * Catat angka `Id` yang tampil, lalu masukkan ke `TELEGRAM_CHAT_ID` di `.env.local`.
-
-3. **Tentukan Secret Token Webhook**:
-   * Buat string acak (misal: `dompi_super_secret_token_123`) dan masukkan ke `TELEGRAM_WEBHOOK_SECRET`.
-
-4. **Deploy Aplikasi ke URL Publik**:
-   * Deploy aplikasi Anda ke penyedia hosting seperti [Vercel](https://vercel.com/) sehingga memiliki domain HTTPS publik (misal: `https://dompi.vercel.app`).
-
-5. **Daftarkan Webhook ke Telegram**:
-   Jalankan perintah HTTP GET berikut melalui browser atau cURL di terminal:
+2. **Daftarkan Webhook Telegram**:
+   Jalankan perintah berikut menggunakan domain publik aplikasi Anda (misal domain Vercel):
    ```bash
-   curl -F "url=https://domain-kamu.vercel.app/api/telegram" \
-        -F "secret_token=NILAI_TELEGRAM_WEBHOOK_SECRET_KAMU" \
-        https://api.telegram.org/bot<NILAI_TELEGRAM_BOT_TOKEN_KAMU>/setWebhook
-   ```
-   Jika berhasil, Telegram akan mengembalikan respon:
-   ```json
-   {"ok": true, "result": true, "description": "Webhook was set"}
+   curl -F "url=https://domain-anda.vercel.app/api/telegram" \
+        -F "secret_token=TELEGRAM_WEBHOOK_SECRET_ANDA" \
+        https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook
    ```
 
-Sekarang Anda bisa langsung mengirim pesan ke bot Anda di Telegram!
+3. **Hubungkan Akun Melalui Web Dompi**:
+   * Masuk ke web Dompi dan buka menu **Pengaturan** (`/pengaturan`).
+   * Klik tombol **Hubungkan ke Telegram**.
+   * Sistem akan menghasilkan tautan unik berformat `/start <token>`.
+   * Klik tautan tersebut untuk membuka bot di Telegram dan klik tombol *Start*. Akun Telegram Anda akan langsung terhubung secara aman dengan akun Dompi Anda.
 
 ---
 
-## 💬 Contoh Perintah Bahasa Alami (Dompi AI)
+## Contoh Percakapan & Perintah Alami
 
-Dompi dirancang fleksibel sehingga Anda tidak perlu menghafal sintaks kaku:
+Dompi memahami bahasa sehari-hari secara fleksibel:
 
-### 1. Pencatatan Pengeluaran & Pemasukan
-* *"Makan siang soto ayam 25rb bayar pake Tunai"*
-* *"Beli bensin pertamax 50.000 pake BCA"*
-* *"Dapat gaji bulanan 7.5jt masuk rekening Mandiri"*
-* *"Top up pulsa 100rb dari GoPay"*
+### 1. Pencatatan Transaksi Tunggal & Jamak
+* *"Makan siang ayam geprek 22rb pake Tunai"*
+* *"Beli pulsa 50rb bca, bensin 30rb tunai, parkir 2rb"* (Mencatat 3 pengeluaran sekaligus)
+* *"Terima transfer honor project 1.5jt masuk rekening Mandiri"*
 
-### 2. Mengubah & Menghapus Transaksi
-* *"Ubah makan siang tadi jadi 30rb"*
-* *"Hapus transaksi beli bensin"*
-* *"Batalkan penghapusan terakhir"* *(Fitur Undo)*
+### 2. Transfer Saldo Antar-Dompet
+* *"Transfer 250rb dari rekening BCA ke ShopeePay"*
+* *"Pindahkan 500rb dari Mandiri ke Tunai"*
 
-### 3. Operasi Saldo & Dompet
-* *"Tambah saldo dompet BCA 500rb"* *(Menambahkan 500rb ke saldo BCA yang sudah ada)*
-* *"Tambah dompet baru Seabank tipe Rekening Bank saldo awal 1jt"*
-* *"Ubah saldo dompet Tunai jadi 250rb"* *(Mengatur ulang saldo menjadi nominal tertentu)*
-* *"Cek dompet"* atau *"Berapa saldo semua rekeningku?"*
+### 3. Koreksi & Saldo Riil
+* *"Ubah saldo Tunai jadi 150rb"*
+* *"Tambah saldo BCA 1.000.000"*
+* *"Hapus pengeluaran parkir tadi"*
+* *"Batalkan transaksi terakhir"*
 
-### 4. Rekap & Ringkasan Keuangan
-* *"Rekap keuangan"*
-* *"Ringkasan bulan ini"*
-* *"Bagaimana kondisi keuanganku sekarang?"*
-
-**Contoh Balasan Rekap dari Dompi:**
-> 📊 **Rekap Keuangan Bulan Ini (Oktober 2026):**
->
-> 💰 **Total Pemasukan:** Rp7.500.000  
-> 💸 **Total Pengeluaran:** Rp2.150.000  
-> 📈 **Arus Kas Bersih:** +Rp5.350.000 (Surplus)  
->
-> 💳 **Total Saldo Saat Ini:** Rp14.850.000  
-> **Rincian Dompet:**  
-> • BCA: Rp10.500.000  
-> • Mandiri: Rp3.000.000  
-> • GoPay: Rp350.000  
-> • Tunai: Rp1.000.000
+### 4. Ringkasan & Analisis Finansial
+* *"Berapa sisa uangku di semua dompet?"*
+* *"Rekap pengeluaran bulan ini"*
+* *"Bantu audit keuangan saya, pos mana yang paling boros?"*
 
 ---
 
-## 📄 Lisensi
+## Lisensi
 
-Proyek ini dibuat untuk keperluan manajemen keuangan pribadi dan bersifat pribadi / open source di bawah lisensi [MIT](LICENSE). Silakan gunakan dan sesuaikan sesuai kebutuhan finansial Anda! 🚀
+Proyek ini dikembangkan di bawah lisensi [MIT](LICENSE). Terbuka untuk digunakan dan disesuaikan demi kebutuhan pencatatan keuangan pribadi yang lebih baik.
