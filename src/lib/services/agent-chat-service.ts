@@ -45,6 +45,19 @@ export type AgentExecutionResult = {
   affectedTransactions?: TransactionRecord[]
 }
 
+function extractNominal(text?: string): number | null {
+  if (!text) return null
+  const s = text.toLowerCase().trim()
+  const jt = s.match(/(\d+(?:[.,]\d+)?)\s*(?:jt|juta)/)
+  if (jt) return Math.round(parseFloat(jt[1].replace(',', '.')) * 1000000)
+  const clean = s.replace(/\./g, '')
+  const rb = clean.match(/(\d+)\s*(?:k|rb|ribu)/)
+  if (rb) return parseInt(rb[1], 10) * 1000
+  const num = clean.match(/\b\d{4,9}\b/)
+  if (num) return parseInt(num[0], 10)
+  return null
+}
+
 async function resolveClientAndUser(options?: AgentExecutionOptions) {
   const client = options?.client ?? (await createServerSupabaseClient())
   let userId = options?.userId
@@ -201,6 +214,10 @@ export async function executeFinancialAgent(
             .map((t) => `• ${t.deskripsi}: ${t.tipe === 'Pengeluaran' ? '-' : '+'}Rp${Number(t.nominal).toLocaleString('id-ID')} (${t.dompet})`)
             .join('\n')
 
+          const baseReply = typeof args.reply === 'string' && args.reply.trim()
+            ? args.reply.trim()
+            : (createRes.data.length > 0 ? `Berhasil mencatat ${createRes.data.length} transaksi:\n${details}` : 'Berhasil mencatat transaksi.')
+
           return {
             result: {
               success: true,
@@ -217,7 +234,7 @@ export async function executeFinancialAgent(
             },
             actionType: 'RECORD_TRANSACTIONS',
             affectedTransactions: createRes.data,
-            fallbackReply: `Berhasil mencatat ${createRes.data.length} transaksi:\n${details}`,
+            fallbackReply: baseReply,
           }
         }
 
@@ -246,6 +263,12 @@ export async function executeFinancialAgent(
                 .join('\n')
             : 'Tidak ada transaksi yang cocok.'
 
+          const baseReply = typeof args.reply === 'string' && args.reply.trim()
+            ? args.reply.trim()
+            : `Ditemukan ${searchRes.data.length} transaksi:`
+
+          const fullReply = searchRes.data.length > 0 ? `${baseReply}\n\n${listText}` : baseReply
+
           return {
             result: {
               success: true,
@@ -262,7 +285,7 @@ export async function executeFinancialAgent(
             },
             actionType: 'QUERY_TRANSACTIONS',
             affectedTransactions: searchRes.data,
-            fallbackReply: `Ditemukan ${searchRes.data.length} transaksi:\n${listText}`,
+            fallbackReply: fullReply,
           }
         }
 
@@ -461,40 +484,109 @@ export async function executeFinancialAgent(
 
         case 'update_or_delete_transaction': {
           const action = typeof args.action === 'string' ? args.action : ''
-          const transactionId = typeof args.transactionId === 'number' ? args.transactionId : args.transactionId ? Number(args.transactionId) : undefined
-          const newData = args.newData as TransactionInput | undefined
+          let transactionId =
+            typeof args.transactionId === 'number' && args.transactionId > 0
+              ? args.transactionId
+              : args.transactionId
+                ? Number(args.transactionId)
+                : undefined
+          const targetQuery = typeof args.targetQuery === 'string' ? args.targetQuery.trim() : undefined
+          const newData = (args.newData || {}) as Partial<TransactionInput>
 
-          if (action === 'UPDATE') {
-            if (!transactionId || !newData) {
-              return {
-                result: { success: false, error: 'Target transaksi atau data koreksi tidak lengkap.' },
-                fallbackReply: 'Target transaksi atau data koreksi tidak lengkap.',
+          // Jika ID tidak ada, cari dari targetQuery di daftar transaksi aktif
+          if (!transactionId && targetQuery) {
+            const nominal = extractNominal(targetQuery)
+            if (nominal) {
+              const matchedByNominal = allActiveTransactions.filter((t) => Number(t.nominal) === nominal)
+              if (matchedByNominal.length > 0) {
+                const cleanWords = targetQuery
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]/g, ' ')
+                  .split(/\s+/)
+                  .filter((w) => w.length > 2 && !String(nominal).includes(w))
+                const best = matchedByNominal.find((t) => cleanWords.some((w) => t.deskripsi.toLowerCase().includes(w)))
+                transactionId = best ? best.id : matchedByNominal[0].id
               }
             }
-            const updRes = await updateTransaction(transactionId, newData, serviceOpts)
-            if (!updRes.success) {
+
+            if (!transactionId) {
+              const cleanQ = targetQuery.toLowerCase().trim()
+              const matchedByDesc = allActiveTransactions.find(
+                (t) => t.deskripsi.toLowerCase().includes(cleanQ) || cleanQ.includes(t.deskripsi.toLowerCase())
+              )
+              if (matchedByDesc) {
+                transactionId = matchedByDesc.id
+              }
+            }
+          }
+
+          if (action === 'UPDATE') {
+            const targetId = transactionId || (allActiveTransactions.length > 0 ? allActiveTransactions[0].id : null)
+            if (!targetId) {
+              return {
+                result: { success: false, error: 'Target transaksi yang ingin diubah tidak ditemukan.' },
+                fallbackReply: 'Maaf, transaksi yang dimaksud tidak ditemukan untuk diubah.',
+              }
+            }
+
+            // Ambil data transaksi lama untuk merge agar partial update (misal rename saja) berhasil
+            let existingTrx = allActiveTransactions.find((t) => t.id === targetId)
+            if (!existingTrx) {
+              const { data: dbTrx } = await client
+                .from('transactions')
+                .select('*')
+                .eq('id', targetId)
+                .eq('user_id', userId)
+                .is('deleted_at', null)
+                .maybeSingle()
+              existingTrx = dbTrx || undefined
+            }
+
+            if (!existingTrx) {
+              return {
+                result: { success: false, error: 'Transaksi tidak ditemukan.' },
+                fallbackReply: 'Maaf, transaksi tersebut tidak ditemukan di catatanmu.',
+              }
+            }
+
+            const mergedInput: TransactionInput = {
+              tanggal: newData.tanggal && /^\d{4}-\d{2}-\d{2}$/.test(newData.tanggal) ? newData.tanggal : existingTrx.tanggal,
+              kategori: newData.kategori && newData.kategori.trim() ? newData.kategori.trim() : existingTrx.kategori,
+              nominal:
+                typeof newData.nominal === 'number' && newData.nominal > 0 ? Math.round(newData.nominal) : existingTrx.nominal,
+              tipe: newData.tipe === 'Pengeluaran' || newData.tipe === 'Pemasukan' ? newData.tipe : existingTrx.tipe,
+              dompet: newData.dompet && newData.dompet.trim() ? newData.dompet.trim() : existingTrx.dompet,
+              deskripsi: newData.deskripsi && newData.deskripsi.trim() ? newData.deskripsi.trim() : existingTrx.deskripsi,
+            }
+
+            const updRes = await updateTransaction(targetId, mergedInput, serviceOpts)
+            if (!updRes.success || !updRes.data) {
               return {
                 result: { success: false, error: updRes.error || 'Gagal memperbarui transaksi.' },
                 fallbackReply: updRes.error || 'Gagal memperbarui transaksi.',
               }
             }
+
+            const defaultReply = `Transaksi "${existingTrx.deskripsi}" berhasil diubah menjadi "${updRes.data.deskripsi}" (Rp${Number(updRes.data.nominal).toLocaleString('id-ID')}).`
+
             return {
               result: { success: true, transaction: updRes.data },
               actionType: 'UPDATE_TRANSACTION',
-              affectedTransactions: updRes.data ? [updRes.data] : undefined,
-              fallbackReply: `Transaksi "${updRes.data?.deskripsi}" berhasil diubah menjadi Rp${Number(updRes.data?.nominal).toLocaleString('id-ID')}.`,
+              affectedTransactions: [updRes.data],
+              fallbackReply: typeof args.reply === 'string' && args.reply.trim() ? args.reply : defaultReply,
             }
           }
 
           if (action === 'DELETE') {
-            if (!transactionId) {
+            const targetId = transactionId || (allActiveTransactions.length > 0 ? allActiveTransactions[0].id : null)
+            if (!targetId) {
               return {
                 result: { success: false, error: 'ID transaksi yang ingin dihapus tidak ditemukan.' },
                 fallbackReply: 'ID transaksi yang ingin dihapus tidak ditemukan.',
               }
             }
-            const delTrxRes = await deleteTransaction(transactionId, serviceOpts)
-            if (!delTrxRes.success) {
+            const delTrxRes = await deleteTransaction(targetId, serviceOpts)
+            if (!delTrxRes.success || !delTrxRes.data) {
               return {
                 result: { success: false, error: delTrxRes.error || 'Gagal menghapus transaksi.' },
                 fallbackReply: delTrxRes.error || 'Gagal menghapus transaksi.',
@@ -503,14 +595,17 @@ export async function executeFinancialAgent(
             return {
               result: { success: true, transaction: delTrxRes.data },
               actionType: 'DELETE_TRANSACTION',
-              affectedTransactions: delTrxRes.data ? [delTrxRes.data] : undefined,
-              fallbackReply: `Transaksi "${delTrxRes.data?.deskripsi}" Rp${Number(delTrxRes.data?.nominal).toLocaleString('id-ID')} sudah dihapus.`,
+              affectedTransactions: [delTrxRes.data],
+              fallbackReply:
+                typeof args.reply === 'string' && args.reply.trim()
+                  ? args.reply
+                  : `Transaksi "${delTrxRes.data.deskripsi}" Rp${Number(delTrxRes.data.nominal).toLocaleString('id-ID')} sudah dihapus.`,
             }
           }
 
           if (action === 'UNDO') {
             const undoRes = await undoDeleteTransaction(transactionId || undefined, serviceOpts)
-            if (!undoRes.success) {
+            if (!undoRes.success || !undoRes.data) {
               return {
                 result: { success: false, error: undoRes.error || 'Tidak ada transaksi yang dapat dipulihkan.' },
                 fallbackReply: undoRes.error || 'Tidak ada transaksi yang dapat dipulihkan.',
@@ -519,8 +614,11 @@ export async function executeFinancialAgent(
             return {
               result: { success: true, transaction: undoRes.data },
               actionType: 'UNDO_TRANSACTION',
-              affectedTransactions: undoRes.data ? [undoRes.data] : undefined,
-              fallbackReply: `Transaksi "${undoRes.data?.deskripsi}" Rp${Number(undoRes.data?.nominal).toLocaleString('id-ID')} berhasil dipulihkan.`,
+              affectedTransactions: [undoRes.data],
+              fallbackReply:
+                typeof args.reply === 'string' && args.reply.trim()
+                  ? args.reply
+                  : `Transaksi "${undoRes.data.deskripsi}" Rp${Number(undoRes.data.nominal).toLocaleString('id-ID')} berhasil dipulihkan.`,
             }
           }
 

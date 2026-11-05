@@ -504,7 +504,7 @@ const AGENT_TOOLS = [
           properties: {
             reply: {
               type: SchemaType.STRING,
-              description: 'Balasan konfirmasi opsional.',
+              description: 'Balasan konfirmasi ramah, jelas, dan natural dalam bahasa Indonesia untuk pengguna.',
             },
             items: {
               type: SchemaType.ARRAY,
@@ -544,7 +544,7 @@ const AGENT_TOOLS = [
               },
             },
           },
-          required: ['items'],
+          required: ['items', 'reply'],
         },
       },
       {
@@ -583,7 +583,12 @@ const AGENT_TOOLS = [
               type: SchemaType.NUMBER,
               description: 'Batas jumlah transaksi (default 10, maksimal 30).',
             },
+            reply: {
+              type: SchemaType.STRING,
+              description: 'Balasan pembuka percakapan yang komunikatif dan ramah untuk pengguna yang menjawab pertanyaan mereka (misal: "Bulan ini kamu isi bensin 2 kali ya!").',
+            },
           },
+          required: ['reply'],
         },
       },
       {
@@ -724,37 +729,41 @@ const AGENT_TOOLS = [
       {
         name: 'update_or_delete_transaction',
         description:
-          'Mengoreksi atau menghapus transaksi yang sudah ada di database (contoh: "eh nominal tadi bukan 50rb tapi 35rb", "hapus transaksi makan siang tadi", "batalkan penghapusan terakhir").',
+          'Mengoreksi, mengubah/rename nama keterangan, mengganti nominal/dompet/kategori, atau menghapus transaksi. Bisa menggunakan transactionId ATAU mencari berdasarkan targetQuery (deskripsi, nominal, atau kata kunci dari percakapan seperti "40rb", "bensin 40rb", "tadi siang").',
         parameters: {
           type: SchemaType.OBJECT,
           properties: {
             action: {
               type: SchemaType.STRING,
               enum: ['UPDATE', 'DELETE', 'UNDO'],
-              description: 'Tindakan: UPDATE (ubah), DELETE (hapus), atau UNDO (pulihkan transaksi terakhir).',
+              description: 'Tindakan: UPDATE (ubah/rename keterangan atau data), DELETE (hapus), atau UNDO (pulihkan transaksi terakhir).',
             },
             transactionId: {
               type: SchemaType.NUMBER,
-              description: 'ID transaksi target (cari dari Konteks Transaksi Pengguna). Untuk UNDO, ID transaksi terakhir yang dihapus.',
+              description: 'ID transaksi target jika diketahui dari daftar riwayat (opsional).',
+            },
+            targetQuery: {
+              type: SchemaType.STRING,
+              description: 'Kata kunci pencarian, deskripsi, atau nominal transaksi yang ingin diubah/dihapus jika ID tidak diketahui pasti (contoh: "40rb", "isi bensin", "bensin 40rb", "kemarin").',
             },
             newData: {
               type: SchemaType.OBJECT,
-              description: 'Data baru untuk UPDATE transaksi.',
+              description: 'Data baru untuk UPDATE transaksi (hanya cantumkan field yang ingin diubah).',
               properties: {
-                tanggal: { type: SchemaType.STRING },
-                kategori: { type: SchemaType.STRING },
-                nominal: { type: SchemaType.NUMBER },
+                deskripsi: { type: SchemaType.STRING, description: 'Nama/keterangan baru jika ingin diubah atau di-rename (contoh: "isi bensin gear").' },
+                nominal: { type: SchemaType.NUMBER, description: 'Nominal baru jika diubah.' },
+                tanggal: { type: SchemaType.STRING, description: 'Tanggal baru format YYYY-MM-DD jika diubah.' },
+                kategori: { type: SchemaType.STRING, description: 'Kategori baru jika diubah.' },
                 tipe: { type: SchemaType.STRING, enum: ['Pengeluaran', 'Pemasukan'] },
-                dompet: { type: SchemaType.STRING },
-                deskripsi: { type: SchemaType.STRING },
+                dompet: { type: SchemaType.STRING, description: 'Nama dompet baru jika dipindahkan.' },
               },
             },
             reply: {
               type: SchemaType.STRING,
-              description: 'Balasan konfirmasi opsional.',
+              description: 'Balasan konfirmasi ramah, santai, dan komunikatif dalam bahasa Indonesia untuk pengguna.',
             },
           },
-          required: ['action'],
+          required: ['action', 'reply'],
         },
       },
     ],
@@ -870,10 +879,9 @@ PANDUAN FORMAT TAMPILAN:
 `;
 
     const candidateModels = [
-      'gemini-2.5-flash',
-      'gemini-2.0-flash',
-      'gemini-1.5-flash',
       'gemini-3.5-flash-lite',
+      'gemini-3.5-flash',
+      'gemini-3.8-flash',
       'gemini-flash-latest',
       'gemini-flash-lite-latest',
     ];
@@ -903,18 +911,11 @@ PANDUAN FORMAT TAMPILAN:
           history: recentHistory,
         });
 
-        let result = await chat.sendMessage(text);
-        let response = await result.response;
-        let calls = response.functionCalls();
+        const result = await chat.sendMessage(text);
+        const response = await result.response;
+        const calls = response.functionCalls();
 
-        let lastActionType: string | undefined;
-        let lastAffectedTrx: unknown[] | undefined;
-        let fallbackReply: string | undefined;
-        let turn = 0;
-        const maxTurns = 3;
-
-        while (calls && calls.length > 0 && turn < maxTurns) {
-          turn++;
+        if (calls && calls.length > 0) {
           const call = calls[0];
           const callArgs = (call.args || {}) as Record<string, unknown>;
           const currentToolCall: AgentToolCall = {
@@ -922,57 +923,32 @@ PANDUAN FORMAT TAMPILAN:
             args: callArgs,
           };
 
-          if (!toolHandler) {
+          if (toolHandler) {
+            const execOutcome = await toolHandler(currentToolCall);
+            const chosenReply =
+              execOutcome.fallbackReply ||
+              (typeof callArgs.reply === 'string' && callArgs.reply.trim()
+                ? callArgs.reply.trim()
+                : 'Aksi berhasil diproses.');
+
             return {
               success: true,
-              toolCall: currentToolCall,
-              reply: typeof callArgs.reply === 'string' ? callArgs.reply : undefined,
+              reply: chosenReply,
+              actionType: execOutcome.actionType || call.name,
+              affectedTransactions: execOutcome.affectedTransactions,
             };
           }
 
-          const execOutcome = await toolHandler(currentToolCall);
-          if (execOutcome.actionType) lastActionType = execOutcome.actionType;
-          if (execOutcome.affectedTransactions) lastAffectedTrx = execOutcome.affectedTransactions;
-          if (execOutcome.fallbackReply) fallbackReply = execOutcome.fallbackReply;
-
-          try {
-            result = await chat.sendMessage([
-              {
-                functionResponse: {
-                  name: call.name,
-                  response: execOutcome.result,
-                },
-              },
-            ]);
-            response = await result.response;
-            calls = response.functionCalls();
-          } catch (reactErr) {
-            console.warn(`FunctionResponse error on model ${modelName}:`, reactErr);
-            return {
-              success: true,
-              reply:
-                fallbackReply ||
-                (typeof callArgs.reply === 'string' && callArgs.reply.trim()
-                  ? callArgs.reply
-                  : 'Aksi berhasil diproses.'),
-              actionType: lastActionType,
-              affectedTransactions: lastAffectedTrx,
-            };
-          }
-        }
-
-        let finalText = '';
-        try {
-          finalText = response.text()?.trim() || '';
-        } catch {
-          finalText = fallbackReply || 'Permintaanmu sudah berhasil diproses.';
+          return {
+            success: true,
+            toolCall: currentToolCall,
+            reply: typeof callArgs.reply === 'string' ? callArgs.reply : undefined,
+          };
         }
 
         return {
           success: true,
-          reply: finalText || fallbackReply || 'Permintaanmu sudah berhasil diproses.',
-          actionType: lastActionType,
-          affectedTransactions: lastAffectedTrx,
+          reply: response.text().trim(),
         };
       } catch (err) {
         lastError = err;
