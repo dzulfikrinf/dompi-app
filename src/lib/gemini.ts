@@ -474,11 +474,22 @@ export type AgentToolCall = {
   args: Record<string, unknown>;
 };
 
+export type ToolExecutionHandler = (
+  toolCall: AgentToolCall
+) => Promise<{
+  result: Record<string, unknown>;
+  actionType?: string;
+  affectedTransactions?: unknown[];
+  fallbackReply?: string;
+}>;
+
 export type AgentChatResult = {
   success: boolean;
   reply?: string;
   toolCall?: AgentToolCall;
   error?: string;
+  actionType?: string;
+  affectedTransactions?: unknown[];
 };
 
 const AGENT_TOOLS = [
@@ -487,13 +498,13 @@ const AGENT_TOOLS = [
       {
         name: 'record_transactions',
         description:
-          'Catat satu atau banyak transaksi keuangan (pengeluaran atau pemasukan) sekaligus ke database. Panggil fungsi ini jika pengguna ingin mencatat transaksi harian.',
+          'Catat satu atau banyak transaksi keuangan (pengeluaran atau pemasukan) sekaligus ke database. Panggil fungsi ini jika pengguna ingin mencatat transaksi harian baik dalam bahasa santai/slang, formal, maupun multi-item dalam satu kalimat.',
         parameters: {
           type: SchemaType.OBJECT,
           properties: {
             reply: {
               type: SchemaType.STRING,
-              description: 'Balasan konfirmasi ramah, jelas, dan natural dalam bahasa Indonesia untuk pengguna.',
+              description: 'Balasan konfirmasi opsional.',
             },
             items: {
               type: SchemaType.ARRAY,
@@ -533,7 +544,46 @@ const AGENT_TOOLS = [
               },
             },
           },
-          required: ['items', 'reply'],
+          required: ['items'],
+        },
+      },
+      {
+        name: 'query_transactions',
+        description:
+          'Cari atau filter riwayat transaksi pengguna berdasarkan kata kunci pada deskripsi/kategori, rentang tanggal, dompet, atau tipe transaksi. Panggil jika pengguna menanyakan transaksi lampau, memeriksa apakah pernah membeli sesuatu, atau melihat daftar pengeluaran tertentu.',
+        parameters: {
+          type: SchemaType.OBJECT,
+          properties: {
+            query: {
+              type: SchemaType.STRING,
+              description: 'Kata kunci pencarian (contoh: bensin, indomaret, kopi, obat, shopee).',
+            },
+            kategori: {
+              type: SchemaType.STRING,
+              description: 'Filter kategori transaksi spesifik (opsional).',
+            },
+            dompet: {
+              type: SchemaType.STRING,
+              description: 'Filter nama dompet/rekening (opsional).',
+            },
+            tipe: {
+              type: SchemaType.STRING,
+              enum: ['Pengeluaran', 'Pemasukan'],
+              description: 'Filter tipe transaksi (opsional).',
+            },
+            startDate: {
+              type: SchemaType.STRING,
+              description: 'Tanggal awal pencarian format YYYY-MM-DD (opsional).',
+            },
+            endDate: {
+              type: SchemaType.STRING,
+              description: 'Tanggal akhir pencarian format YYYY-MM-DD (opsional).',
+            },
+            limit: {
+              type: SchemaType.NUMBER,
+              description: 'Batas jumlah transaksi (default 10, maksimal 30).',
+            },
+          },
         },
       },
       {
@@ -569,10 +619,10 @@ const AGENT_TOOLS = [
             },
             reply: {
               type: SchemaType.STRING,
-              description: 'Balasan konfirmasi ramah dalam bahasa Indonesia untuk pengguna.',
+              description: 'Balasan konfirmasi opsional.',
             },
           },
-          required: ['fromWallet', 'toWallet', 'nominal', 'reply'],
+          required: ['fromWallet', 'toWallet', 'nominal'],
         },
       },
       {
@@ -600,10 +650,10 @@ const AGENT_TOOLS = [
             },
             reply: {
               type: SchemaType.STRING,
-              description: 'Balasan konfirmasi ramah dalam bahasa Indonesia untuk pengguna.',
+              description: 'Balasan konfirmasi opsional.',
             },
           },
-          required: ['walletName', 'nominalTarget', 'reply'],
+          required: ['walletName', 'nominalTarget'],
         },
       },
       {
@@ -641,10 +691,10 @@ const AGENT_TOOLS = [
             },
             reply: {
               type: SchemaType.STRING,
-              description: 'Balasan konfirmasi ramah dalam bahasa Indonesia untuk pengguna.',
+              description: 'Balasan konfirmasi opsional.',
             },
           },
-          required: ['action', 'walletName', 'reply'],
+          required: ['action', 'walletName'],
         },
       },
       {
@@ -662,6 +712,10 @@ const AGENT_TOOLS = [
             focus: {
               type: SchemaType.STRING,
               description: 'Fokus pertanyaan pengguna (misal: pos boros, perbandingan bulan lalu, tren pengeluaran, rasio tabungan).',
+            },
+            reply: {
+              type: SchemaType.STRING,
+              description: 'Balasan konfirmasi opsional.',
             },
           },
           required: ['period'],
@@ -697,10 +751,10 @@ const AGENT_TOOLS = [
             },
             reply: {
               type: SchemaType.STRING,
-              description: 'Balasan konfirmasi ramah dalam bahasa Indonesia untuk pengguna.',
+              description: 'Balasan konfirmasi opsional.',
             },
           },
-          required: ['action', 'reply'],
+          required: ['action'],
         },
       },
     ],
@@ -708,12 +762,13 @@ const AGENT_TOOLS = [
 ];
 
 /**
- * Memproses chat percakapan natural pengguna dengan Gemini Function Calling
+ * Memproses chat percakapan natural pengguna dengan Gemini Function Calling & ReAct Loop
  */
 export async function processAgentChat(
   text: string,
   context: GeminiContext,
-  history: ChatHistoryItem[] = []
+  history: ChatHistoryItem[] = [],
+  toolHandler?: ToolExecutionHandler
 ): Promise<AgentChatResult> {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -733,19 +788,20 @@ export async function processAgentChat(
                 `• ${w.nama} (ID: ${w.id}, Tipe: ${w.tipe}, Saldo Awal: Rp${Number(w.saldo_awal).toLocaleString('id-ID')}, Saldo Terkini: Rp${Number(w.saldo_terkini ?? w.saldo_awal).toLocaleString('id-ID')})`
             )
             .join('\n')
-        : (context.wallets && context.wallets.length > 0 ? context.wallets.join(', ') : 'blu bca, BNI, Cash, BRI');
+        : (context.wallets && context.wallets.length > 0 ? context.wallets.join(', ') : 'Cash');
 
     const recentTrxSummary = (context.activeTransactions || [])
       .slice(0, 15)
       .map(
         (t) =>
-          `ID ${t.id} [${t.tanggal}] ${t.tipe} Rp${Number(t.nominal).toLocaleString('id-ID')} | ${t.kategori} | ${t.dompet || 'Tunai'} | "${t.deskripsi}"`
+          `ID ${t.id} [${t.tanggal}] ${t.tipe} Rp${Number(t.nominal).toLocaleString('id-ID')} | ${t.kategori} | ${t.dompet || 'Cash'} | "${t.deskripsi}"`
       )
       .join('\n');
 
     const systemInstruction = `
-Kamu adalah "Dompi", asisten pencatat dan penasihat keuangan pribadi cerdas berbahasa Indonesia santai, ramah, dan suportif.
-Kamu berbicara santai selayaknya teman ngobrol finansial yang cerdas dan solutif.
+Kamu adalah "Dompi", asisten finansial pribadi cerdas, ramah, dan solutif berbahasa Indonesia.
+Kamu bisa diajak berdiskusi tentang apa saja: ngobrol santai, konsultasi perencanaan keuangan, budgeting (50-30-20, amplop belanja), evaluasi pengeluaran, edukasi investasi pemula, maupun analisis arus kas.
+Gaya bicaramu santai, hangat, dan komunikatif selayaknya sahabat diskusi yang paham keuangan ("aku" / "kamu").
 
 Tanggal hari ini: ${today} (WIB).
 
@@ -769,54 +825,63 @@ ${
     : 'Belum ada ringkasan.'
 }
 
-PANDUAN AKURASI DATA:
-- Data Saldo Terkini pada Daftar Dompet dan Ringkasan Finansial Bulan Ini di atas adalah data RESMI hasil kalkulasi lengkap database.
-- Saat pengguna bertanya saldo, sisa uang, atau total pengeluaran/pemasukan, gunakan angka di atas secara eksak dan jangan mengarang angka lain.
-- Jika pengguna meminta analisis mendalam per kategori atau perbandingan periode, panggil tool 'get_financial_analysis'.
+KEMAMPUAN MEMAHAMI INPUT FLEKSIBEL & SLANG (NATURAL LANGUAGE UNDERSTANDING):
+- Pengguna tidak wajib memakai format tertentu. Input bisa berupa curhat, pesan santai, singkatan slang, atau daftar belanja panjang.
+- Pemahaman Nominal Otomatis:
+  • "25k", "25rb" -> 25000
+  • "1.5jt", "1,5 juta" -> 1500000
+  • "ceban" -> 10000, "gocap" -> 50000, "seceng" -> 1000, "pekgo" -> 150000
+  • "500 perak" -> 500
+- Multi-Transaksi dalam Satu Kalimat:
+  • Jika pengguna menyebut beberapa transaksi sekaligus (misal: "tadi beli bensin 30k qris bca trus mampir beli cilok 10k cash"), catat semua ke dalam array 'items' di tool record_transactions.
+- Estimasi Tanggal Relatif:
+  • "kemarin", "tadi pagi", "lusa", dsb, sesuaikan dengan tanggal referensi hari ini (${today}).
+- Nama Dompet:
+  • Cocokkan dengan Daftar Dompet Pengguna secara fleksibel (misal "bca" -> dompet dengan nama yang mengandung bca).
+  • Jika pengguna tidak menyebut dompet, gunakan dompet default yang paling wajar (utamakan Cash atau rekening pertama).
+- Kategori Otomatis:
+  • Tentukan kategori yang logis secara mandiri jika tidak disebutkan eksplisit (makan/kopi -> Makanan & Minuman, bensin/parkir -> Transportasi, token/wifi -> Tagihan, gaji/bonus -> Gaji, dst).
 
-ATURAN PERILAKU:
+ATURAN PENGGUNAAN TOOL & RESPON NATURAL:
 1. PENCATATAN TRANSAKSI (record_transactions):
-   - Jika pengguna menyebut pengeluaran atau pemasukan (bisa 1 transaksi maupun banyak transaksi dalam satu kalimat/list), PANGGIL fungsi 'record_transactions'.
-   - Ekstrak semua transaksi secara akurat ke dalam array 'items'.
-   - Cocokkan nama dompet dengan Daftar Dompet Pengguna. Jika tidak disebut, gunakan dompet default yang paling wajar (misal "Cash" atau "blu bca").
-   - Berikan 'reply' konfirmasi yang ramah, hangat, dan sebutkan rincian apa saja yang sudah berhasil dicatat secara rapi.
-
-2. TRANSFER SALDO ANTAR DOMPET (transfer_wallet_balance):
-   - Jika pengguna ingin memindahkan uang, top-up e-wallet, atau tarik tunai (misal: "pindahin 100rb dari blu bca ke Cash"), PANGGIL 'transfer_wallet_balance'.
-
-3. KOREKSI / SESUAIKAN SALDO RIIL (adjust_wallet_balance):
-   - Jika pengguna berkata saldonya selisih atau ingin mencocokkan saldo dengan uang fisik/rekening riil (misal: "saldo cash asliku sisa 45.000 tolong sesuaikan"), PANGGIL 'adjust_wallet_balance'.
-
-4. ANALISIS KEUANGAN (get_financial_analysis):
-   - Jika pengguna meminta analisis pengeluaran, evaluasi keuangan, pos boros, atau saran hemat bulanan, PANGGIL 'get_financial_analysis'.
-
+   - Panggil jika ada pemasukan atau pengeluaran baru yang ingin dicatat.
+   - Setelah tool selesai dijalankan, sampaikan konfirmasi pencatatan dengan hangat, jelas, dan sebutkan rinciannya secara ringkas.
+2. PENCARIAN TRANSAKSI (query_transactions):
+   - Panggil jika pengguna menanyakan transaksi spesifik lampau atau memeriksa riwayat pembelian tertentu.
+   - Setelah data ditemukan, rangkumkan hasilnya untuk pengguna secara komunikatif.
+3. TRANSFER DANA (transfer_wallet_balance):
+   - Panggil jika pengguna memindahkan saldo antar dompet/rekening.
+4. KOREKSI SALDO RIIL (adjust_wallet_balance):
+   - Panggil jika pengguna ingin mencocokkan saldo aplikasi dengan saldo fisik/asli nyata.
 5. KELOLA DOMPET (manage_wallet):
-   - Jika pengguna ingin membuat dompet baru, ganti nama dompet, atau hapus dompet, PANGGIL 'manage_wallet'.
+   - Panggil jika ingin membuat, mengubah nama, atau menghapus dompet.
+6. UPDATE / DELETE / UNDO TRANSAKSI (update_or_delete_transaction):
+   - Panggil jika pengguna mengoreksi transaksi lampau atau memulihkan transaksi yang terhapus.
+7. ANALISIS KEUANGAN (get_financial_analysis):
+   - Panggil jika pengguna meminta evaluasi pos boros, arus kas, tren pengeluaran, atau kesehatan keuangan.
+8. PERCAKAPAN UMUM / MULTI-INTENT:
+   - Jika pengguna hanya mengobrol, menyapa, bertanya rumus finansial, atau berdiskusi edukasi, JANGAN panggil tool apapun. Balaslah langsung dengan ramah dan bernas.
+   - Jika pengguna mencatat transaksi SEKALIGUS bertanya hal lain (misal: "catat kopi 20k cash, sekalian mau tanya tips budgeting dong"), panggil tool record_transactions terlebih dahulu. Ketika hasil tool diterima, berikan konfirmasi pencatatan DAN jawab pertanyaan pengguna secara lengkap dalam satu balasan yang padu!
 
-6. KOREKSI / HAPUS TRANSAKSI (update_or_delete_transaction):
-   - Jika pengguna mengoreksi transaksi ("eh tadi nominalnya keliru", "hapus transaksi bensin tadi"), cari ID yang cocok dari transaksi aktif pengguna dan panggil fungsi ini.
-
-7. OBROLAN UMUM / EDUKASI / CURHAT FINANSIAL:
-   - Jika pengguna sekadar menyapa, bertanya tips keuangan, rumus alokasi gaji (misal 50-30-20), atau ngobrol bebas, JANGAN panggil tool apapun.
-   - Balas langsung dengan teks bahasa Indonesia yang santai, jelas, mengalir natural, dan terstruktur rapi.
-
-PANDUAN FORMAT TAMPILAN & READABILITY:
-- Susun teks balasan dengan bersih, rapi, dan nyaman dibaca (hindari paragraf panjang yang menumpuk).
-- Gunakan poin bullet (•) untuk daftar/rincian.
-- Jangan gunakan simbol bintang berlebihan atau membungkus setiap kata dengan tanda bintang ganda (**). Cukup gunakan penekanan secara wajar pada judul bagian atau angka kunci.
-- Hindari penggunaan emotikon berlebihan agar teks tetap elegan dan profesional.
+PANDUAN FORMAT TAMPILAN:
+- Buat teks balasan bersih, rapi, dan mudah dibaca (gunakan baris baru jika berganti topik).
+- Gunakan bullet point (•) untuk daftar/rincian.
+- Berikan penekanan tebal (**kata**) secukupnya pada angka atau kata kunci penting, hindari simbol bintang yang berlebihan.
 `;
 
     const candidateModels = [
+      'gemini-2.5-flash',
+      'gemini-2.0-flash',
+      'gemini-1.5-flash',
       'gemini-3.5-flash-lite',
       'gemini-flash-latest',
       'gemini-flash-lite-latest',
     ];
 
     // Susun riwayat percakapan untuk chat context
-    // Ambil maksimal 8 pesan terakhir agar konteks tetap segar
-    const recentHistory = (history || []).slice(-8).map((h) => ({
-      role: h.role === 'assistant' ? ('model' as const) : ('user' as const),
+    // Ambil maksimal 10 pesan terakhir agar konteks tetap segar
+    const recentHistory = (history || []).slice(-10).map((h) => ({
+      role: h.role === 'assistant' || h.role === 'model' ? ('model' as const) : ('user' as const),
       parts: [{ text: h.text }],
     }));
 
@@ -838,26 +903,76 @@ PANDUAN FORMAT TAMPILAN & READABILITY:
           history: recentHistory,
         });
 
-        const result = await chat.sendMessage(text);
-        const response = await result.response;
-        const calls = response.functionCalls();
+        let result = await chat.sendMessage(text);
+        let response = await result.response;
+        let calls = response.functionCalls();
 
-        if (calls && calls.length > 0) {
+        let lastActionType: string | undefined;
+        let lastAffectedTrx: unknown[] | undefined;
+        let fallbackReply: string | undefined;
+        let turn = 0;
+        const maxTurns = 3;
+
+        while (calls && calls.length > 0 && turn < maxTurns) {
+          turn++;
           const call = calls[0];
           const callArgs = (call.args || {}) as Record<string, unknown>;
-          return {
-            success: true,
-            toolCall: {
-              name: call.name,
-              args: callArgs,
-            },
-            reply: typeof callArgs.reply === 'string' ? callArgs.reply : undefined,
+          const currentToolCall: AgentToolCall = {
+            name: call.name,
+            args: callArgs,
           };
+
+          if (!toolHandler) {
+            return {
+              success: true,
+              toolCall: currentToolCall,
+              reply: typeof callArgs.reply === 'string' ? callArgs.reply : undefined,
+            };
+          }
+
+          const execOutcome = await toolHandler(currentToolCall);
+          if (execOutcome.actionType) lastActionType = execOutcome.actionType;
+          if (execOutcome.affectedTransactions) lastAffectedTrx = execOutcome.affectedTransactions;
+          if (execOutcome.fallbackReply) fallbackReply = execOutcome.fallbackReply;
+
+          try {
+            result = await chat.sendMessage([
+              {
+                functionResponse: {
+                  name: call.name,
+                  response: execOutcome.result,
+                },
+              },
+            ]);
+            response = await result.response;
+            calls = response.functionCalls();
+          } catch (reactErr) {
+            console.warn(`FunctionResponse error on model ${modelName}:`, reactErr);
+            return {
+              success: true,
+              reply:
+                fallbackReply ||
+                (typeof callArgs.reply === 'string' && callArgs.reply.trim()
+                  ? callArgs.reply
+                  : 'Aksi berhasil diproses.'),
+              actionType: lastActionType,
+              affectedTransactions: lastAffectedTrx,
+            };
+          }
+        }
+
+        let finalText = '';
+        try {
+          finalText = response.text()?.trim() || '';
+        } catch {
+          finalText = fallbackReply || 'Permintaanmu sudah berhasil diproses.';
         }
 
         return {
           success: true,
-          reply: response.text().trim(),
+          reply: finalText || fallbackReply || 'Permintaanmu sudah berhasil diproses.',
+          actionType: lastActionType,
+          affectedTransactions: lastAffectedTrx,
         };
       } catch (err) {
         lastError = err;
@@ -878,6 +993,7 @@ PANDUAN FORMAT TAMPILAN & READABILITY:
     };
   }
 }
+
 
 /**
  * Menghasilkan narasi analisis keuangan mendalam dan personal

@@ -373,3 +373,76 @@ export async function createTransactionsBatch(
     return { success: false, error: 'Terjadi kesalahan sistem saat menyimpan transaksi jamak.' }
   }
 }
+
+export type TransactionSearchParams = {
+  query?: string
+  kategori?: string
+  dompet?: string
+  tipe?: 'Pengeluaran' | 'Pemasukan'
+  startDate?: string
+  endDate?: string
+  limit?: number
+}
+
+/**
+ * 7. Cari / filter riwayat transaksi pengguna berdasarkan kriteria fleksibel
+ */
+export async function searchTransactions(
+  params: TransactionSearchParams,
+  options?: ServiceOptions
+): Promise<ServiceResult<TransactionRecord[]>> {
+  try {
+    const { supabase, user } = await resolveClientAndUser(options)
+    if (!user) {
+      return { success: false, error: 'Sesi Anda tidak valid. Silakan login kembali.' }
+    }
+
+    let q = supabase
+      .from('transactions')
+      .select('*')
+      .eq('user_id', user.id)
+      .is('deleted_at', null)
+
+    if (params.query && params.query.trim()) {
+      const sanitized = params.query.trim().replace(/[%_]/g, '')
+      if (sanitized) {
+        q = q.or(`deskripsi.ilike.%${sanitized}%,kategori.ilike.%${sanitized}%`)
+      }
+    }
+
+    if (params.kategori && params.kategori.trim()) {
+      q = q.ilike('kategori', `%${params.kategori.trim()}%`)
+    }
+
+    if (params.dompet && params.dompet.trim()) {
+      q = q.ilike('dompet', `%${params.dompet.trim()}%`)
+    }
+
+    if (params.tipe === 'Pengeluaran' || params.tipe === 'Pemasukan') {
+      q = q.eq('tipe', params.tipe)
+    }
+
+    if (params.startDate && /^\d{4}-\d{2}-\d{2}$/.test(params.startDate)) {
+      q = q.gte('tanggal', params.startDate)
+    }
+
+    if (params.endDate && /^\d{4}-\d{2}-\d{2}$/.test(params.endDate)) {
+      q = q.lte('tanggal', params.endDate)
+    }
+
+    const maxLimit = Math.min(Math.max(params.limit || 15, 1), 50)
+    q = q.order('tanggal', { ascending: false }).order('id', { ascending: false }).limit(maxLimit)
+
+    const { data, error } = await q
+    if (error) {
+      console.error('Error in searchTransactions service:', error)
+      return { success: false, error: 'Gagal mencari data transaksi.' }
+    }
+
+    return { success: true, data: (data as TransactionRecord[]) || [] }
+  } catch (err) {
+    console.error('Unexpected error in searchTransactions:', err)
+    return { success: false, error: 'Terjadi kesalahan sistem saat mencari transaksi.' }
+  }
+}
+

@@ -129,6 +129,13 @@ function getActionBadge(actionType?: string) {
         color: 'bg-[#FFE600] text-[#121212]',
         icon: Sparkles,
       }
+    case 'QUERY_TRANSACTIONS':
+    case 'query_transactions':
+      return {
+        label: 'Pencarian Transaksi',
+        color: 'bg-[#00F0FF] text-[#121212]',
+        icon: List,
+      }
     default:
       return null
   }

@@ -8,8 +8,34 @@ import {
   resolveUserByTelegramChatId,
 } from '@/lib/services/telegram-service'
 import { executeFinancialAgent } from '@/lib/services/agent-chat-service'
+import { ChatHistoryItem } from '@/lib/gemini'
 
 export const dynamic = 'force-dynamic'
+
+// Cache sliding window riwayat percakapan Telegram per chat_id (TTL 30 menit, maks 10 pesan)
+const telegramChatHistory = new Map<string, { history: ChatHistoryItem[]; lastUpdated: number }>()
+
+function getTelegramChatHistory(chatId: number | string): ChatHistoryItem[] {
+  const key = String(chatId)
+  const item = telegramChatHistory.get(key)
+  if (!item) return []
+  if (Date.now() - item.lastUpdated > 30 * 60 * 1000) {
+    telegramChatHistory.delete(key)
+    return []
+  }
+  return item.history
+}
+
+function updateTelegramChatHistory(chatId: number | string, userText: string, botReply: string) {
+  const key = String(chatId)
+  const current = getTelegramChatHistory(key)
+  const updated: ChatHistoryItem[] = [
+    ...current,
+    { role: 'user' as const, text: userText },
+    { role: 'assistant' as const, text: botReply },
+  ].slice(-10)
+  telegramChatHistory.set(key, { history: updated, lastUpdated: Date.now() })
+}
 
 export async function GET() {
   return NextResponse.json({ error: 'Method Not Allowed' }, { status: 405 })
@@ -152,9 +178,11 @@ Silakan buka menu Pengaturan di aplikasi web Dompi, lalu klik "Hubungkan ke Tele
     }
 
     // 6. Eksekusi pesan menggunakan Financial Agent AI untuk user_id tersebut
+    const chatHistory = getTelegramChatHistory(chatId)
     const agentRes = await executeFinancialAgent(text, {
       client: serverClient,
       userId,
+      history: chatHistory,
     })
 
     let botReply =
@@ -188,6 +216,9 @@ Silakan buka menu Pengaturan di aplikasi web Dompi, lalu klik "Hubungkan ke Tele
 
     // 7. Kirim balasan ke Telegram
     await sendTelegramMessage(chatId, botReply)
+
+    // Perbarui riwayat percakapan untuk multi-turn context
+    updateTelegramChatHistory(chatId, text, botReply)
 
     return NextResponse.json({ ok: true })
   } catch (error) {
